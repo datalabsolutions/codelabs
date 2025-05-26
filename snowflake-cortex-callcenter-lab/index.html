@@ -170,7 +170,7 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CALLER;
 
       </google-codelab-step>
     
-      <google-codelab-step label="Summarize the Transcript with 
+      <google-codelab-step label="Identity Complaint using 
 SUMMARIZE" duration="5">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Use the <code>SUMMARIZE()</code> function to generate a concise summary of each call center transcript, with a focus on the main complaint raised by the customer.</p>
@@ -202,6 +202,81 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
 <h2 is-upgraded>Step 3: View Summary Results</h2>
 <pre><code language="language-sql" class="language-sql">SELECT *
 FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SUMMARY;
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Extract Product Sentiment Using 
+SENTIMENT" duration="3">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Use Snowflake Cortex&#39;s <code>SENTIMENT()</code> function to evaluate the general emotional tone of each call center transcript.</p>
+<h2 is-upgraded>Set Snowflake Context</h2>
+<pre><code language="language-sql" class="language-sql">USE DATABASE LLM_CORTEX_DEMO_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+</code></pre>
+<h2 is-upgraded>Step 1: Create Table for Overall Sentiment</h2>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SENTIMENT (
+    FILE_NAME STRING,
+    OVERALL_SENTIMENT STRING,
+    TRANSCRIPT VARIANT
+);
+</code></pre>
+<h2 is-upgraded>Step 2: Run Sentiment Analysis</h2>
+<pre><code language="language-sql" class="language-sql">INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SENTIMENT
+SELECT
+    FILE_NAME,
+    SENTIMENT(PARSED_CONTENT:text) AS OVERALL_SENTIMENT,
+    PARSED_CONTENT AS TRANSCRIPT
+FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
+</code></pre>
+<h2 is-upgraded>Step 3: View Sentiment Results</h2>
+<pre><code language="language-sql" class="language-sql">SELECT *
+FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SENTIMENT;
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Extract Product Sentiment Using 
+ENTITY_SENTIMENT" duration="3">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Use Snowflake Cortex&#39;s <code>ENTITY_SENTIMENT()</code> function to identify and analyze sentiment directed at specific products mentioned in each transcript.</p>
+<h2 is-upgraded>Set Snowflake Context</h2>
+<pre><code language="language-sql" class="language-sql">USE DATABASE LLM_CORTEX_DEMO_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+</code></pre>
+<h2 is-upgraded>Step 1: Create Table for Product Entity Sentiment</h2>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT (
+    FILE_NAME STRING,
+    PRODUCT_ENTITY_SENTIMENT VARIANT,
+    TRANSCRIPT VARIANT
+);
+</code></pre>
+<h2 is-upgraded>Step 2: Extract Entity Sentiment</h2>
+<p>This step applies the <code>ENTITY_SENTIMENT()</code> function to analyze how the transcript discusses key business concepts — specifically <code>Cost</code>, <code>Quality</code>, and <code>Delivery Time</code>. The result is a structured array with entity names, associated sentiment (e.g., positive, neutral, negative), and confidence scores.</p>
+<pre><code language="language-sql" class="language-sql">INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT
+SELECT
+    FILE_NAME,
+    ENTITY_SENTIMENT(
+        PARSED_CONTENT:text,
+        ARRAY_CONSTRUCT(&#39;Cost&#39;, &#39;Quality&#39;, &#39;Delivery Time&#39;)
+    ) AS PRODUCT_ENTITY_SENTIMENT,
+    PARSED_CONTENT AS TRANSCRIPT
+FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
+</code></pre>
+<h2 is-upgraded>Step 3: View Entity Sentiment Results</h2>
+<p>The <code>PRODUCT_ENTITY_SENTIMENT</code> column contains an array of JSON objects. In this query, we use the <code>FLATTEN</code> table function to expand that array into individual rows, so each product entity is listed with its corresponding sentiment and confidence score.</p>
+<p>To expand the <code>PRODUCT_ENTITY_SENTIMENT</code> array into rows for each entity:</p>
+<pre><code language="language-sql" class="language-sql">SELECT
+    FILE_NAME,
+    flattened.value:entity::STRING AS ENTITY,
+    flattened.value:sentiment::STRING AS SENTIMENT,
+    flattened.value:confidence::FLOAT AS CONFIDENCE
+FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT,
+     LATERAL FLATTEN(INPUT =&gt; PRODUCT_ENTITY_SENTIMENT) AS flattened;
 </code></pre>
 
 

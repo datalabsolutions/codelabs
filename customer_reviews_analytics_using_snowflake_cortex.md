@@ -213,7 +213,7 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CALLER;
 ```
 
 ---
-## Summarize the Transcript with `SUMMARIZE`
+## Identity Complaint using `SUMMARIZE`
 
 Duration: 0:05:00
 
@@ -261,6 +261,112 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
 ```sql
 SELECT *
 FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SUMMARY;
+```
+
+---
+
+## Extract Product Sentiment Using `SENTIMENT`
+
+Duration: 0:03:00
+
+### Learning Outcome
+
+Use Snowflake Cortex’s `SENTIMENT()` function to evaluate the general emotional tone of each call center transcript.
+
+### Set Snowflake Context
+
+```sql
+USE DATABASE LLM_CORTEX_DEMO_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+```
+
+### Step 1: Create Table for Overall Sentiment
+
+```sql
+CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SENTIMENT (
+    FILE_NAME STRING,
+    OVERALL_SENTIMENT STRING,
+    TRANSCRIPT VARIANT
+);
+```
+
+### Step 2: Run Sentiment Analysis
+
+```sql
+INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SENTIMENT
+SELECT
+    FILE_NAME,
+    SENTIMENT(PARSED_CONTENT:text) AS OVERALL_SENTIMENT,
+    PARSED_CONTENT AS TRANSCRIPT
+FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
+```
+
+### Step 3: View Sentiment Results
+
+```sql
+SELECT *
+FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SENTIMENT;
+```
+
+---
+
+##  Extract Product Sentiment Using `ENTITY_SENTIMENT`
+
+Duration: 0:03:00
+
+### Learning Outcome
+
+Use Snowflake Cortex’s `ENTITY_SENTIMENT()` function to identify and analyze sentiment directed at specific products mentioned in each transcript.
+
+### Set Snowflake Context
+
+```sql
+USE DATABASE LLM_CORTEX_DEMO_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+```
+
+### Step 1: Create Table for Product Entity Sentiment
+
+```sql
+CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT (
+    FILE_NAME STRING,
+    PRODUCT_ENTITY_SENTIMENT VARIANT,
+    TRANSCRIPT VARIANT
+);
+```
+
+### Step 2: Extract Entity Sentiment
+
+This step applies the `ENTITY_SENTIMENT()` function to analyze how the transcript discusses key business concepts — specifically `Cost`, `Quality`, and `Delivery Time`. The result is a structured array with entity names, associated sentiment (e.g., positive, neutral, negative), and confidence scores.
+
+```sql
+INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT
+SELECT
+    FILE_NAME,
+    ENTITY_SENTIMENT(
+        PARSED_CONTENT:text,
+        ARRAY_CONSTRUCT('Cost', 'Quality', 'Delivery Time')
+    ) AS PRODUCT_ENTITY_SENTIMENT,
+    PARSED_CONTENT AS TRANSCRIPT
+FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
+```
+
+### Step 3: View Entity Sentiment Results
+
+The `PRODUCT_ENTITY_SENTIMENT` column contains an array of JSON objects. In this query, we use the `FLATTEN` table function to expand that array into individual rows, so each product entity is listed with its corresponding sentiment and confidence score.
+
+To expand the `PRODUCT_ENTITY_SENTIMENT` array into rows for each entity:
+
+```sql
+SELECT
+    FILE_NAME,
+    flattened.value:entity::STRING AS ENTITY,
+    flattened.value:sentiment::STRING AS SENTIMENT,
+    flattened.value:confidence::FLOAT AS CONFIDENCE
+FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT,
+     LATERAL FLATTEN(INPUT => PRODUCT_ENTITY_SENTIMENT) AS flattened;
 ```
 
 ---
