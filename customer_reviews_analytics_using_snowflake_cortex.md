@@ -1,219 +1,488 @@
-author: Marc DiPasquale
-summary: Create a CodeLab Using Markdown
-id: codelab-4-codelab-markdown
-categories: codelab,markdown
-environments: Web
-status: Published
-feedback link: https://github.com/Mrc0113/codelab-4-codelab
+id: snowflake-cortex-callcenter-lab
+name: Snowflake Cortex AI for Call Center Transcript Analysis
+summary: A self-paced hands-on lab that teaches how to use Snowflake Cortex AI to ingest, extract, structure, translate, analyze, summarize, and answer questions from PDF call center transcripts.
+author: datalab-solutions
+categories: \["AI", "Cortex", "Call Center", "Text Analysis"]
+duration: 90
+status: published
+license: Apache-2.0
+tags: \["snowflake", "cortex-ai", "prompt-engineering", "pdf-extraction", "sentiment-analysis"]
+source: internal
+analytics: true
+level: intermediate
+products: \["Snowflake Cortex"]
 
-# CodeLab to Create a CodeLab
+# Snowflake Cortex AI for Call Center Transcript Analysis
 
-## CodeLab Overview
-Duration: 0:02:00
+## Overview
 
-Are you trying to create easy to use, visually appealing content for the tech community? This CodeLab will show you how to quickly create your own Google CodeLab just like the one you're using right now. 
-When creating a Codelab you have two authoring options: 
-1. Using a Google Doc
-1. Using a markdown file
+This self-paced lab walks you through leveraging Snowflake Cortex AI functions to ingest, process, analyze, and extract insights from unstructured call center transcript data in PDF format. By the end of this lab, you'll be equipped to transform raw transcript text into structured, multilingual, and insightful outputs—all within Snowflake.
 
-In this codelab we are going to use the second option and author our codelab using a markdown file. This gives us the flexibility of using our markdown file for other things and also storing it in our github repo with any code that might be used for a tutorial. 
+### Learning Outcomes
 
-Here is an example image of another CodeLab that I created:
-![image_caption](img/codelabexample.png)
+By completing this lab, you will be able to:
 
+* Upload and manage unstructured documents in Snowflake.
+* Extract, transform, and analyze call transcript data using Cortex AI functions.
+* Generate structured summaries and answer questions from raw transcripts.
 
-**Resources:** 
-* This codelab's original home is located here: [Link to Codelab](https://www.marcd.dev/codelab-4-codelab)
-* The markdown for the original codelab is located here: [codelab.md](https://github.com/Mrc0113/codelab-4-codelab/blob/master/codelab.md)
-* [Google CodeLabs Tools Github](https://github.com/googlecodelabs/tools) - The repo that contains the claat tool we'll be using today
-* [Google Group for CodeLab Authors](https://groups.google.com/forum/#!forum/codelab-authors) - great forum for asking questions about codelabs and discussing future functionality
-* [A blog that I used when getting started with Google Codelabs](https://medium.com/@mariopce/tutorial-how-to-make-tutorials-using-google-code-labs-gangdam-style-d62b35476816)
+---
 
-## Environment Setup
-Duration: 0:04:00
+## 1. Set Up Your Snowflake Environment
 
-In order to create a CodeLab you need *Go* and *claat* (the codelabs command line tool) installed.
-
-The instructions below are what worked for me on Mac, but you can also find instructions [here](https://github.com/googlecodelabs/tools/tree/master/claat) 
-
-#### Install Go 
-
-Install [Go](https://golang.org/dl/) if you don't have it.
-You can use Homebrew if you have it on mac 
-``` bash
-$ brew install go
-```
-
-#### Setup Go Environment Variables
-Below is what I set on mac, but instructions are [here](https://golang.org/doc/install) for other OS options
-
-``` bash
-$ export GOPATH=$HOME/Go
-$ export GOROOT=/usr/local/opt/go/libexec
-$ export PATH=$PATH:$GOPATH/bin
-$ export PATH=$PATH:$GOROOT/bin
-```
-
-#### Install claat
-Install claat
-``` bash
-$ go get -u -v -x github.com/googlecodelabs/tools/claat
-```
-
-You should now have the *claat* command available to you. 
-``` bash
-$ claat
-```
-
-## Create your initial CodeLab
 Duration: 0:05:00
 
-Now that we have the environment setup let's go ahead and create a markdown file where we'll create the actual codelab. 
+### Learning Outcome
 
-Negative
-: If you're using Windows make sure to set your text editor to use UNIX line endings! 
+Set up the necessary Snowflake database, schema, and warehouse context to organize the lab work.
 
-####
-``` bash
-$ vim codelab.md
+### Step-by-Step Guide
+
+1. Log in to Snowsight or connect using SnowSQL.
+2. Run the SQL below to create a clean environment.
+
+```sql
+USE WAREHOUSE <YOUR_WAREHOUSE_NAME>;
+CREATE DATABASE IF NOT EXISTS LLM_CORTEX_DEMO_DB;
+CREATE SCHEMA IF NOT EXISTS LLM_CORTEX_DEMO_DB.CALL_CENTER_ANALYTICS;
+USE SCHEMA LLM_CORTEX_DEMO_DB.CALL_CENTER_ANALYTICS;
 ```
 
-#### Fill-in the header metadata
-Copy and paste the headers below into your markdown file and change the values appropriately. 
-Guidelines are available below the sample headers. 
+---
 
-``` bash
-author: Author Name
-summary: Summary of your codelab that is human readable
-id: unique-codelab-identifier
-categories: codelab,markdown
-environments: Web
-status: Published
-feedback link: A link where users can go to provide feedback (Maybe the git repo)
-analytics account: Google Analytics ID
-```
+## 2. Create a Snowflake Internal Stage and Upload PDFs
 
-Metadata consists of key-value pairs of the form "key: value". Keys cannot
-contain colons, and separate metadata fields must be separated by blank lines.
-At present, values must all be on one line. All metadata must come before the
-title. Any arbitrary keys and values may be used; however, only the following
-will be understood by the renderer:
-
-* Summary: A human-readable summary of the codelab. Defaults to blank.
-* Id: An identifier composed of lowercase letters ideally describing the
-  content of the codelab. This field should be unique among
-  codelabs.
-* Categories: A comma-separated list of the topics the codelab covers.
-* Environments: A list of environments the codelab should be discoverable in.
-  Codelabs marked "Web" will be visible at the codelabs index. Codelabs marked
-  "Kiosk" will only be available at codelabs kiosks, which have special
-  equipment attached.
-* Status: The publication status of the codelab. Valid values are:
-  - Draft: Codelab is not finished.
-  - Published: Codelab is finished and visible.
-  - Deprecated: Codelab is considered stale and should not be widely advertised.
-  - Hidden: Codelab is not shown in index.
-* Feedback Link: A link to send users to if they wish to leave feedback on the
-  codelab.
-* Analytics Account: A Google Analytics ID to include with all codelab pages.
-
-#### Add the Title
-Next add your title using a single '#' character
-```
-# Title of codelab
-```
-
-#### Add Sections and Durations
-Then for each section use Header 2 or '##' and specify an optional duration beneath for time remaining calculations
-Optional section times will be used to automatically total and remaining tutorial times
-In markdown I've found that the time is formatted hh:mm:ss
-
-Example
-``` bash
-## Section 1
 Duration: 0:10:00
 
-## Section 2
+### Learning Outcome
+
+Create an internal stage to store PDF transcripts and upload documents using either Snowsight or SnowSQL.
+
+### Step-by-Step Guide
+
+1. Create the internal stage:
+
+```sql
+CREATE STAGE IF NOT EXISTS CALL_CENTER_TRANSCRIPTS_STAGE
+  DIRECTORY = (ENABLE = TRUE)
+  COMMENT = 'Internal stage for call center transcript PDFs';
+```
+
+2. Upload PDF files:
+
+#### Option A: Snowsight
+
+* Navigate to `LLM_CORTEX_DEMO_DB > CALL_CENTER_ANALYTICS > Stages`.
+* Click on `CALL_CENTER_TRANSCRIPTS_STAGE`.
+* Use **+ Add Files** to upload your `.pdf` transcripts.
+
+#### Option B: SnowSQL
+
+```bash
+PUT file:///path/to/your/files/transcript_1.pdf @CALL_CENTER_TRANSCRIPTS_STAGE AUTO_COMPRESS=FALSE;
+```
+
+3. Confirm successful upload:
+
+```sql
+LIST @CALL_CENTER_TRANSCRIPTS_STAGE;
+```
+
+---
+
+## 3. Extract Text from PDFs
+
+Duration: 0:10:00
+
+### Learning Outcome
+
+Use the `PARSE_DOCUMENT` function to extract text from PDF files and store the content.
+
+### Step-by-Step Guide
+
+1. Create a table to hold the raw parsed content:
+
+```sql
+CREATE OR REPLACE TABLE RAW_TRANSCRIPTS (
+    FILE_NAME VARCHAR,
+    RAW_TEXT VARIANT
+);
+```
+
+2. Run `PARSE_DOCUMENT` on all files:
+
+```sql
+INSERT INTO RAW_TRANSCRIPTS
+SELECT
+    RELATIVE_PATH,
+    SNOWFLAKE.CORTEX.PARSE_DOCUMENT(@CALL_CENTER_TRANSCRIPTS_STAGE, RELATIVE_PATH, OBJECT_CONSTRUCT('mode', 'OCR'))
+FROM DIRECTORY(@CALL_CENTER_TRANSCRIPTS_STAGE);
+```
+
+3. View the extracted text:
+
+```sql
+SELECT FILE_NAME, RAW_TEXT:content::STRING AS EXTRACTED_TEXT FROM RAW_TRANSCRIPTS;
+```
+
+---
+
+## 4. Best Practices for Prompt Engineering
+
+Duration: 0:10:00
+
+### Learning Outcome
+
+Understand the components of effective prompts for structured information extraction using Cortex AI, and learn how to write prompts that yield reliable, structured outputs.
+
+### What Makes a Good Prompt?
+
+Effective prompts typically include the following elements:
+
+* **Instruction**: Clearly define what the model should do (e.g., "Extract the customer name from the transcript").
+* **Role / Persona**: Set the perspective or assumed knowledge level of the model (e.g., "You are a data analyst reviewing customer service transcripts").
+* **Context**: Provide background or sample content that frames the data (e.g., a portion of a transcript).
+* **Constraints or Guidelines**: Specify required output format and error handling (e.g., "If information is missing, use 'N/A'").
+* **Examples (Few-Shot)**: Include examples when possible to demonstrate the desired behavior.
+* **Tone & Style**: Optional for tasks needing a specific writing style or professional tone.
+* **Format Specification**: Define output style, such as JSON, CSV, or plain text.
+* **Subject Matter**: Anchor prompts in domain-specific language or terminology.
+* **Target Audience**: Ensure the output is tailored to the user who will consume the results.
+* **Data**: Supply clear, well-structured input data to avoid confusion.
+
+### Example Prompt (Simple)
+
+```
+Extract the customer name, issue description, resolution status, and agent name from the transcript below. If a field is missing, return "N/A". Format your response as JSON.
+
+Transcript:
+Hello, this is Mark. I'm calling about a billing error on my last invoice... [continues]
+
+JSON Output:
+```
+
+### Example Prompt (Expanded with Role/Persona)
+
+```
+You are a professional data annotator tasked with extracting structured fields from customer service transcripts. Your goal is to return:
+- Customer Name
+- Issue Description
+- Resolution Status
+- Agent Name
+
+If any field is unavailable, return "N/A". Use the following transcript:
+
+Transcript:
+Hi, this is Jane. I'm following up on a delay in service delivery from last week... [continues]
+
+Return the result as a valid JSON object.
+```
+
+### Example with User/Assistant/System Roles
+
+```json
+{
+  "system": "You are an AI assistant skilled at information extraction from customer service transcripts.",
+  "user": "Extract the fields: Customer Name, Issue Description, Resolution Status, and Agent Name. Return JSON. If not found, use 'N/A'.",
+  "assistant": {
+    "Customer Name": "Jane",
+    "Issue Description": "Delay in service delivery",
+    "Resolution Status": "Resolved",
+    "Agent Name": "Tom"
+  }
+}
+```
+
+### Exploring Parameters: `top_p` and `top_k`
+
+* **`top_p` (nucleus sampling)** controls diversity. Lower values (e.g. `0.1`) make the output more deterministic. Higher values (e.g. `0.9`) allow for more varied responses.
+* **`top_k`** limits how many top tokens to sample from. A smaller `top_k` (e.g. 5) narrows the response range.
+
+#### Example: Same prompt with different `top_p` values
+
+```sql
+-- More deterministic output
+SELECT SNOWFLAKE.CORTEX.COMPLETE('mistral-7b', '<prompt>', OBJECT_CONSTRUCT('top_p', 0.1));
+
+-- More creative output
+SELECT SNOWFLAKE.CORTEX.COMPLETE('mistral-7b', '<prompt>', OBJECT_CONSTRUCT('top_p', 0.9));
+```
+
+Try experimenting with both `top_p` and `top_k` to fine-tune outputs based on your use case.
+
+---
+
+## 5. Convert to JSON Using COMPLETE
+
+Duration: 0:15:00
+
+### Learning Outcome
+
+Use the `COMPLETE` function to extract structured fields such as customer name, issue description, and agent details from the raw transcript text.
+
+### Step-by-Step Guide
+
+1. Create a table to store structured data:
+
+```sql
+CREATE OR REPLACE TABLE STRUCTURED_TRANSCRIPTS (
+    FILE_NAME VARCHAR,
+    TRANSCRIPT_ID VARCHAR,
+    CUSTOMER_NAME VARCHAR,
+    ISSUE_DESCRIPTION VARCHAR,
+    RESOLUTION_STATUS VARCHAR,
+    AGENT_NAME VARCHAR,
+    STRUCTURED_JSON VARIANT
+);
+```
+
+2. Use `COMPLETE` to parse fields from the extracted content:
+
+```sql
+INSERT INTO STRUCTURED_TRANSCRIPTS
+SELECT
+    rt.FILE_NAME,
+    MD5(rt.FILE_NAME || rt.RAW_TEXT:content::STRING),
+    PARSE_JSON(SNOWFLAKE.CORTEX.COMPLETE(...)):"Customer Name"::STRING,
+    PARSE_JSON(SNOWFLAKE.CORTEX.COMPLETE(...)):"Issue Description"::STRING,
+    PARSE_JSON(SNOWFLAKE.CORTEX.COMPLETE(...)):"Resolution Status"::STRING,
+    PARSE_JSON(SNOWFLAKE.CORTEX.COMPLETE(...)):"Agent Name"::STRING,
+    PARSE_JSON(SNOWFLAKE.CORTEX.COMPLETE(...))
+FROM RAW_TRANSCRIPTS rt;
+```
+
+3. Verify results:
+
+```sql
+SELECT * FROM STRUCTURED_TRANSCRIPTS;
+```
+
+---
+
+## 6. Translate Using TRANSLATE
+
 Duration: 0:05:00
+
+### Learning Outcome
+
+Translate extracted transcript content into another language using the `TRANSLATE` function.
+
+### Step-by-Step Guide
+
+1. Add a new column to store translated output:
+
+```sql
+ALTER TABLE STRUCTURED_TRANSCRIPTS ADD COLUMN TRANSLATED_TEXT VARCHAR;
 ```
 
-#### Add Section Content
-Now that we have 2 sections to our titled codelab let's go ahead and add some content to each section. 
-Make up your own or copy and paste the example below: 
+2. Translate the raw text from English to Spanish:
 
-Copy into section 1 (Below Duration and above Section 2):
-```
-### Info Boxes
-Plain Text followed by green and yellow info boxes 
-
-Negative
-: This will appear in a yellow info box.
-
-Positive
-: This will appear in a green info box.
-
-You created info boxes!
-
-### Bullets
-Plain Text followed by bullets
-* Hello
-* CodeLab
-* World
-
-You created bullets!
-
-### Numbered List
-1. List
-1. Using
-1. Numbers
-
-You created a numbered list!
-
+```sql
+UPDATE STRUCTURED_TRANSCRIPTS st
+SET TRANSLATED_TEXT = SNOWFLAKE.CORTEX.TRANSLATE(
+    (SELECT rt.RAW_TEXT:content::STRING FROM RAW_TRANSCRIPTS rt WHERE rt.FILE_NAME = st.FILE_NAME),
+    'en', 'es'
+);
 ```
 
-Copy into section 2 (Below Duration): 
-```
-### Add a Link
-Adding a link!
-[Example of a Link](https://www.google.com)
+3. View the translated text:
 
-### Add an Image
-Adding an image!
-![image_caption](https://googlecloud.tips/img/031/codelabs.png)
-
-### Embed an iframe
-![https://codepen.io/tzoght/embed/yRNZaP](https://en.wikipedia.org/wiki/File:Example.jpg "Try Me Publisher")
+```sql
+SELECT FILE_NAME, CUSTOMER_NAME, ISSUE_DESCRIPTION, TRANSLATED_TEXT FROM STRUCTURED_TRANSCRIPTS;
 ```
 
-More Markdown Parser examples can be found [here](https://github.com/googlecodelabs/tools/tree/master/claat/parser/md).
+---
 
-## Export and Serve
-Duration: 0:02:00
+## 7. Sentiment Analysis
 
-Now that you have an initial codelab defined in your markdown file let's go ahead and generate the static site content. 
-We can export and serve the content locally using the `claat` command that we installed earlier. 
+Duration: 0:10:00
 
-``` bash
-$ claat export codelab.md
-$ claat serve
+### Learning Outcome
+
+Analyze the emotional tone of the transcripts overall and for specific entities like 'agent' or 'product'.
+
+### Step-by-Step Guide
+
+1. Add columns for storing sentiment outputs:
+
+```sql
+ALTER TABLE STRUCTURED_TRANSCRIPTS
+ADD COLUMN OVERALL_SENTIMENT_SCORE FLOAT,
+ADD COLUMN ENTITY_SENTIMENT_JSON VARIANT;
 ```
 
-* Your browser should have opened (if it doesn't then try going to localhost:9090 in your browser). 
-* Choose the directory that matches your "id" that you put in the headers. 
-* Viola! You should have your first codelab!
+2. Update overall sentiment:
 
-## Host Your CodeLab
-Duration: 0:01:00
+```sql
+UPDATE STRUCTURED_TRANSCRIPTS st
+SET OVERALL_SENTIMENT_SCORE = SNOWFLAKE.CORTEX.SENTIMENT(...);
+```
 
-When you ran the `claat export` command you created the static web content needed to host your codelab. 
-It placed static web content in a directory specified by your unique "id" and you can view it locally by opening the index.html page. 
+3. Analyze sentiment for specific entities:
 
-Negative
-: Note that when you view it locally by opening index.html some of the graphics may not show up (such as access_time, Next, Back), but they work once online. 
+```sql
+UPDATE STRUCTURED_TRANSCRIPTS st
+SET ENTITY_SENTIMENT_JSON = SNOWFLAKE.CORTEX.ENTITY_SENTIMENT(...);
+```
 
+4. View results:
 
-Now that you have the static content you can host it however you want.
-One option is pushing it to github and serving it up from Netlify.  
+```sql
+SELECT FILE_NAME, CUSTOMER_NAME, OVERALL_SENTIMENT_SCORE,
+       ENTITY_SENTIMENT_JSON:categories[0]:sentiment::STRING AS OVERALL_SENTIMENT_CATEGORY,
+       ENTITY_SENTIMENT_JSON FROM STRUCTURED_TRANSCRIPTS;
+```
 
-If you'd like to create your own landing page for codelabs, [like this one](https://codelabs.developers.google.com), there is a tool to do that as well! 
-Check it out here: [CodeLabs Site](https://github.com/googlecodelabs/tools/blob/master/site/README.md)
+5. Drill into entity-level sentiment:
+
+```sql
+SELECT FILE_NAME, s.value:"name"::STRING, s.value:"sentiment"::STRING, s.value:"score"::FLOAT
+FROM STRUCTURED_TRANSCRIPTS, LATERAL FLATTEN(INPUT => ENTITY_SENTIMENT_JSON:categories) s
+WHERE s.value:"name"::STRING != 'overall';
+```
+
+---
+
+## 8. Summarize Using SUMMARIZE
+
+Duration: 0:05:00
+
+### Learning Outcome
+
+Summarize lengthy transcripts to quickly understand key points.
+
+### Step-by-Step Guide
+
+1. Add a summary column:
+
+```sql
+ALTER TABLE STRUCTURED_TRANSCRIPTS ADD COLUMN SUMMARY VARCHAR;
+```
+
+2. Generate summaries:
+
+```sql
+UPDATE STRUCTURED_TRANSCRIPTS st
+SET SUMMARY = SNOWFLAKE.CORTEX.SUMMARIZE(
+    (SELECT rt.RAW_TEXT:content::STRING FROM RAW_TRANSCRIPTS rt WHERE rt.FILE_NAME = st.FILE_NAME)
+);
+```
+
+3. Review the output:
+
+```sql
+SELECT FILE_NAME, CUSTOMER_NAME, SUMMARY FROM STRUCTURED_TRANSCRIPTS;
+```
+
+---
+
+## 9. Extract Answers Using EXTRACT\_ANSWER
+
+Duration: 0:05:00
+
+### Learning Outcome
+
+Ask specific questions about transcript content and retrieve direct answers.
+
+### Step-by-Step Guide
+
+1. Create a table for Q\&A storage:
+
+```sql
+CREATE OR REPLACE TABLE TRANSCRIPT_ANSWERS (
+    FILE_NAME VARCHAR,
+    QUESTION VARCHAR,
+    ANSWER VARCHAR
+);
+```
+
+2. Insert answers for key questions:
+
+```sql
+INSERT INTO TRANSCRIPT_ANSWERS
+SELECT st.FILE_NAME, 'What was the main issue reported by the customer?',
+       SNOWFLAKE.CORTEX.EXTRACT_ANSWER(...)
+FROM STRUCTURED_TRANSCRIPTS st;
+
+INSERT INTO TRANSCRIPT_ANSWERS
+SELECT st.FILE_NAME, 'What was the resolution provided by the agent?',
+       SNOWFLAKE.CORTEX.EXTRACT_ANSWER(...)
+FROM STRUCTURED_TRANSCRIPTS st;
+```
+
+3. View results:
+
+```sql
+SELECT * FROM TRANSCRIPT_ANSWERS ORDER BY FILE_NAME, QUESTION;
+```
+
+---
+
+## 10. Clean Up (Optional)
+
+Duration: 0:03:00
+
+### Learning Outcome
+
+Safely remove all lab-related objects to keep your Snowflake account clean.
+
+```sql
+DROP DATABASE IF EXISTS LLM_CORTEX_DEMO_DB;
+-- Or drop individually:
+-- DROP TABLE IF EXISTS STRUCTURED_TRANSCRIPTS;
+-- DROP TABLE IF EXISTS RAW_TRANSCRIPTS;
+-- DROP TABLE IF EXISTS TRANSCRIPT_ANSWERS;
+-- DROP STAGE IF EXISTS CALL_CENTER_TRANSCRIPTS_STAGE;
+-- DROP SCHEMA IF EXISTS LLM_CORTEX_DEMO_DB.CALL_CENTER_ANALYTICS;
+```
+
+---
+
+## 11. Explore the Cortex Analyst Playground
+
+Duration: 0:07:00
+
+### Learning Outcome
+
+Gain hands-on experience with prompts and models in a no-code environment using Snowflake's Cortex Analyst Playground.
+
+Before you use Cortex AI functions like `COMPLETE`, it's helpful to experiment with your prompts in an interactive environment. Snowflake provides a [Cortex Analyst Playground](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-playground) where you can test and refine prompts before integrating them into SQL.
+
+### Step-by-Step Guide
+
+1. **Navigate to the Playground**: Visit the [Cortex Analyst Playground](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-playground).
+
+2. **Choose a Model**: Select from models like `mistral-7b`, `mixtral-8x7b`, `llama2-70b`, or `claude-3-5-sonnet`.
+
+3. **Paste Sample Transcript Text**: Use extracted text from your PDFs (e.g., `RAW_TEXT:content`) as input.
+
+4. **Craft Your Prompt**: Use prompts like:
+
+   ```text
+   Extract the following fields from this call transcript and return them as a JSON object: Customer Name, Issue Description, Resolution Status, Agent Name.
+   If a field is not found, use "N/A".
+   Transcript:
+   [Paste content here]
+   ```
+
+5. **Test and Iterate**: Run your prompt and refine it until the model returns your desired structure.
+
+6. **Copy Your Prompt**: Use the refined version in your `COMPLETE` function for better consistency.
+
+This optional step greatly improves prompt quality and boosts the reliability of your results.
+
+---
+
+## 🎉 Congratulations!
+
+Duration: 0:05:00
+
+You’ve successfully completed the Snowflake Cortex AI lab for call center transcript analysis! You’ve learned how to:
+
+* Ingest unstructured PDFs
+* Extract, translate, and summarize text
+* Analyze sentiment
+* Convert transcripts to structured JSON
+* Ask and answer targeted questions
+
+Snowflake Cortex AI makes it possible to derive insights from unstructured data directly within your warehouse. Continue experimenting with models and use cases to deepen your skills!
