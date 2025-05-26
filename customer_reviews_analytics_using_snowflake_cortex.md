@@ -125,9 +125,9 @@ USE WAREHOUSE USER_STD_XSMALL_WH;
 This table will store the extracted Markdown content for each uploaded file:
 
 ```sql
-CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS (
+CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT (
     FILE_NAME STRING,
-    PARSED_CONTENT VARIANT
+    TRANSCRIPT VARIANT
 );
 ```
 
@@ -136,10 +136,10 @@ CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS (
 The query below uses `PARSE_DOCUMENT()` to extract and convert each PDF to Markdown format. Ensure you run this in the same warehouse and context created earlier:
 
 ```sql
-INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS
+INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT
 SELECT
     METADATA$FILENAME AS FILE_NAME,
-    PARSE_DOCUMENT(
+    TRANSCRIPT(
         '{"format": "markdown"}',
         $1
     ) AS PARSED_CONTENT
@@ -157,6 +157,59 @@ SELECT
     FILE_NAME,
     PARSED_CONTENT
 FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
+```
+---
+
+## Identify Caller Using `EXTRACT_ANSWER`
+
+Duration: 0:05:00
+
+### Learning Outcome
+
+Use `EXTRACT_ANSWER()` to extract the name of the customer (caller) from each parsed call center transcript.
+
+### Set Snowflake Context
+
+Before proceeding, make sure your session is using the correct database, schema, and warehouse:
+
+```sql
+USE DATABASE LLM_CORTEX_DEMO_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+```
+
+### Step 1: Create a Table for Caller Names
+
+```sql
+CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CALLER (
+    FILE_NAME STRING,
+    CALLER_NAME STRING,
+    TRANSCRIPT VARIANT
+);
+```
+
+### Step 2: Use `EXTRACT_ANSWER()` to Find the Caller’s Name
+
+This query asks the model to extract the name of the customer involved in the conversation:
+
+```sql
+INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CALLER
+SELECT
+    FILE_NAME,
+    EXTRACT_ANSWER(
+        'gpt-4',
+        'What is the name of the customer speaking in this transcript? Only return the name.',
+        PARSED_CONTENT:text
+    ) AS CALLER_NAME,
+    PARSED_CONTENT:text AS TRANSCRIPT
+FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
+```
+
+### Step 3: View Extracted Caller Names
+
+```sql
+SELECT *
+FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CALLER;
 ```
 
 ---

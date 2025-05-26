@@ -104,17 +104,17 @@ USE WAREHOUSE USER_STD_XSMALL_WH;
 </code></pre>
 <h2 is-upgraded>Step 1: Create a Table for Parsed Results</h2>
 <p>This table will store the extracted Markdown content for each uploaded file:</p>
-<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS (
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT (
     FILE_NAME STRING,
-    PARSED_CONTENT VARIANT
+    TRANSCRIPT VARIANT
 );
 </code></pre>
 <h2 is-upgraded>Step 2: Extract PDF Content from Stage</h2>
 <p>The query below uses <code>PARSE_DOCUMENT()</code> to extract and convert each PDF to Markdown format. Ensure you run this in the same warehouse and context created earlier:</p>
-<pre><code language="language-sql" class="language-sql">INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS
+<pre><code language="language-sql" class="language-sql">INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT
 SELECT
     METADATA$FILENAME AS FILE_NAME,
-    PARSE_DOCUMENT(
+    TRANSCRIPT(
         &#39;{&#34;format&#34;: &#34;markdown&#34;}&#39;,
         $1
     ) AS PARSED_CONTENT
@@ -127,6 +127,44 @@ FROM @LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW;
     FILE_NAME,
     PARSED_CONTENT
 FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Identify Caller Using 
+EXTRACT_ANSWER" duration="5">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Use <code>EXTRACT_ANSWER()</code> to extract the name of the customer (caller) from each parsed call center transcript.</p>
+<h2 is-upgraded>Set Snowflake Context</h2>
+<p>Before proceeding, make sure your session is using the correct database, schema, and warehouse:</p>
+<pre><code language="language-sql" class="language-sql">USE DATABASE LLM_CORTEX_DEMO_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+</code></pre>
+<h2 is-upgraded>Step 1: Create a Table for Caller Names</h2>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CALLER (
+    FILE_NAME STRING,
+    CALLER_NAME STRING,
+    TRANSCRIPT VARIANT
+);
+</code></pre>
+<h2 is-upgraded>Step 2: Use <code>EXTRACT_ANSWER()</code> to Find the Caller&#39;s Name</h2>
+<p>This query asks the model to extract the name of the customer involved in the conversation:</p>
+<pre><code language="language-sql" class="language-sql">INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CALLER
+SELECT
+    FILE_NAME,
+    EXTRACT_ANSWER(
+        &#39;gpt-4&#39;,
+        &#39;What is the name of the customer speaking in this transcript? Only return the name.&#39;,
+        PARSED_CONTENT:text
+    ) AS CALLER_NAME,
+    PARSED_CONTENT:text AS TRANSCRIPT
+FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
+</code></pre>
+<h2 is-upgraded>Step 3: View Extracted Caller Names</h2>
+<pre><code language="language-sql" class="language-sql">SELECT *
+FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CALLER;
 </code></pre>
 
 
