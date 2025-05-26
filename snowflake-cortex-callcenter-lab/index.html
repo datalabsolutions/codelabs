@@ -28,6 +28,39 @@
                   environment="web"
                   feedback-link="">
     
+      <google-codelab-step label="CodeLab Overview" duration="3">
+        <p>This hands-on lab introduces participants to Snowflake Cortex AI&#39;s ability to extract valuable insights from unstructured documents using large language models. The lab uses real-world examples of call center transcripts stored as PDFs. Participants will explore functions such as <a href="https://docs.snowflake.com/en/sql-reference/functions/parse_document" target="_blank"><code>PARSE_DOCUMENT</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/complete" target="_blank"><code>COMPLETE</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/translate" target="_blank"><code>TRANSLATE</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/sentiment" target="_blank"><code>SENTIMENT</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/entity_sentiment" target="_blank"><code>ENTITY_SENTIMENT</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/summarize" target="_blank"><code>SUMMARIZE</code></a>, and <a href="https://docs.snowflake.com/en/sql-reference/functions/extract_answer" target="_blank"><code>EXTRACT_ANSWER</code></a>. These tools empower users to parse, translate, analyze, and query unstructured customer support data to uncover sentiment, highlight issues, and summarize conversations at scale.</p>
+<p>Whether you&#39;re a data engineer, business analyst, or AI enthusiast, this lab will help you understand how to turn raw documents into structured, actionable data using generative AI.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="What you&#39;ll learn" duration="0">
+        <ul>
+<li>Upload and manage unstructured documents in Snowflake.</li>
+<li>Extract and transform transcript text with <a href="https://docs.snowflake.com/en/sql-reference/functions/parse_document" target="_blank"><code>PARSE_DOCUMENT</code></a>.</li>
+<li>Structure data using prompt engineering and the <a href="https://docs.snowflake.com/en/sql-reference/functions/complete" target="_blank"><code>COMPLETE</code></a> function.</li>
+<li>Translate text with <a href="https://docs.snowflake.com/en/sql-reference/functions/translate" target="_blank"><code>TRANSLATE</code></a>.</li>
+<li>Analyze sentiment using <a href="https://docs.snowflake.com/en/sql-reference/functions/sentiment" target="_blank"><code>SENTIMENT</code></a> and <a href="https://docs.snowflake.com/en/sql-reference/functions/entity_sentiment" target="_blank"><code>ENTITY_SENTIMENT</code></a>.</li>
+<li>Summarize content with <a href="https://docs.snowflake.com/en/sql-reference/functions/summarize" target="_blank"><code>SUMMARIZE</code></a>.</li>
+<li>Extract answers using <a href="https://docs.snowflake.com/en/sql-reference/functions/extract_answer" target="_blank"><code>EXTRACT_ANSWER</code></a>.</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Prerequisites" duration="1">
+        <p>To complete this lab, you will need:</p>
+<ul>
+<li>A <a href="https://trial.snowflake.com/?owner=SPN-PID-452710" target="_blank">Snowflake account</a> in a cloud region where <strong>Snowflake Cortex LLM functions</strong> are supported.</li>
+<li>A Snowflake account in a cloud region where <strong>Snowflake Cortex LLM functions</strong> are supported.</li>
+<li>Basic familiarity with SQL and the Snowflake UI.</li>
+</ul>
+<p>💡 <strong>Tip:</strong> Not all Snowflake regions currently support Cortex LLM functions. Use the <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex-overview#llm-function-availability" target="_blank">LLM Function Availability</a> page to check which cloud regions are supported before creating your account.</p>
+
+
+      </google-codelab-step>
+    
   </google-codelab>
 
   <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>

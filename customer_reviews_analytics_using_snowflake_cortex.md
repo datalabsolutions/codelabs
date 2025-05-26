@@ -16,7 +16,7 @@ products: \["Snowflake Cortex"]
 
 # Snowflake Cortex AI for Call Center Transcript Analysis
 
-### CodeLab Overview
+## CodeLab Overview
 
 Duration: 0:03:00
 
@@ -24,9 +24,7 @@ This hands-on lab introduces participants to Snowflake Cortex AI’s ability to 
 
 Whether you're a data engineer, business analyst, or AI enthusiast, this lab will help you understand how to turn raw documents into structured, actionable data using generative AI.
 
----
-
-### What you'll learn
+## What you'll learn
 
 * Upload and manage unstructured documents in Snowflake.
 * Extract and transform transcript text with [`PARSE_DOCUMENT`](https://docs.snowflake.com/en/sql-reference/functions/parse_document).
@@ -36,9 +34,7 @@ Whether you're a data engineer, business analyst, or AI enthusiast, this lab wil
 * Summarize content with [`SUMMARIZE`](https://docs.snowflake.com/en/sql-reference/functions/summarize).
 * Extract answers using [`EXTRACT_ANSWER`](https://docs.snowflake.com/en/sql-reference/functions/extract_answer).
 
----
-
-### Prerequisites
+## Prerequisites
 
 Duration: 0:01:00
 
@@ -51,3 +47,5 @@ To complete this lab, you will need:
 * Basic familiarity with SQL and the Snowflake UI.
 
 > 💡 **Tip:** Not all Snowflake regions currently support Cortex LLM functions. Use the [LLM Function Availability](https://docs.snowflake.com/en/user-guide/snowflake-cortex-overview#llm-function-availability) page to check which cloud regions are supported before creating your account.
+
+---
