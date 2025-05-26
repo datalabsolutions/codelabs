@@ -110,6 +110,16 @@ Use the `PARSE_DOCUMENT()` function to extract the contents of uploaded PDF file
 
 You will now query the internal stage and use Snowflake Cortex to extract and parse the call center transcripts.
 
+### Set Snowflake Context
+
+Ensure you're working in the correct context before running the extraction steps:
+
+```sql
+USE DATABASE LLM_CORTEX_DEMO_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+```
+
 ### Step 1: Create a Table for Parsed Results
 
 This table will store the extracted Markdown content for each uploaded file:
@@ -137,5 +147,16 @@ FROM @LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW;
 ```
 
 > 💡 **Note:** This approach stores both the filename and parsed content for downstream use. The Markdown format keeps the extracted structure readable for further processing.
+
+### Step 3: View Parsed Results
+
+Run the following query to view the extracted content from your PDF files:
+
+```sql
+SELECT
+    FILE_NAME,
+    PARSED_CONTENT
+FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
+```
 
 ---
