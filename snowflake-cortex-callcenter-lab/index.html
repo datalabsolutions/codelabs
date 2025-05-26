@@ -29,7 +29,7 @@
                   feedback-link="">
     
       <google-codelab-step label="Lab Overview" duration="1">
-        <p>This hands-on lab introduces participants to Snowflake Cortex AI&#39;s ability to extract valuable insights from unstructured documents using large language models. The lab uses real-world examples of call center transcripts stored as PDFs. Participants will explore functions such as <a href="https://docs.snowflake.com/en/sql-reference/functions/parse_document" target="_blank"><code>PARSE_DOCUMENT</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/complete" target="_blank"><code>COMPLETE</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/translate" target="_blank"><code>TRANSLATE</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/sentiment" target="_blank"><code>SENTIMENT</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/entity_sentiment" target="_blank"><code>ENTITY_SENTIMENT</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/summarize" target="_blank"><code>SUMMARIZE</code></a>, and <a href="https://docs.snowflake.com/en/sql-reference/functions/extract_answer" target="_blank"><code>EXTRACT_ANSWER</code></a>. These tools empower users to parse, translate, analyze, and query unstructured customer support data to uncover sentiment, highlight issues, and summarize conversations at scale.</p>
+        <p>This hands-on lab introduces participants to Snowflake Cortex AI&#39;s ability to extract valuable insights from unstructured documents using large language models. The lab uses examples of call center transcripts stored as PDFs. Participants will explore functions such as <a href="https://docs.snowflake.com/en/sql-reference/functions/parse_document" target="_blank"><code>PARSE_DOCUMENT</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/complete" target="_blank"><code>COMPLETE</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/translate" target="_blank"><code>TRANSLATE</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/sentiment" target="_blank"><code>SENTIMENT</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/entity_sentiment" target="_blank"><code>ENTITY_SENTIMENT</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/summarize" target="_blank"><code>SUMMARIZE</code></a>, and <a href="https://docs.snowflake.com/en/sql-reference/functions/extract_answer" target="_blank"><code>EXTRACT_ANSWER</code></a>. These tools empower users to parse, translate, analyze, and query unstructured customer support data to uncover sentiment, highlight issues, and summarize conversations at scale.</p>
 <p>Whether you&#39;re a data engineer, business analyst, or AI enthusiast, this lab will help you understand how to turn raw documents into structured, actionable data using generative AI.</p>
 <h2 class="checklist" is-upgraded>What you&#39;ll learn</h2>
 <ul class="checklist">
@@ -48,6 +48,53 @@
 <li>Basic familiarity with SQL and the Snowflake UI.</li>
 </ul>
 <p>💡 <strong>Tip:</strong> Not all Snowflake regions currently support Cortex LLM functions. Use the <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex-overview#llm-function-availability" target="_blank">LLM Function Availability</a> page to check which cloud regions are supported before creating your account.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Set Up Your Snowflake Environment" duration="5">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Prepare your Snowflake environment by creating a new database, warehouse, schemas, and internal stage.</p>
+<h2 is-upgraded>Instructions</h2>
+<pre><code language="language-sql" class="language-sql">-- Step 1: Create Database
+CREATE DATABASE IF NOT EXISTS LLM_CORTEX_DEMO_DB;
+
+-- Step 2: Create Warehouse
+CREATE OR REPLACE WAREHOUSE USER_STD_XSMALL_WH
+WITH
+    WAREHOUSE_SIZE = &#39;XSMALL&#39;
+    WAREHOUSE_TYPE = &#39;STANDARD&#39;
+    AUTO_SUSPEND = 60       -- suspend after 60 seconds of inactivity
+    AUTO_RESUME = TRUE
+    INITIALLY_SUSPENDED = TRUE;
+
+-- Step 3: Create Schemas
+CREATE SCHEMA IF NOT EXISTS LLM_CORTEX_DEMO_DB.RAW;
+CREATE SCHEMA IF NOT EXISTS LLM_CORTEX_DEMO_DB.STAGE;
+
+-- Step 4: Create Internal Stage for PDFs
+CREATE OR REPLACE STAGE LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW
+    DIRECTORY = ( ENABLE = true )
+    ENCRYPTION = ( TYPE = &#39;SNOWFLAKE_SSE&#39; );
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Step 2: Upload PDF Files to a Snowflake Stage" duration="5">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Upload call center transcript PDFs into the internal Snowflake stage you created in Step 1.</p>
+<h2 is-upgraded>Instructions</h2>
+<p>Your internal stage <code>LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW</code> is already set up.</p>
+<p>To upload PDF files:</p>
+<h3 is-upgraded>Using Snowsight:</h3>
+<ol type="1">
+<li>In Snowsight, go to <strong>Databases</strong>.</li>
+<li>Click on <code>LLM_CORTEX_DEMO_DB</code> &gt; <code>RAW</code> &gt; <code>Stages</code>.</li>
+<li>Select <code>INT_STAGE_DOC_RAW</code>.</li>
+<li>Click the <strong>+ Files</strong> tab.</li>
+<li>Click <strong>Upload</strong> and add one or more call center transcript PDFs.</li>
+</ol>
 
 
       </google-codelab-step>

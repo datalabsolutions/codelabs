@@ -20,7 +20,7 @@ products: \["Snowflake Cortex"]
 
 Duration: 0:03:00
 
-This hands-on lab introduces participants to Snowflake Cortex AI’s ability to extract valuable insights from unstructured documents using large language models. The lab uses real-world examples of call center transcripts stored as PDFs. Participants will explore functions such as [`PARSE_DOCUMENT`](https://docs.snowflake.com/en/sql-reference/functions/parse_document), [`COMPLETE`](https://docs.snowflake.com/en/sql-reference/functions/complete), [`TRANSLATE`](https://docs.snowflake.com/en/sql-reference/functions/translate), [`SENTIMENT`](https://docs.snowflake.com/en/sql-reference/functions/sentiment), [`ENTITY_SENTIMENT`](https://docs.snowflake.com/en/sql-reference/functions/entity_sentiment), [`SUMMARIZE`](https://docs.snowflake.com/en/sql-reference/functions/summarize), and [`EXTRACT_ANSWER`](https://docs.snowflake.com/en/sql-reference/functions/extract_answer). These tools empower users to parse, translate, analyze, and query unstructured customer support data to uncover sentiment, highlight issues, and summarize conversations at scale.
+This hands-on lab introduces participants to Snowflake Cortex AI’s ability to extract valuable insights from unstructured documents using large language models. The lab uses examples of call center transcripts stored as PDFs. Participants will explore functions such as [`PARSE_DOCUMENT`](https://docs.snowflake.com/en/sql-reference/functions/parse_document), [`COMPLETE`](https://docs.snowflake.com/en/sql-reference/functions/complete), [`TRANSLATE`](https://docs.snowflake.com/en/sql-reference/functions/translate), [`SENTIMENT`](https://docs.snowflake.com/en/sql-reference/functions/sentiment), [`ENTITY_SENTIMENT`](https://docs.snowflake.com/en/sql-reference/functions/entity_sentiment), [`SUMMARIZE`](https://docs.snowflake.com/en/sql-reference/functions/summarize), and [`EXTRACT_ANSWER`](https://docs.snowflake.com/en/sql-reference/functions/extract_answer). These tools empower users to parse, translate, analyze, and query unstructured customer support data to uncover sentiment, highlight issues, and summarize conversations at scale.
 
 Whether you're a data engineer, business analyst, or AI enthusiast, this lab will help you understand how to turn raw documents into structured, actionable data using generative AI.
 
@@ -48,5 +48,66 @@ To complete this lab, you will need:
 * Basic familiarity with SQL and the Snowflake UI.
 
 > 💡 **Tip:** Not all Snowflake regions currently support Cortex LLM functions. Use the [LLM Function Availability](https://docs.snowflake.com/en/user-guide/snowflake-cortex-overview#llm-function-availability) page to check which cloud regions are supported before creating your account.
+
+---
+
+## Set Up Your Snowflake Environment
+
+Duration: 0:05:00
+
+### Learning Outcome
+
+Prepare your Snowflake environment by creating a new database, warehouse, schemas, and internal stage.
+
+### Instructions
+
+```sql
+-- Step 1: Create Database
+CREATE DATABASE IF NOT EXISTS LLM_CORTEX_DEMO_DB;
+
+-- Step 2: Create Warehouse
+CREATE OR REPLACE WAREHOUSE USER_STD_XSMALL_WH
+WITH
+    WAREHOUSE_SIZE = 'XSMALL'
+    WAREHOUSE_TYPE = 'STANDARD'
+    AUTO_SUSPEND = 60       -- suspend after 60 seconds of inactivity
+    AUTO_RESUME = TRUE
+    INITIALLY_SUSPENDED = TRUE;
+
+-- Step 3: Create Schemas
+CREATE SCHEMA IF NOT EXISTS LLM_CORTEX_DEMO_DB.RAW;
+CREATE SCHEMA IF NOT EXISTS LLM_CORTEX_DEMO_DB.STAGE;
+
+-- Step 4: Create Internal Stage for PDFs
+CREATE OR REPLACE STAGE LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW
+    DIRECTORY = ( ENABLE = true )
+    ENCRYPTION = ( TYPE = 'SNOWFLAKE_SSE' );
+```
+
+---
+
+## Step 2: Upload PDF Files to a Snowflake Stage
+
+Duration: 0:05:00
+
+### Learning Outcome
+
+Upload call center transcript PDFs into the internal Snowflake stage you created in Step 1.
+
+### Instructions
+
+Your internal stage `LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW` is already set up.
+
+To upload PDF files:
+
+#### Using Snowsight:
+
+1. In Snowsight, go to **Databases**.
+2. Click on `LLM_CORTEX_DEMO_DB` > `RAW` > `Stages`.
+3. Select `INT_STAGE_DOC_RAW`.
+4. Click the **+ Files** tab.
+5. Click **Upload** and add one or more call center transcript PDFs.
+
+####
 
 ---
