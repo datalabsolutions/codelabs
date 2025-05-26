@@ -16,7 +16,7 @@ products: \["Snowflake Cortex"]
 
 # Snowflake Cortex AI for Call Center Transcript Analysis
 
-## CodeLab Overview
+### CodeLab Overview
 
 Duration: 0:03:00
 
@@ -26,7 +26,7 @@ Whether you're a data engineer, business analyst, or AI enthusiast, this lab wil
 
 ---
 
-## What you'll learn
+### What you'll learn
 
 * Upload and manage unstructured documents in Snowflake.
 * Extract and transform transcript text with [`PARSE_DOCUMENT`](https://docs.snowflake.com/en/sql-reference/functions/parse_document).
@@ -38,7 +38,7 @@ Whether you're a data engineer, business analyst, or AI enthusiast, this lab wil
 
 ---
 
-## Prerequisites
+### Prerequisites
 
 Duration: 0:01:00
 
