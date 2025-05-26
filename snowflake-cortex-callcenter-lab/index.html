@@ -91,6 +91,34 @@ CREATE OR REPLACE STAGE LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW
 
       </google-codelab-step>
     
+      <google-codelab-step label="Parse PDF Documents" duration="7">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Use the <code>PARSE_DOCUMENT()</code> function to extract the contents of uploaded PDF files from your internal stage and store them in a structured format as Markdown text.</p>
+<h2 is-upgraded>Instructions</h2>
+<p>You will now query the internal stage and use Snowflake Cortex to extract and parse the call center transcripts.</p>
+<h2 is-upgraded>Step 1: Create a Table for Parsed Results</h2>
+<p>This table will store the extracted Markdown content for each uploaded file:</p>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS (
+    FILE_NAME STRING,
+    PARSED_CONTENT VARIANT
+);
+</code></pre>
+<h2 is-upgraded>Step 2: Extract PDF Content from Stage</h2>
+<p>The query below uses <code>PARSE_DOCUMENT()</code> to extract and convert each PDF to Markdown format. Ensure you run this in the same warehouse and context created earlier:</p>
+<pre><code language="language-sql" class="language-sql">INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS
+SELECT
+    METADATA$FILENAME AS FILE_NAME,
+    PARSE_DOCUMENT(
+        &#39;{&#34;format&#34;: &#34;markdown&#34;}&#39;,
+        $1
+    ) AS PARSED_CONTENT
+FROM @LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW;
+</code></pre>
+<p>💡 <strong>Note:</strong> This approach stores both the filename and parsed content for downstream use. The Markdown format keeps the extracted structure readable for further processing.</p>
+
+
+      </google-codelab-step>
+    
   </google-codelab>
 
   <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>

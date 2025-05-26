@@ -97,3 +97,45 @@ Your internal stage `LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW` is already set up
 5. Click **Upload** and add one or more call center transcript PDFs.
 
 ---
+
+## Parse PDF Documents
+
+Duration: 0:07:00
+
+### Learning Outcome
+
+Use the `PARSE_DOCUMENT()` function to extract the contents of uploaded PDF files from your internal stage and store them in a structured format as Markdown text.
+
+### Instructions
+
+You will now query the internal stage and use Snowflake Cortex to extract and parse the call center transcripts.
+
+### Step 1: Create a Table for Parsed Results
+
+This table will store the extracted Markdown content for each uploaded file:
+
+```sql
+CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS (
+    FILE_NAME STRING,
+    PARSED_CONTENT VARIANT
+);
+```
+
+### Step 2: Extract PDF Content from Stage
+
+The query below uses `PARSE_DOCUMENT()` to extract and convert each PDF to Markdown format. Ensure you run this in the same warehouse and context created earlier:
+
+```sql
+INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS
+SELECT
+    METADATA$FILENAME AS FILE_NAME,
+    PARSE_DOCUMENT(
+        '{"format": "markdown"}',
+        $1
+    ) AS PARSED_CONTENT
+FROM @LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW;
+```
+
+> 💡 **Note:** This approach stores both the filename and parsed content for downstream use. The Markdown format keeps the extracted structure readable for further processing.
+
+---
