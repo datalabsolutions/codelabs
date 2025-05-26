@@ -21,390 +21,42 @@
 </head>
 <body>
   <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
-  <google-codelab codelab-gaid=""
+  <google-codelab codelab-gaid="UA-XXXXXXXXX-X"
                   codelab-ga4id=""
                   id="snowflake-cortex-callcenter-lab"
                   title="Snowflake Cortex AI for Call Center Transcript Analysis"
                   environment="web"
                   feedback-link="">
     
-      <google-codelab-step label="Overview" duration="0">
-        <p>This self-paced lab walks you through leveraging Snowflake Cortex AI functions to ingest, process, analyze, and extract insights from unstructured call center transcript data in PDF format. By the end of this lab, you&#39;ll be equipped to transform raw transcript text into structured, multilingual, and insightful outputs—all within Snowflake.</p>
-<h2 is-upgraded>Learning Outcomes</h2>
-<p>By completing this lab, you will be able to:</p>
-<ul>
+      <google-codelab-step label="CodeLab Overview" duration="3">
+        <p>This hands-on lab introduces participants to Snowflake Cortex AI&#39;s ability to extract valuable insights from unstructured documents using large language models. The lab uses real-world examples of call center transcripts stored as PDFs. Participants will explore functions such as <a href="https://docs.snowflake.com/en/sql-reference/functions/parse_document" target="_blank"><code>PARSE_DOCUMENT</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/complete" target="_blank"><code>COMPLETE</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/translate" target="_blank"><code>TRANSLATE</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/sentiment" target="_blank"><code>SENTIMENT</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/entity_sentiment" target="_blank"><code>ENTITY_SENTIMENT</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/summarize" target="_blank"><code>SUMMARIZE</code></a>, and <a href="https://docs.snowflake.com/en/sql-reference/functions/extract_answer" target="_blank"><code>EXTRACT_ANSWER</code></a>. These tools empower users to parse, translate, analyze, and query unstructured customer support data to uncover sentiment, highlight issues, and summarize conversations at scale.</p>
+<p>Whether you&#39;re a data engineer, business analyst, or AI enthusiast, this lab will help you understand how to turn raw documents into structured, actionable data using generative AI.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="What you&#39;ll learn" duration="0">
+        <ul>
 <li>Upload and manage unstructured documents in Snowflake.</li>
-<li>Extract, transform, and analyze call transcript data using Cortex AI functions.</li>
-<li>Generate structured summaries and answer questions from raw transcripts.</li>
+<li>Extract and transform transcript text with <a href="https://docs.snowflake.com/en/sql-reference/functions/parse_document" target="_blank"><code>PARSE_DOCUMENT</code></a>.</li>
+<li>Structure data using prompt engineering and the <a href="https://docs.snowflake.com/en/sql-reference/functions/complete" target="_blank"><code>COMPLETE</code></a> function.</li>
+<li>Translate text with <a href="https://docs.snowflake.com/en/sql-reference/functions/translate" target="_blank"><code>TRANSLATE</code></a>.</li>
+<li>Analyze sentiment using <a href="https://docs.snowflake.com/en/sql-reference/functions/sentiment" target="_blank"><code>SENTIMENT</code></a> and <a href="https://docs.snowflake.com/en/sql-reference/functions/entity_sentiment" target="_blank"><code>ENTITY_SENTIMENT</code></a>.</li>
+<li>Summarize content with <a href="https://docs.snowflake.com/en/sql-reference/functions/summarize" target="_blank"><code>SUMMARIZE</code></a>.</li>
+<li>Extract answers using <a href="https://docs.snowflake.com/en/sql-reference/functions/extract_answer" target="_blank"><code>EXTRACT_ANSWER</code></a>.</li>
 </ul>
 
 
       </google-codelab-step>
     
-      <google-codelab-step label="1. Set Up Your Snowflake Environment" duration="5">
-        <h2 is-upgraded>Learning Outcome</h2>
-<p>Set up the necessary Snowflake database, schema, and warehouse context to organize the lab work.</p>
-<h2 is-upgraded>Step-by-Step Guide</h2>
-<ol type="1">
-<li>Log in to Snowsight or connect using SnowSQL.</li>
-<li>Run the SQL below to create a clean environment.</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">USE WAREHOUSE &lt;YOUR_WAREHOUSE_NAME&gt;;
-CREATE DATABASE IF NOT EXISTS LLM_CORTEX_DEMO_DB;
-CREATE SCHEMA IF NOT EXISTS LLM_CORTEX_DEMO_DB.CALL_CENTER_ANALYTICS;
-USE SCHEMA LLM_CORTEX_DEMO_DB.CALL_CENTER_ANALYTICS;
-</code></pre>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="2. Create a Snowflake Internal Stage and Upload PDFs" duration="10">
-        <h2 is-upgraded>Learning Outcome</h2>
-<p>Create an internal stage to store PDF transcripts and upload documents using either Snowsight or SnowSQL.</p>
-<h2 is-upgraded>Step-by-Step Guide</h2>
-<ol type="1">
-<li>Create the internal stage:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">CREATE STAGE IF NOT EXISTS CALL_CENTER_TRANSCRIPTS_STAGE
-  DIRECTORY = (ENABLE = TRUE)
-  COMMENT = &#39;Internal stage for call center transcript PDFs&#39;;
-</code></pre>
-<ol type="1" start="2">
-<li>Upload PDF files:</li>
-</ol>
-<h3 is-upgraded>Option A: Snowsight</h3>
+      <google-codelab-step label="Prerequisites" duration="1">
+        <p>To complete this lab, you will need:</p>
 <ul>
-<li>Navigate to <code>LLM_CORTEX_DEMO_DB > CALL_CENTER_ANALYTICS > Stages</code>.</li>
-<li>Click on <code>CALL_CENTER_TRANSCRIPTS_STAGE</code>.</li>
-<li>Use <strong>+ Add Files</strong> to upload your <code>.pdf</code> transcripts.</li>
+<li>A <a href="https://trial.snowflake.com/?owner=SPN-PID-452710" target="_blank">Snowflake account</a> in a cloud region where <strong>Snowflake Cortex LLM functions</strong> are supported.</li>
+<li>A Snowflake account in a cloud region where <strong>Snowflake Cortex LLM functions</strong> are supported.</li>
+<li>Basic familiarity with SQL and the Snowflake UI.</li>
 </ul>
-<h3 is-upgraded>Option B: SnowSQL</h3>
-<pre><code language="language-bash" class="language-bash">PUT file:///path/to/your/files/transcript_1.pdf @CALL_CENTER_TRANSCRIPTS_STAGE AUTO_COMPRESS=FALSE;
-</code></pre>
-<ol type="1" start="3">
-<li>Confirm successful upload:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">LIST @CALL_CENTER_TRANSCRIPTS_STAGE;
-</code></pre>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="3. Extract Text from PDFs" duration="10">
-        <h2 is-upgraded>Learning Outcome</h2>
-<p>Use the <code>PARSE_DOCUMENT</code> function to extract text from PDF files and store the content.</p>
-<h2 is-upgraded>Step-by-Step Guide</h2>
-<ol type="1">
-<li>Create a table to hold the raw parsed content:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE RAW_TRANSCRIPTS (
-    FILE_NAME VARCHAR,
-    RAW_TEXT VARIANT
-);
-</code></pre>
-<ol type="1" start="2">
-<li>Run <code>PARSE_DOCUMENT</code> on all files:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">INSERT INTO RAW_TRANSCRIPTS
-SELECT
-    RELATIVE_PATH,
-    SNOWFLAKE.CORTEX.PARSE_DOCUMENT(@CALL_CENTER_TRANSCRIPTS_STAGE, RELATIVE_PATH, OBJECT_CONSTRUCT(&#39;mode&#39;, &#39;OCR&#39;))
-FROM DIRECTORY(@CALL_CENTER_TRANSCRIPTS_STAGE);
-</code></pre>
-<ol type="1" start="3">
-<li>View the extracted text:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">SELECT FILE_NAME, RAW_TEXT:content::STRING AS EXTRACTED_TEXT FROM RAW_TRANSCRIPTS;
-</code></pre>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="4. Best Practices for Prompt Engineering" duration="10">
-        <h2 is-upgraded>Learning Outcome</h2>
-<p>Understand the components of effective prompts for structured information extraction using Cortex AI, and learn how to write prompts that yield reliable, structured outputs.</p>
-<h2 is-upgraded>What Makes a Good Prompt?</h2>
-<p>Effective prompts typically include the following elements:</p>
-<ul>
-<li><strong>Instruction</strong>: Clearly define what the model should do (e.g., &#34;Extract the customer name from the transcript&#34;).</li>
-<li><strong>Role / Persona</strong>: Set the perspective or assumed knowledge level of the model (e.g., &#34;You are a data analyst reviewing customer service transcripts&#34;).</li>
-<li><strong>Context</strong>: Provide background or sample content that frames the data (e.g., a portion of a transcript).</li>
-<li><strong>Constraints or Guidelines</strong>: Specify required output format and error handling (e.g., &#34;If information is missing, use ‘N/A&#39;&#34;).</li>
-<li><strong>Examples (Few-Shot)</strong>: Include examples when possible to demonstrate the desired behavior.</li>
-<li><strong>Tone &amp; Style</strong>: Optional for tasks needing a specific writing style or professional tone.</li>
-<li><strong>Format Specification</strong>: Define output style, such as JSON, CSV, or plain text.</li>
-<li><strong>Subject Matter</strong>: Anchor prompts in domain-specific language or terminology.</li>
-<li><strong>Target Audience</strong>: Ensure the output is tailored to the user who will consume the results.</li>
-<li><strong>Data</strong>: Supply clear, well-structured input data to avoid confusion.</li>
-</ul>
-<h2 is-upgraded>Example Prompt (Simple)</h2>
-<pre><code>Extract the customer name, issue description, resolution status, and agent name from the transcript below. If a field is missing, return &#34;N/A&#34;. Format your response as JSON.
-
-Transcript:
-Hello, this is Mark. I&#39;m calling about a billing error on my last invoice... [continues]
-
-JSON Output:
-</code></pre>
-<h2 is-upgraded>Example Prompt (Expanded with Role/Persona)</h2>
-<pre><code>You are a professional data annotator tasked with extracting structured fields from customer service transcripts. Your goal is to return:
-- Customer Name
-- Issue Description
-- Resolution Status
-- Agent Name
-
-If any field is unavailable, return &#34;N/A&#34;. Use the following transcript:
-
-Transcript:
-Hi, this is Jane. I&#39;m following up on a delay in service delivery from last week... [continues]
-
-Return the result as a valid JSON object.
-</code></pre>
-<h2 is-upgraded>Example with User/Assistant/System Roles</h2>
-<pre><code language="language-json" class="language-json">{
-  &#34;system&#34;: &#34;You are an AI assistant skilled at information extraction from customer service transcripts.&#34;,
-  &#34;user&#34;: &#34;Extract the fields: Customer Name, Issue Description, Resolution Status, and Agent Name. Return JSON. If not found, use &#39;N/A&#39;.&#34;,
-  &#34;assistant&#34;: {
-    &#34;Customer Name&#34;: &#34;Jane&#34;,
-    &#34;Issue Description&#34;: &#34;Delay in service delivery&#34;,
-    &#34;Resolution Status&#34;: &#34;Resolved&#34;,
-    &#34;Agent Name&#34;: &#34;Tom&#34;
-  }
-}
-</code></pre>
-<h2 is-upgraded>Exploring Parameters: <code>top_p</code> and <code>top_k</code></h2>
-<ul>
-<li><strong><code>top_p</code></strong><strong> (nucleus sampling)</strong> controls diversity. Lower values (e.g. <code>0.1</code>) make the output more deterministic. Higher values (e.g. <code>0.9</code>) allow for more varied responses.</li>
-<li><strong><code>top_k</code></strong> limits how many top tokens to sample from. A smaller <code>top_k</code> (e.g. 5) narrows the response range.</li>
-</ul>
-<h3 is-upgraded>Example: Same prompt with different <code>top_p</code> values</h3>
-<pre><code language="language-sql" class="language-sql">-- More deterministic output
-SELECT SNOWFLAKE.CORTEX.COMPLETE(&#39;mistral-7b&#39;, &#39;&lt;prompt&gt;&#39;, OBJECT_CONSTRUCT(&#39;top_p&#39;, 0.1));
-
--- More creative output
-SELECT SNOWFLAKE.CORTEX.COMPLETE(&#39;mistral-7b&#39;, &#39;&lt;prompt&gt;&#39;, OBJECT_CONSTRUCT(&#39;top_p&#39;, 0.9));
-</code></pre>
-<p>Try experimenting with both <code>top_p</code> and <code>top_k</code> to fine-tune outputs based on your use case.</p>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="5. Convert to JSON Using COMPLETE" duration="15">
-        <h2 is-upgraded>Learning Outcome</h2>
-<p>Use the <code>COMPLETE</code> function to extract structured fields such as customer name, issue description, and agent details from the raw transcript text.</p>
-<h2 is-upgraded>Step-by-Step Guide</h2>
-<ol type="1">
-<li>Create a table to store structured data:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE STRUCTURED_TRANSCRIPTS (
-    FILE_NAME VARCHAR,
-    TRANSCRIPT_ID VARCHAR,
-    CUSTOMER_NAME VARCHAR,
-    ISSUE_DESCRIPTION VARCHAR,
-    RESOLUTION_STATUS VARCHAR,
-    AGENT_NAME VARCHAR,
-    STRUCTURED_JSON VARIANT
-);
-</code></pre>
-<ol type="1" start="2">
-<li>Use <code>COMPLETE</code> to parse fields from the extracted content:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">INSERT INTO STRUCTURED_TRANSCRIPTS
-SELECT
-    rt.FILE_NAME,
-    MD5(rt.FILE_NAME || rt.RAW_TEXT:content::STRING),
-    PARSE_JSON(SNOWFLAKE.CORTEX.COMPLETE(...)):&#34;Customer Name&#34;::STRING,
-    PARSE_JSON(SNOWFLAKE.CORTEX.COMPLETE(...)):&#34;Issue Description&#34;::STRING,
-    PARSE_JSON(SNOWFLAKE.CORTEX.COMPLETE(...)):&#34;Resolution Status&#34;::STRING,
-    PARSE_JSON(SNOWFLAKE.CORTEX.COMPLETE(...)):&#34;Agent Name&#34;::STRING,
-    PARSE_JSON(SNOWFLAKE.CORTEX.COMPLETE(...))
-FROM RAW_TRANSCRIPTS rt;
-</code></pre>
-<ol type="1" start="3">
-<li>Verify results:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">SELECT * FROM STRUCTURED_TRANSCRIPTS;
-</code></pre>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="6. Translate Using TRANSLATE" duration="5">
-        <h2 is-upgraded>Learning Outcome</h2>
-<p>Translate extracted transcript content into another language using the <code>TRANSLATE</code> function.</p>
-<h2 is-upgraded>Step-by-Step Guide</h2>
-<ol type="1">
-<li>Add a new column to store translated output:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">ALTER TABLE STRUCTURED_TRANSCRIPTS ADD COLUMN TRANSLATED_TEXT VARCHAR;
-</code></pre>
-<ol type="1" start="2">
-<li>Translate the raw text from English to Spanish:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">UPDATE STRUCTURED_TRANSCRIPTS st
-SET TRANSLATED_TEXT = SNOWFLAKE.CORTEX.TRANSLATE(
-    (SELECT rt.RAW_TEXT:content::STRING FROM RAW_TRANSCRIPTS rt WHERE rt.FILE_NAME = st.FILE_NAME),
-    &#39;en&#39;, &#39;es&#39;
-);
-</code></pre>
-<ol type="1" start="3">
-<li>View the translated text:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">SELECT FILE_NAME, CUSTOMER_NAME, ISSUE_DESCRIPTION, TRANSLATED_TEXT FROM STRUCTURED_TRANSCRIPTS;
-</code></pre>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="7. Sentiment Analysis" duration="10">
-        <h2 is-upgraded>Learning Outcome</h2>
-<p>Analyze the emotional tone of the transcripts overall and for specific entities like ‘agent&#39; or ‘product&#39;.</p>
-<h2 is-upgraded>Step-by-Step Guide</h2>
-<ol type="1">
-<li>Add columns for storing sentiment outputs:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">ALTER TABLE STRUCTURED_TRANSCRIPTS
-ADD COLUMN OVERALL_SENTIMENT_SCORE FLOAT,
-ADD COLUMN ENTITY_SENTIMENT_JSON VARIANT;
-</code></pre>
-<ol type="1" start="2">
-<li>Update overall sentiment:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">UPDATE STRUCTURED_TRANSCRIPTS st
-SET OVERALL_SENTIMENT_SCORE = SNOWFLAKE.CORTEX.SENTIMENT(...);
-</code></pre>
-<ol type="1" start="3">
-<li>Analyze sentiment for specific entities:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">UPDATE STRUCTURED_TRANSCRIPTS st
-SET ENTITY_SENTIMENT_JSON = SNOWFLAKE.CORTEX.ENTITY_SENTIMENT(...);
-</code></pre>
-<ol type="1" start="4">
-<li>View results:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">SELECT FILE_NAME, CUSTOMER_NAME, OVERALL_SENTIMENT_SCORE,
-       ENTITY_SENTIMENT_JSON:categories[0]:sentiment::STRING AS OVERALL_SENTIMENT_CATEGORY,
-       ENTITY_SENTIMENT_JSON FROM STRUCTURED_TRANSCRIPTS;
-</code></pre>
-<ol type="1" start="5">
-<li>Drill into entity-level sentiment:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">SELECT FILE_NAME, s.value:&#34;name&#34;::STRING, s.value:&#34;sentiment&#34;::STRING, s.value:&#34;score&#34;::FLOAT
-FROM STRUCTURED_TRANSCRIPTS, LATERAL FLATTEN(INPUT =&gt; ENTITY_SENTIMENT_JSON:categories) s
-WHERE s.value:&#34;name&#34;::STRING != &#39;overall&#39;;
-</code></pre>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="8. Summarize Using SUMMARIZE" duration="5">
-        <h2 is-upgraded>Learning Outcome</h2>
-<p>Summarize lengthy transcripts to quickly understand key points.</p>
-<h2 is-upgraded>Step-by-Step Guide</h2>
-<ol type="1">
-<li>Add a summary column:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">ALTER TABLE STRUCTURED_TRANSCRIPTS ADD COLUMN SUMMARY VARCHAR;
-</code></pre>
-<ol type="1" start="2">
-<li>Generate summaries:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">UPDATE STRUCTURED_TRANSCRIPTS st
-SET SUMMARY = SNOWFLAKE.CORTEX.SUMMARIZE(
-    (SELECT rt.RAW_TEXT:content::STRING FROM RAW_TRANSCRIPTS rt WHERE rt.FILE_NAME = st.FILE_NAME)
-);
-</code></pre>
-<ol type="1" start="3">
-<li>Review the output:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">SELECT FILE_NAME, CUSTOMER_NAME, SUMMARY FROM STRUCTURED_TRANSCRIPTS;
-</code></pre>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="9. Extract Answers Using EXTRACT_ANSWER" duration="5">
-        <h2 is-upgraded>Learning Outcome</h2>
-<p>Ask specific questions about transcript content and retrieve direct answers.</p>
-<h2 is-upgraded>Step-by-Step Guide</h2>
-<ol type="1">
-<li>Create a table for Q&amp;A storage:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE TRANSCRIPT_ANSWERS (
-    FILE_NAME VARCHAR,
-    QUESTION VARCHAR,
-    ANSWER VARCHAR
-);
-</code></pre>
-<ol type="1" start="2">
-<li>Insert answers for key questions:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">INSERT INTO TRANSCRIPT_ANSWERS
-SELECT st.FILE_NAME, &#39;What was the main issue reported by the customer?&#39;,
-       SNOWFLAKE.CORTEX.EXTRACT_ANSWER(...)
-FROM STRUCTURED_TRANSCRIPTS st;
-
-INSERT INTO TRANSCRIPT_ANSWERS
-SELECT st.FILE_NAME, &#39;What was the resolution provided by the agent?&#39;,
-       SNOWFLAKE.CORTEX.EXTRACT_ANSWER(...)
-FROM STRUCTURED_TRANSCRIPTS st;
-</code></pre>
-<ol type="1" start="3">
-<li>View results:</li>
-</ol>
-<pre><code language="language-sql" class="language-sql">SELECT * FROM TRANSCRIPT_ANSWERS ORDER BY FILE_NAME, QUESTION;
-</code></pre>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="10. Clean Up (Optional)" duration="3">
-        <h2 is-upgraded>Learning Outcome</h2>
-<p>Safely remove all lab-related objects to keep your Snowflake account clean.</p>
-<pre><code language="language-sql" class="language-sql">DROP DATABASE IF EXISTS LLM_CORTEX_DEMO_DB;
--- Or drop individually:
--- DROP TABLE IF EXISTS STRUCTURED_TRANSCRIPTS;
--- DROP TABLE IF EXISTS RAW_TRANSCRIPTS;
--- DROP TABLE IF EXISTS TRANSCRIPT_ANSWERS;
--- DROP STAGE IF EXISTS CALL_CENTER_TRANSCRIPTS_STAGE;
--- DROP SCHEMA IF EXISTS LLM_CORTEX_DEMO_DB.CALL_CENTER_ANALYTICS;
-</code></pre>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="11. Explore the Cortex Analyst Playground" duration="7">
-        <h2 is-upgraded>Learning Outcome</h2>
-<p>Gain hands-on experience with prompts and models in a no-code environment using Snowflake&#39;s Cortex Analyst Playground.</p>
-<p>Before you use Cortex AI functions like <code>COMPLETE</code>, it&#39;s helpful to experiment with your prompts in an interactive environment. Snowflake provides a <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-playground" target="_blank">Cortex Analyst Playground</a> where you can test and refine prompts before integrating them into SQL.</p>
-<h2 is-upgraded>Step-by-Step Guide</h2>
-<ol type="1">
-<li><strong>Navigate to the Playground</strong>: Visit the <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-playground" target="_blank">Cortex Analyst Playground</a>.</li>
-<li><strong>Choose a Model</strong>: Select from models like <code>mistral-7b</code>, <code>mixtral-8x7b</code>, <code>llama2-70b</code>, or <code>claude-3-5-sonnet</code>.</li>
-<li><strong>Paste Sample Transcript Text</strong>: Use extracted text from your PDFs (e.g., <code>RAW_TEXT:content</code>) as input.</li>
-<li><strong>Craft Your Prompt</strong>: Use prompts like:<pre><code language="language-text" class="language-text">Extract the following fields from this call transcript and return them as a JSON object: Customer Name, Issue Description, Resolution Status, Agent Name.
-If a field is not found, use &#34;N/A&#34;.
-Transcript:
-[Paste content here]
-</code></pre>
-</li>
-<li><strong>Test and Iterate</strong>: Run your prompt and refine it until the model returns your desired structure.</li>
-<li><strong>Copy Your Prompt</strong>: Use the refined version in your <code>COMPLETE</code> function for better consistency.</li>
-</ol>
-<p>This optional step greatly improves prompt quality and boosts the reliability of your results.</p>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="🎉 Congratulations!" duration="5">
-        <p>You&#39;ve successfully completed the Snowflake Cortex AI lab for call center transcript analysis! You&#39;ve learned how to:</p>
-<ul>
-<li>Ingest unstructured PDFs</li>
-<li>Extract, translate, and summarize text</li>
-<li>Analyze sentiment</li>
-<li>Convert transcripts to structured JSON</li>
-<li>Ask and answer targeted questions</li>
-</ul>
-<p>Snowflake Cortex AI makes it possible to derive insights from unstructured data directly within your warehouse. Continue experimenting with models and use cases to deepen your skills!</p>
+<p>💡 <strong>Tip:</strong> Not all Snowflake regions currently support Cortex LLM functions. Use the <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex-overview#llm-function-availability" target="_blank">LLM Function Availability</a> page to check which cloud regions are supported before creating your account.</p>
 
 
       </google-codelab-step>

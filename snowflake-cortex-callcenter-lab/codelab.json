@@ -3,9 +3,9 @@
   "format": "html",
   "prefix": "https://storage.googleapis.com",
   "mainga": "UA-49880327-14",
-  "updated": "2025-05-26T09:05:27+02:00",
+  "updated": "2025-05-26T12:51:19+02:00",
   "id": "snowflake-cortex-callcenter-lab",
-  "duration": 90,
+  "duration": 4,
   "title": "Snowflake Cortex AI for Call Center Transcript Analysis",
   "summary": "A self-paced hands-on lab that teaches how to use Snowflake Cortex AI to ingest, extract, structure, translate, analyze, summarize, and answer questions from PDF call center transcripts.",
   "source": "customer_reviews_analytics_using_snowflake_cortex.md",
@@ -21,10 +21,12 @@
   ],
   "tags": [
     "[“snowflake”",
+    "web",
     "“cortex-ai”",
     "“pdf-extraction”",
     "“prompt-engineering”",
     "“sentiment-analysis”]"
   ],
+  "ga": "UA-XXXXXXXXX-X",
   "url": "snowflake-cortex-callcenter-lab"
 }
