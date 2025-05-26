@@ -24,6 +24,8 @@ This hands-on lab introduces participants to Snowflake Cortex AI’s ability to 
 
 Whether you're a data engineer, business analyst, or AI enthusiast, this lab will help you understand how to turn raw documents into structured, actionable data using generative AI.
 
+---
+
 ## What you'll learn
 
 * Upload and manage unstructured documents in Snowflake.
@@ -34,6 +36,8 @@ Whether you're a data engineer, business analyst, or AI enthusiast, this lab wil
 * Summarize content with [`SUMMARIZE`](https://docs.snowflake.com/en/sql-reference/functions/summarize).
 * Extract answers using [`EXTRACT_ANSWER`](https://docs.snowflake.com/en/sql-reference/functions/extract_answer).
 
+---
+
 ## Prerequisites
 
 Duration: 0:01:00
@@ -41,11 +45,9 @@ Duration: 0:01:00
 To complete this lab, you will need:
 
 * A [Snowflake account](https://trial.snowflake.com/?owner=SPN-PID-452710) in a cloud region where **Snowflake Cortex LLM functions** are supported.
-
-* A Snowflake account in a cloud region where **Snowflake Cortex LLM functions** are supported.
-
 * Basic familiarity with SQL and the Snowflake UI.
 
 > 💡 **Tip:** Not all Snowflake regions currently support Cortex LLM functions. Use the [LLM Function Availability](https://docs.snowflake.com/en/user-guide/snowflake-cortex-overview#llm-function-availability) page to check which cloud regions are supported before creating your account.
 
 ---
+
