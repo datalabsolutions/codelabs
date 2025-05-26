@@ -29,12 +29,12 @@ Whether you're a data engineer, business analyst, or AI enthusiast, this lab wil
 ### What you'll learn
 
 * Upload and manage unstructured documents in Snowflake.
-* Extract and transform transcript text with [`PARSE_DOCUMENT`](https://docs.snowflake.com/en/sql-reference/functions/parse_document).
-* Structure data using prompt engineering and the [`COMPLETE`](https://docs.snowflake.com/en/sql-reference/functions/complete) function.
-* Translate text with [`TRANSLATE`](https://docs.snowflake.com/en/sql-reference/functions/translate).
-* Analyze sentiment using [`SENTIMENT`](https://docs.snowflake.com/en/sql-reference/functions/sentiment) and [`ENTITY_SENTIMENT`](https://docs.snowflake.com/en/sql-reference/functions/entity_sentiment).
-* Summarize content with [`SUMMARIZE`](https://docs.snowflake.com/en/sql-reference/functions/summarize).
-* Extract answers using [`EXTRACT_ANSWER`](https://docs.snowflake.com/en/sql-reference/functions/extract_answer).
+* Extract and transform transcript text with [`PARSE_DOCUMENT`](https://docs.snowflake.com/en/sql-reference/functions/parse_document-snowflake-cortex).
+* Structure data using prompt engineering and the [`COMPLETE`](https://docs.snowflake.com/en/sql-reference/functions/complete-snowflake-cortex) function.
+* Translate text with [`TRANSLATE`](https://docs.snowflake.com/en/sql-reference/functions/translate-snowflake-cortex).
+* Analyze sentiment using [`SENTIMENT`](https://docs.snowflake.com/en/sql-reference/functions/sentiment-snowflake-cortex) and [`ENTITY_SENTIMENT`](https://docs.snowflake.com/en/sql-reference/functions/entity_sentiment-snowflake-cortex).
+* Summarize content with [`SUMMARIZE`](https://docs.snowflake.com/en/sql-reference/functions/summarize-snowflake-cortex).
+* Extract answers using [`EXTRACT_ANSWER`](https://docs.snowflake.com/en/sql-reference/functions/extract_answer-snowflake-cortex).
 
 ---
 
@@ -210,6 +210,57 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
 ```sql
 SELECT *
 FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CALLER;
+```
+
+---
+## Summarize the Transcript with `SUMMARIZE`
+
+Duration: 0:05:00
+
+### Learning Outcome
+
+Use the `SUMMARIZE()` function to generate a concise summary of each call center transcript, with a focus on the main complaint raised by the customer.
+
+### Set Snowflake Context
+
+```sql
+USE DATABASE LLM_CORTEX_DEMO_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+```
+
+### Step 1: Create Table for Summary Results
+
+```sql
+CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SUMMARY (
+    FILE_NAME STRING,
+    MAIN_COMPLAINT STRING,
+    TRANSCRIPT VARIANT
+);
+```
+
+### Step 2: Summarize Using `SUMMARIZE()`
+
+This prompt asks the model to focus on the customer's complaint:
+
+```sql
+INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SUMMARY
+SELECT
+    FILE_NAME,
+    SUMMARIZE(
+        'gpt-4',
+        'Summarize the main complaint made by the customer in this transcript.',
+        PARSED_CONTENT:text
+    ) AS MAIN_COMPLAINT,
+    PARSED_CONTENT AS TRANSCRIPT
+FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
+```
+
+### Step 3: View Summary Results
+
+```sql
+SELECT *
+FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SUMMARY;
 ```
 
 ---

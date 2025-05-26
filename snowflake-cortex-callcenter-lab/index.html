@@ -34,12 +34,12 @@
 <h2 class="checklist" is-upgraded>What you&#39;ll learn</h2>
 <ul class="checklist">
 <li>Upload and manage unstructured documents in Snowflake.</li>
-<li>Extract and transform transcript text with <a href="https://docs.snowflake.com/en/sql-reference/functions/parse_document" target="_blank"><code>PARSE_DOCUMENT</code></a>.</li>
-<li>Structure data using prompt engineering and the <a href="https://docs.snowflake.com/en/sql-reference/functions/complete" target="_blank"><code>COMPLETE</code></a> function.</li>
-<li>Translate text with <a href="https://docs.snowflake.com/en/sql-reference/functions/translate" target="_blank"><code>TRANSLATE</code></a>.</li>
-<li>Analyze sentiment using <a href="https://docs.snowflake.com/en/sql-reference/functions/sentiment" target="_blank"><code>SENTIMENT</code></a> and <a href="https://docs.snowflake.com/en/sql-reference/functions/entity_sentiment" target="_blank"><code>ENTITY_SENTIMENT</code></a>.</li>
-<li>Summarize content with <a href="https://docs.snowflake.com/en/sql-reference/functions/summarize" target="_blank"><code>SUMMARIZE</code></a>.</li>
-<li>Extract answers using <a href="https://docs.snowflake.com/en/sql-reference/functions/extract_answer" target="_blank"><code>EXTRACT_ANSWER</code></a>.</li>
+<li>Extract and transform transcript text with <a href="https://docs.snowflake.com/en/sql-reference/functions/parse_document-snowflake-cortex" target="_blank"><code>PARSE_DOCUMENT</code></a>.</li>
+<li>Structure data using prompt engineering and the <a href="https://docs.snowflake.com/en/sql-reference/functions/complete-snowflake-cortex" target="_blank"><code>COMPLETE</code></a> function.</li>
+<li>Translate text with <a href="https://docs.snowflake.com/en/sql-reference/functions/translate-snowflake-cortex" target="_blank"><code>TRANSLATE</code></a>.</li>
+<li>Analyze sentiment using <a href="https://docs.snowflake.com/en/sql-reference/functions/sentiment-snowflake-cortex" target="_blank"><code>SENTIMENT</code></a> and <a href="https://docs.snowflake.com/en/sql-reference/functions/entity_sentiment-snowflake-cortex" target="_blank"><code>ENTITY_SENTIMENT</code></a>.</li>
+<li>Summarize content with <a href="https://docs.snowflake.com/en/sql-reference/functions/summarize-snowflake-cortex" target="_blank"><code>SUMMARIZE</code></a>.</li>
+<li>Extract answers using <a href="https://docs.snowflake.com/en/sql-reference/functions/extract_answer-snowflake-cortex" target="_blank"><code>EXTRACT_ANSWER</code></a>.</li>
 </ul>
 <h2 is-upgraded>Prerequisites</h2>
 <p>To complete this lab, you will need:</p>
@@ -165,6 +165,43 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
 <h2 is-upgraded>Step 3: View Extracted Caller Names</h2>
 <pre><code language="language-sql" class="language-sql">SELECT *
 FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CALLER;
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Summarize the Transcript with 
+SUMMARIZE" duration="5">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Use the <code>SUMMARIZE()</code> function to generate a concise summary of each call center transcript, with a focus on the main complaint raised by the customer.</p>
+<h2 is-upgraded>Set Snowflake Context</h2>
+<pre><code language="language-sql" class="language-sql">USE DATABASE LLM_CORTEX_DEMO_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+</code></pre>
+<h2 is-upgraded>Step 1: Create Table for Summary Results</h2>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SUMMARY (
+    FILE_NAME STRING,
+    MAIN_COMPLAINT STRING,
+    TRANSCRIPT VARIANT
+);
+</code></pre>
+<h2 is-upgraded>Step 2: Summarize Using <code>SUMMARIZE()</code></h2>
+<p>This prompt asks the model to focus on the customer&#39;s complaint:</p>
+<pre><code language="language-sql" class="language-sql">INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SUMMARY
+SELECT
+    FILE_NAME,
+    SUMMARIZE(
+        &#39;gpt-4&#39;,
+        &#39;Summarize the main complaint made by the customer in this transcript.&#39;,
+        PARSED_CONTENT:text
+    ) AS MAIN_COMPLAINT,
+    PARSED_CONTENT AS TRANSCRIPT
+FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
+</code></pre>
+<h2 is-upgraded>Step 3: View Summary Results</h2>
+<pre><code language="language-sql" class="language-sql">SELECT *
+FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SUMMARY;
 </code></pre>
 
 
