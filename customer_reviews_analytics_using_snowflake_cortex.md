@@ -46,6 +46,7 @@ To complete this lab, you will need:
 
 * A [Snowflake account](https://trial.snowflake.com/?owner=SPN-PID-452710) in a cloud region where **Snowflake Cortex LLM functions** are supported.
 * Basic familiarity with SQL and the Snowflake UI.
+* Access all the scripts for this Lab [on Github](https://github.com/datalabsolutions/AI-Labs/tree/main/snowflake-cortex-callcenter-lab)  
 
 > 💡 **Tip:** Not all Snowflake regions currently support Cortex LLM functions. Use the [LLM Function Availability](https://docs.snowflake.com/en/user-guide/snowflake-cortex-overview#llm-function-availability) page to check which cloud regions are supported before creating your account.
 
@@ -311,7 +312,7 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SENTIMENT;
 
 ---
 
-##  Extract Product Sentiment Using `ENTITY_SENTIMENT`
+## Extract Product Sentiment Using `ENTITY_SENTIMENT`
 
 Duration: 0:03:00
 
@@ -368,5 +369,73 @@ SELECT
 FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT,
      LATERAL FLATTEN(INPUT => PRODUCT_ENTITY_SENTIMENT) AS flattened;
 ```
+
+### Step 4: Create Flattened Table with Individual Sentiment Columns
+
+This step prepares a structured table where each column corresponds to one of the target entities (`Cost`, `Quality`, `Delivery Time`). This makes it easier to compare sentiment across transcripts.
+
+```sql
+CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_COLUMNS AS
+SELECT
+    FILE_NAME,
+    TRANSCRIPT,
+    MAX(CASE WHEN flattened.value:entity::STRING = 'Cost' THEN flattened.value:sentiment::STRING END) AS COST,
+    MAX(CASE WHEN flattened.value:entity::STRING = 'Quality' THEN flattened.value:sentiment::STRING END) AS QUALITY,
+    MAX(CASE WHEN flattened.value:entity::STRING = 'Delivery Time' THEN flattened.value:sentiment::STRING END) AS DELIVERY_TIME
+FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT,
+     LATERAL FLATTEN(INPUT => PRODUCT_ENTITY_SENTIMENT) AS flattened
+GROUP BY FILE_NAME, TRANSCRIPT;
+```
+
+### Step 5: Query Sentiment by Entity
+
+This query lets you retrieve the structured results per transcript with the sentiment classification for each of the three product-related dimensions.
+
+```sql
+SELECT *
+FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_COLUMNS;
+```
+
+---
+
+## Extract Product Information Using `COMPLETE`
+
+Duration: 0:06:00
+
+### Learning Outcome
+
+Use the `COMPLETE()` function to extract structured product-related information from each call center transcript. This can include product names, features discussed, complaints, or inquiries made by the customer.
+
+### Set Snowflake Context
+
+```sql
+USE DATABASE LLM_CORTEX_DEMO_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+```
+
+### Step 1: Create Table to Store Extracted Product Data
+
+```sql
+CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_PRODUCTS AS
+SELECT
+    FILE_NAME,
+    COMPLETE(
+      'gpt-4',
+      'Extract a JSON list of all products mentioned in this transcript. For each product, include the name, any feature discussed, and a short description of what the customer said about it.',
+      PARSED_CONTENT:text
+    ) AS PRODUCT_DETAILS,
+    PARSED_CONTENT AS TRANSCRIPT
+FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
+```
+
+### Step 2: View Extracted Product Details
+
+```sql
+SELECT *
+FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_PRODUCTS;
+```
+
+> 💡 **Tip:** The `COMPLETE()` function allows flexible prompt engineering — you can adjust the prompt to extract more specific attributes like pricing, satisfaction levels, or support needs.
 
 ---

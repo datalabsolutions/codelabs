@@ -46,6 +46,7 @@
 <ul>
 <li>A <a href="https://trial.snowflake.com/?owner=SPN-PID-452710" target="_blank">Snowflake account</a> in a cloud region where <strong>Snowflake Cortex LLM functions</strong> are supported.</li>
 <li>Basic familiarity with SQL and the Snowflake UI.</li>
+<li>Access all the scripts for this Lab <a href="https://github.com/datalabsolutions/AI-Labs/tree/main/snowflake-cortex-callcenter-lab" target="_blank">on Github</a></li>
 </ul>
 <p>💡 <strong>Tip:</strong> Not all Snowflake regions currently support Cortex LLM functions. Use the <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex-overview#llm-function-availability" target="_blank">LLM Function Availability</a> page to check which cloud regions are supported before creating your account.</p>
 
@@ -278,6 +279,54 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
 FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT,
      LATERAL FLATTEN(INPUT =&gt; PRODUCT_ENTITY_SENTIMENT) AS flattened;
 </code></pre>
+<h2 is-upgraded>Step 4: Create Flattened Table with Individual Sentiment Columns</h2>
+<p>This step prepares a structured table where each column corresponds to one of the target entities (<code>Cost</code>, <code>Quality</code>, <code>Delivery Time</code>). This makes it easier to compare sentiment across transcripts.</p>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_COLUMNS AS
+SELECT
+    FILE_NAME,
+    TRANSCRIPT,
+    MAX(CASE WHEN flattened.value:entity::STRING = &#39;Cost&#39; THEN flattened.value:sentiment::STRING END) AS COST,
+    MAX(CASE WHEN flattened.value:entity::STRING = &#39;Quality&#39; THEN flattened.value:sentiment::STRING END) AS QUALITY,
+    MAX(CASE WHEN flattened.value:entity::STRING = &#39;Delivery Time&#39; THEN flattened.value:sentiment::STRING END) AS DELIVERY_TIME
+FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT,
+     LATERAL FLATTEN(INPUT =&gt; PRODUCT_ENTITY_SENTIMENT) AS flattened
+GROUP BY FILE_NAME, TRANSCRIPT;
+</code></pre>
+<h2 is-upgraded>Step 5: Query Sentiment by Entity</h2>
+<p>This query lets you retrieve the structured results per transcript with the sentiment classification for each of the three product-related dimensions.</p>
+<pre><code language="language-sql" class="language-sql">SELECT *
+FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_COLUMNS;
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Extract Product Information Using 
+COMPLETE" duration="6">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Use the <code>COMPLETE()</code> function to extract structured product-related information from each call center transcript. This can include product names, features discussed, complaints, or inquiries made by the customer.</p>
+<h2 is-upgraded>Set Snowflake Context</h2>
+<pre><code language="language-sql" class="language-sql">USE DATABASE LLM_CORTEX_DEMO_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+</code></pre>
+<h2 is-upgraded>Step 1: Create Table to Store Extracted Product Data</h2>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_PRODUCTS AS
+SELECT
+    FILE_NAME,
+    COMPLETE(
+      &#39;gpt-4&#39;,
+      &#39;Extract a JSON list of all products mentioned in this transcript. For each product, include the name, any feature discussed, and a short description of what the customer said about it.&#39;,
+      PARSED_CONTENT:text
+    ) AS PRODUCT_DETAILS,
+    PARSED_CONTENT AS TRANSCRIPT
+FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
+</code></pre>
+<h2 is-upgraded>Step 2: View Extracted Product Details</h2>
+<pre><code language="language-sql" class="language-sql">SELECT *
+FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_PRODUCTS;
+</code></pre>
+<p>💡 <strong>Tip:</strong> The <code>COMPLETE()</code> function allows flexible prompt engineering — you can adjust the prompt to extract more specific attributes like pricing, satisfaction levels, or support needs.</p>
 
 
       </google-codelab-step>
