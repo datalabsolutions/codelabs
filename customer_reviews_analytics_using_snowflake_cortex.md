@@ -16,7 +16,7 @@ products: \["Snowflake Cortex"]
 
 # Snowflake Cortex AI for Call Center Transcript Analysis
 
-## Lab Overview
+## Overview
 
 Duration: 0:03:00
 
@@ -51,15 +51,15 @@ To complete this lab, you will need:
 
 ---
 
-## Set Up Your Snowflake Environment
+## Setup Environment
 
-Duration: 0:05:00
+Duration: 0:10:00
 
 ### Learning Outcome
 
-Prepare your Snowflake environment by creating a new database, warehouse, schemas, and internal stage.
+Prepare your Snowflake environment by creating a new database, warehouse, schemas, and internal stage, and upload call center transcript PDFs to that stage.
 
-### Instructions
+### Step 1: Create Database Objects
 
 ```sql
 -- Step 1: Create Database
@@ -84,30 +84,16 @@ CREATE OR REPLACE STAGE LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW
     ENCRYPTION = ( TYPE = 'SNOWFLAKE_SSE' );
 ```
 
----
-
-## Step 2: Upload PDF Files to a Snowflake Stage
-
-Duration: 0:05:00
-
-### Learning Outcome
-
-Upload call center transcript PDFs into the internal Snowflake stage you created in Step 1.
-
-### Instructions
+### Step 2: Upload PDF Files to the Internal Stage
 
 Your internal stage `LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW` is already set up.
-
-To upload PDF files:
 
 #### Using Snowsight:
 
 1. In Snowsight, go to **Databases**.
 2. Click on `LLM_CORTEX_DEMO_DB` > `RAW` > `Stages`.
 3. Select `INT_STAGE_DOC_RAW`.
-4. Click the **+ Files** tab.
+4. Click the **+ Files** tab.
 5. Click **Upload** and add one or more call center transcript PDFs.
-
-####
 
 ---
