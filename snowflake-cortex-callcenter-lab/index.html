@@ -107,7 +107,7 @@ CREATE SCHEMA IF NOT EXISTS LLM_CORTEX_DEMO_DB.STAGE;
 
       </google-codelab-step>
     
-      <google-codelab-step label="Parse Call Center Transcripts from PDF" duration="7">
+      <google-codelab-step label="PARSE_DOCUMENT" duration="7">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Use the <code>PARSE_DOCUMENT()</code> function to extract the contents of uploaded PDF files from your internal stage and store them in a structured format.</p>
 <h2 is-upgraded>Download Script</h2>
@@ -157,7 +157,7 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT;
 
       </google-codelab-step>
     
-      <google-codelab-step label="Extract Answers Using EXTRACT_ANSWER" duration="7">
+      <google-codelab-step label="EXTRACT_ANSWER" duration="7">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Use the <code>EXTRACT_ANSWER()</code> function to identify specific details in a transcript, such as the caller&#39;s name, call date, and duration, and store them in a structured table.</p>
 <h2 is-upgraded>Download Script</h2>
@@ -215,7 +215,7 @@ FROM
 
       </google-codelab-step>
     
-      <google-codelab-step label="Summarize Transcripts Using SUMMARIZE" duration="5">
+      <google-codelab-step label="SUMMARIZE" duration="5">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Use the <code>SUMMARIZE()</code> function to generate a concise, natural language summary of each call center transcript.</p>
 <h2 is-upgraded>Download Script</h2>
@@ -254,7 +254,7 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SUMMARY;
 
       </google-codelab-step>
     
-      <google-codelab-step label="Analyze Overall Sentiment Using SENTIMENT" duration="5">
+      <google-codelab-step label="SENTIMENT" duration="5">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Use the <code>SENTIMENT()</code> function to detect the overall emotional tone of a transcript. This is especially helpful for assessing how a customer felt during a conversation.</p>
 <h2 is-upgraded>Download Script</h2>
@@ -292,7 +292,7 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SENTIMENT;
 
       </google-codelab-step>
     
-      <google-codelab-step label="Analyze Entity Sentiment Using ENTITY_SENTIMENT" duration="6">
+      <google-codelab-step label="ENTITY_SENTIMENT" duration="6">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Use the <code>ENTITY_SENTIMENT()</code> function to extract and evaluate how specific aspects — such as &#34;Tone of voice&#34;, &#34;Issue Resolved&#34;, and &#34;Follow up action&#34; — are discussed in each call transcript.</p>
 <h2 is-upgraded>Download Script</h2>
@@ -345,7 +345,7 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT,
 
       </google-codelab-step>
     
-      <google-codelab-step label="Classify Transcripts Using CLASSIFY_TEXT" duration="5">
+      <google-codelab-step label="CLASSIFY_TEXT" duration="5">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Use the <code>CLASSIFY_TEXT()</code> function to categorize each call center transcript into predefined categories such as ‘Report Incident&#39;, ‘Complaint&#39;, or ‘Follow up&#39;.</p>
 <h2 is-upgraded>Download Script</h2>
@@ -386,7 +386,7 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CLASSIFICATION;
 
       </google-codelab-step>
     
-      <google-codelab-step label="Extract Structured Product Information Using COMPLETE" duration="7">
+      <google-codelab-step label="COMPLETE" duration="7">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Use the <code>COMPLETE()</code> function to extract detailed product references from transcripts and store the output as a structured JSON.</p>
 <h2 is-upgraded>Instructions</h2>

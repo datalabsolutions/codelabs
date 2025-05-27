@@ -122,7 +122,7 @@ Your internal stage `LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW` is already set up
 
 ---
 
-## Parse Call Center Transcripts from PDF
+## PARSE_DOCUMENT
 
 Duration: 0:07:00
 
@@ -196,7 +196,7 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT;
 
 ---
 
-## Extract Answers Using EXTRACT\_ANSWER
+## EXTRACT_ANSWER
 
 Duration: 0:07:00
 
@@ -273,7 +273,7 @@ SELECT * FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CALLER;
 
 ---
 
-## Summarize Transcripts Using SUMMARIZE
+## SUMMARIZE
 
 Duration: 0:05:00
 
@@ -333,7 +333,7 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SUMMARY;
 
 ---
 
-## Analyze Overall Sentiment Using SENTIMENT
+## SENTIMENT
 
 Duration: 0:05:00
 
@@ -391,7 +391,7 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SENTIMENT;
 
 ---
 
-## Analyze Entity Sentiment Using ENTITY\_SENTIMENT
+## ENTITY_SENTIMENT
 
 Duration: 0:06:00
 
@@ -466,7 +466,7 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT,
 
 ---
 
-## Classify Transcripts Using CLASSIFY\_TEXT
+## CLASSIFY_TEXT
 
 Duration: 0:05:00
 
@@ -527,7 +527,7 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CLASSIFICATION;
 
 ---
 
-## Extract Structured Product Information Using COMPLETE
+## COMPLETE
 
 Duration: 0:07:00
 
