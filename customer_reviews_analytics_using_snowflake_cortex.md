@@ -19,8 +19,8 @@ products: ["Snowflake Cortex"]
 ## Overview
 
 **Duration**: 0:03:00
-[Download Demo Files (ZIP)](https://github.com/datalabsolutions/AI-Labs/raw/main/snowflake-cortex-callcenter-lab/assets/audio-files.zip)
 
+### Introduction
 This hands-on lab introduces participants to Snowflake Cortex AI’s ability to extract valuable insights from unstructured documents using large language models. The lab uses examples of call center transcripts stored as PDFs. Participants will explore functions such as PARSE\_DOCUMENT, COMPLETE, TRANSLATE, SENTIMENT, ENTITY\_SENTIMENT, CLASSIFY\_TEXT, SUMMARIZE, and EXTRACT\_ANSWER. These tools empower users to parse, translate, analyze, classify, and query unstructured customer support data to uncover sentiment, highlight issues, and summarize conversations at scale.
 
 ### What You'll Learn
@@ -33,6 +33,10 @@ This hands-on lab introduces participants to Snowflake Cortex AI’s ability to 
 * Classify call intent using [`CLASSIFY_TEXT`](https://docs.snowflake.com/en/sql-reference/functions/classify_text-snowflake-cortex)
 * Summarize content with [`SUMMARIZE`](https://docs.snowflake.com/en/sql-reference/functions/summarize-snowflake-cortex)
 * Extract answers using [`EXTRACT_ANSWER`](https://docs.snowflake.com/en/sql-reference/functions/extract_answer-snowflake-cortex)
+
+### Download Code
+
+Download the source code for this lab [here] (https://github.com/datalabsolutions/AI-Labs/raw/main/snowflake-cortex-callcenter-lab/assets/audio-files.zip)
 
 ### Prerequisites
 
@@ -1091,13 +1095,13 @@ This final step transforms your structured dialogue JSON into a clean SQL table 
 
 **Duration**: 0:07:00
 
-### Download Script
-
-Download the source code for this step [here](https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/10-AI-LAB-FINAL.sql).
-
 ### Learning Outcome
 
 Bring together all outputs from previous steps—parsed transcripts, extracted answers, sentiment analysis, summaries, classifications, and completions—into a unified, queryable dataset. This is ideal for final reporting, QA review, dashboarding, or export.
+
+### Download Script
+
+Download the source code for this step [here](https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/10-AI-LAB-FINAL.sql).
 
 ### Set Snowflake Context
 

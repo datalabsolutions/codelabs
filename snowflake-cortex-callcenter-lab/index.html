@@ -29,7 +29,8 @@
                   feedback-link="https://github.com/datalab-solutions/snowflake-codelabs/issues">
     
       <google-codelab-step label="Overview" duration="0">
-        <p><strong>Duration</strong>: 0:03:00 <a href="https://github.com/datalabsolutions/AI-Labs/raw/main/snowflake-cortex-callcenter-lab/assets/audio-files.zip" target="_blank">Download Demo Files (ZIP)</a></p>
+        <p><strong>Duration</strong>: 0:03:00</p>
+<h2 is-upgraded>Introduction</h2>
 <p>This hands-on lab introduces participants to Snowflake Cortex AI&#39;s ability to extract valuable insights from unstructured documents using large language models. The lab uses examples of call center transcripts stored as PDFs. Participants will explore functions such as PARSE_DOCUMENT, COMPLETE, TRANSLATE, SENTIMENT, ENTITY_SENTIMENT, CLASSIFY_TEXT, SUMMARIZE, and EXTRACT_ANSWER. These tools empower users to parse, translate, analyze, classify, and query unstructured customer support data to uncover sentiment, highlight issues, and summarize conversations at scale.</p>
 <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
 <ul class="checklist">
@@ -42,6 +43,8 @@
 <li>Summarize content with <a href="https://docs.snowflake.com/en/sql-reference/functions/summarize-snowflake-cortex" target="_blank"><code>SUMMARIZE</code></a></li>
 <li>Extract answers using <a href="https://docs.snowflake.com/en/sql-reference/functions/extract_answer-snowflake-cortex" target="_blank"><code>EXTRACT_ANSWER</code></a></li>
 </ul>
+<h2 is-upgraded>Download Code</h2>
+<p>Download the source code for this lab [here] (https://github.com/datalabsolutions/AI-Labs/raw/main/snowflake-cortex-callcenter-lab/assets/audio-files.zip)</p>
 <h2 is-upgraded>Prerequisites</h2>
 <p><strong>Duration</strong>: 0:01:00</p>
 <ul>
@@ -899,10 +902,10 @@ FROM
     
       <google-codelab-step label="FINAL" duration="0">
         <p><strong>Duration</strong>: 0:07:00</p>
-<h2 is-upgraded>Download Script</h2>
-<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/10-AI-LAB-FINAL.sql" target="_blank">here</a>.</p>
 <h2 is-upgraded>Learning Outcome</h2>
 <p>Bring together all outputs from previous steps—parsed transcripts, extracted answers, sentiment analysis, summaries, classifications, and completions—into a unified, queryable dataset. This is ideal for final reporting, QA review, dashboarding, or export.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/10-AI-LAB-FINAL.sql" target="_blank">here</a>.</p>
 <h2 is-upgraded>Set Snowflake Context</h2>
 <pre><code language="language-sql" class="language-sql">USE DATABASE LLM_CORTEX_DEMO_DB;
 USE SCHEMA STAGE;
