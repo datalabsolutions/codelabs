@@ -386,33 +386,8 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CLASSIFICATION;
 
       </google-codelab-step>
     
-      <google-codelab-step label="COMPLETE" duration="7">
-        <h2 is-upgraded>Learning Outcome</h2>
-<p>Use the <code>COMPLETE()</code> function to extract detailed product references from transcripts and store the output as a structured JSON.</p>
-<h2 is-upgraded>Instructions</h2>
-<p>This function enables you to generate custom, structured outputs by engineering a prompt that guides the model to return specific fields. This is useful when extracting data that doesn&#39;t fit predefined functions.</p>
-<h2 is-upgraded>Set Snowflake Context</h2>
-<pre><code language="language-sql" class="language-sql">USE DATABASE LLM_CORTEX_DEMO_DB;
-USE SCHEMA STAGE;
-USE WAREHOUSE USER_STD_XSMALL_WH;
-</code></pre>
-<h2 is-upgraded>Step 1: Create a Table to Store Product Details</h2>
-<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_PRODUCTS AS
-SELECT
-    FILE_NAME,
-    SNOWFLAKE.CORTEX.COMPLETE(
-      &#39;gpt-4&#39;,
-      &#39;Extract a JSON list of all products mentioned in this transcript. For each product, include the name, any feature discussed, and a short description of what the customer said about it.&#39;,
-      TRANSCRIPT
-    ) AS PRODUCT_DETAILS,
-    TRANSCRIPT
-FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT;
-</code></pre>
-<h2 is-upgraded>Step 2: View Extracted Product Information</h2>
-<pre><code language="language-sql" class="language-sql">SELECT *
-FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_PRODUCTS;
-</code></pre>
-
+      <google-codelab-step label="COMPLETE" duration="0">
+        
 
       </google-codelab-step>
     
@@ -441,8 +416,8 @@ USE WAREHOUSE USER_STD_XSMALL_WH;
 </code></pre>
 <h2 is-upgraded>Example 1: Simple One-Line Summary</h2>
 <table>
-<tr><td colspan="1" rowspan="1"><p>Technique</p>
-</td><td colspan="1" rowspan="1"><p>Prompt Line</p>
+<tr><td colspan="1" rowspan="1"><p><strong>Technique</strong></p>
+</td><td colspan="1" rowspan="1"><p><strong>Prompt Line</strong></p>
 </td></tr>
 <tr><td colspan="1" rowspan="1"><p>Instruction</p>
 </td><td colspan="1" rowspan="1"><p>Summarize the following call transcript in one sentence:</p>
@@ -464,8 +439,8 @@ WHERE
 </code></pre>
 <h2 is-upgraded>Example 2: Bullet Summary for Team Leader</h2>
 <table>
-<tr><td colspan="1" rowspan="1"><p>Technique</p>
-</td><td colspan="1" rowspan="1"><p>Prompt Line</p>
+<tr><td colspan="1" rowspan="1"><p><strong>Technique</strong></p>
+</td><td colspan="1" rowspan="1"><p><strong>Prompt Line</strong></p>
 </td></tr>
 <tr><td colspan="1" rowspan="1"><p>Role / Persona</p>
 </td><td colspan="1" rowspan="1"><p>You are a senior support team lead.</p>
@@ -487,11 +462,11 @@ WHERE
     FILE_NAME,
     SNOWFLAKE.CORTEX.COMPLETE(
         &#39;snowflake-arctic&#39;,
-        &#39;You are a senior support team lead.&#39; ||
-        &#39; Read the following transcript and summarize it into exactly three bullet points.&#39; ||
-        &#39; Keep each bullet point under 15 words and use a professional tone.&#39; ||
-        &#39; Use hyphens for each bullet.&#39; ||
-        &#39; Transcript: &#39; || TRANSCRIPT
+        &#39;You are a senior support team lead. &#39; ||
+        &#39;Read the following transcript and summarize it into exactly three bullet points. &#39; ||
+        &#39;Keep each bullet point under 15 words and use a professional tone. &#39; ||
+        &#39;Use hyphens for each bullet. &#39; ||
+        &#39;Transcript: &#39; || TRANSCRIPT
     ) AS BULLET_SUMMARY
 FROM
     LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT
@@ -500,8 +475,8 @@ WHERE
 </code></pre>
 <h2 is-upgraded>Example 3: Escalation Detection</h2>
 <table>
-<tr><td colspan="1" rowspan="1"><p>Technique</p>
-</td><td colspan="1" rowspan="1"><p>Prompt Line</p>
+<tr><td colspan="1" rowspan="1"><p><strong>Technique</strong></p>
+</td><td colspan="1" rowspan="1"><p><strong>Prompt Line</strong></p>
 </td></tr>
 <tr><td colspan="1" rowspan="1"><p>Role / Persona</p>
 </td><td colspan="1" rowspan="1"><p>You are a triage assistant.</p>
@@ -520,10 +495,10 @@ WHERE
     FILE_NAME,
     SNOWFLAKE.CORTEX.COMPLETE(
         &#39;snowflake-arctic&#39;,
-        &#39;You are a triage assistant.&#39; ||
-        &#39; Does this call require escalation? Answer YES or NO.&#39; ||
-        &#39; If YES, explain briefly in one sentence why.&#39; ||
-        &#39; Transcript: &#39; || TRANSCRIPT
+        &#39;You are a triage assistant. &#39; ||
+        &#39;Does this call require escalation? Answer YES or NO. &#39; ||
+        &#39;If YES, explain briefly in one sentence why. &#39; ||
+        &#39;Transcript: &#39; || TRANSCRIPT
     ) AS ESCALATION_FLAG
 FROM
     LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT
@@ -532,8 +507,8 @@ WHERE
 </code></pre>
 <h2 is-upgraded>Example 4: Call Quality Scoring</h2>
 <table>
-<tr><td colspan="1" rowspan="1"><p>Technique</p>
-</td><td colspan="1" rowspan="1"><p>Prompt Line</p>
+<tr><td colspan="1" rowspan="1"><p><strong>Technique</strong></p>
+</td><td colspan="1" rowspan="1"><p><strong>Prompt Line</strong></p>
 </td></tr>
 <tr><td colspan="1" rowspan="1"><p>Role / Persona</p>
 </td><td colspan="1" rowspan="1"><p>You are a quality control AI.</p>
@@ -552,10 +527,10 @@ WHERE
     FILE_NAME,
     SNOWFLAKE.CORTEX.COMPLETE(
         &#39;snowflake-arctic&#39;,
-        &#39;You are a quality control AI.&#39; ||
-        &#39; Rate the call on a scale of 1–5 stars based on clarity, empathy, and professionalism.&#39; ||
-        &#39; Format as &#34;Score: X/5 - Reason&#34;.&#39; ||
-        &#39; Transcript: &#39; || TRANSCRIPT
+        &#39;You are a quality control AI. &#39; ||
+        &#39;Rate the call on a scale of 1–5 stars based on clarity, empathy, and professionalism. &#39; ||
+        &#39;Format as &#34;Score: X/5 - Reason&#34;. &#39; ||
+        &#39;Transcript: &#39; || TRANSCRIPT
     ) AS QUALITY_SCORE
 FROM
     LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT
@@ -564,8 +539,8 @@ WHERE
 </code></pre>
 <h2 is-upgraded>Example 5: Follow-Up Email Draft</h2>
 <table>
-<tr><td colspan="1" rowspan="1"><p>Technique</p>
-</td><td colspan="1" rowspan="1"><p>Prompt Line</p>
+<tr><td colspan="1" rowspan="1"><p><strong>Technique</strong></p>
+</td><td colspan="1" rowspan="1"><p><strong>Prompt Line</strong></p>
 </td></tr>
 <tr><td colspan="1" rowspan="1"><p>Role / Persona</p>
 </td><td colspan="1" rowspan="1"><p>You are a customer service agent.</p>
@@ -584,10 +559,10 @@ WHERE
     FILE_NAME,
     SNOWFLAKE.CORTEX.COMPLETE(
         &#39;snowflake-arctic&#39;,
-        &#39;You are a customer service agent.&#39; ||
-        &#39; Based on this transcript, write a short follow-up email under 100 words.&#39; ||
-        &#39; Keep it friendly and professional.&#39; ||
-        &#39; Transcript: &#39; || TRANSCRIPT
+        &#39;You are a customer service agent. &#39; ||
+        &#39;Based on this transcript, write a short follow-up email under 100 words. &#39; ||
+        &#39;Keep it friendly and professional. &#39; ||
+        &#39;Transcript: &#39; || TRANSCRIPT
     ) AS FOLLOW_UP_EMAIL
 FROM
     LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT
@@ -596,8 +571,8 @@ WHERE
 </code></pre>
 <h2 is-upgraded>Example 6: Compliance Red Flag Detection</h2>
 <table>
-<tr><td colspan="1" rowspan="1"><p>Technique</p>
-</td><td colspan="1" rowspan="1"><p>Prompt Line</p>
+<tr><td colspan="1" rowspan="1"><p><strong>Technique</strong></p>
+</td><td colspan="1" rowspan="1"><p><strong>Prompt Line</strong></p>
 </td></tr>
 <tr><td colspan="1" rowspan="1"><p>Role / Persona</p>
 </td><td colspan="1" rowspan="1"><p>You are a risk compliance assistant.</p>
