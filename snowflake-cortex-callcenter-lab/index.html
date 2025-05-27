@@ -49,7 +49,7 @@
 <li>Basic familiarity with SQL and the Snowflake UI</li>
 <li>Access all the scripts for this Lab <a href="https://github.com/datalabsolutions/AI-Labs/tree/main/snowflake-cortex-callcenter-lab" target="_blank">on GitHub</a></li>
 </ul>
-<p>💡 <strong>Tip:</strong> Use the <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex-overview#llm-function-availability" target="_blank">LLM Function Availability</a> page to check which cloud regions are supported.</p>
+<p>💡 <strong>Tip:</strong> Use the <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#availability" target="_blank">LLM Function Availability</a> page to check which cloud regions are supported.</p>
 
 
       </google-codelab-step>
@@ -404,7 +404,7 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT,
      LATERAL FLATTEN(INPUT =&gt; PRODUCT_ENTITY_SENTIMENT) AS flattened;
 </code></pre>
 <p>📊 This result shows one row per label per transcript — ideal for QA review and comparison dashboards.</p>
-<h2 is-upgraded>Step 4 (Optional): Pivot Results into One Row per Transcript</h2>
+<h2 is-upgraded>Step 4: Pivot Results into One Row per Transcript</h2>
 <p>You can transform entity results into columns using aggregation:</p>
 <pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT_FINAL AS
 SELECT 
@@ -898,7 +898,9 @@ FROM
       </google-codelab-step>
     
       <google-codelab-step label="FINAL" duration="0">
-        <p><strong>Duration</strong>: 0:07:00 <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/10-AI-LAB-FINAL.sql" target="_blank">10-AI-LAB-FINAL.sql</a></p>
+        <p><strong>Duration</strong>: 0:07:00</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/10-AI-LAB-FINAL.sql" target="_blank">here</a>.</p>
 <h2 is-upgraded>Learning Outcome</h2>
 <p>Bring together all outputs from previous steps—parsed transcripts, extracted answers, sentiment analysis, summaries, classifications, and completions—into a unified, queryable dataset. This is ideal for final reporting, QA review, dashboarding, or export.</p>
 <h2 is-upgraded>Set Snowflake Context</h2>

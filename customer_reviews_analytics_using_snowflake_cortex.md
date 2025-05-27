@@ -42,7 +42,7 @@ This hands-on lab introduces participants to Snowflake Cortex AI’s ability to 
 * Basic familiarity with SQL and the Snowflake UI
 * Access all the scripts for this Lab [on GitHub](https://github.com/datalabsolutions/AI-Labs/tree/main/snowflake-cortex-callcenter-lab)
 
-> 💡 **Tip:** Use the [LLM Function Availability](https://docs.snowflake.com/en/user-guide/snowflake-cortex-overview#llm-function-availability) page to check which cloud regions are supported.
+> 💡 **Tip:** Use the [LLM Function Availability](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#availability) page to check which cloud regions are supported.
 
 ## Environment Configuration
 
@@ -555,7 +555,7 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT,
 
 > 📊 This result shows one row per label per transcript — ideal for QA review and comparison dashboards.
 
-### Step 4 (Optional): Pivot Results into One Row per Transcript
+### Step 4: Pivot Results into One Row per Transcript
 
 You can transform entity results into columns using aggregation:
 
@@ -1090,7 +1090,10 @@ This final step transforms your structured dialogue JSON into a clean SQL table 
 ## FINAL
 
 **Duration**: 0:07:00
-[10-AI-LAB-FINAL.sql](https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/10-AI-LAB-FINAL.sql)
+
+### Download Script
+
+Download the source code for this step [here](https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/10-AI-LAB-FINAL.sql).
 
 ### Learning Outcome
 
