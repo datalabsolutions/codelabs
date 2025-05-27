@@ -1138,16 +1138,6 @@ You can preview results with:
 SELECT * FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_FINAL;
 ```
 
-To export the results as CSV or JSON:
-
-```sql
-COPY INTO @LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW/exports/
-FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_FINAL
-FILE_FORMAT = (TYPE = CSV HEADER = TRUE);
-```
-
-> 📤 Exported data can be loaded into Power BI, Tableau, or Excel for further analysis.
-
 ## Conclusion
 
 Congratulations on completing the Snowflake Cortex AI for Call Center Transcript Analysis lab!

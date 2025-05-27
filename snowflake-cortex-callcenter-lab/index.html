@@ -931,12 +931,6 @@ LEFT JOIN LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT E USING (FILE_NAM
 <p>You can preview results with:</p>
 <pre><code language="language-sql" class="language-sql">SELECT * FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_FINAL;
 </code></pre>
-<p>To export the results as CSV or JSON:</p>
-<pre><code language="language-sql" class="language-sql">COPY INTO @LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW/exports/
-FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_FINAL
-FILE_FORMAT = (TYPE = CSV HEADER = TRUE);
-</code></pre>
-<p>📤 Exported data can be loaded into Power BI, Tableau, or Excel for further analysis.</p>
 
 
       </google-codelab-step>
