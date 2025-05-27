@@ -21,7 +21,7 @@ Duration: 0:03:00
 
 [Download Demo Files (ZIP)](https://github.com/datalabsolutions/AI-Labs/raw/main/snowflake-cortex-callcenter-lab/assets/audio-files.zip)
 
-This hands-on lab introduces participants to Snowflake Cortex AI’s ability to extract valuable insights from unstructured documents using large language models. The lab uses examples of call center transcripts stored as PDFs. Participants will explore functions such as [`PARSE_DOCUMENT`](https://docs.snowflake.com/en/sql-reference/functions/parse_document), [`COMPLETE`](https://docs.snowflake.com/en/sql-reference/functions/complete), [`TRANSLATE`](https://docs.snowflake.com/en/sql-reference/functions/translate), [`SENTIMENT`](https://docs.snowflake.com/en/sql-reference/functions/sentiment), [`ENTITY_SENTIMENT`](https://docs.snowflake.com/en/sql-reference/functions/entity_sentiment), [`SUMMARIZE`](https://docs.snowflake.com/en/sql-reference/functions/summarize), and [`EXTRACT_ANSWER`](https://docs.snowflake.com/en/sql-reference/functions/extract_answer). These tools empower users to parse, translate, analyze, and query unstructured customer support data to uncover sentiment, highlight issues, and summarize conversations at scale.
+This hands-on lab introduces participants to Snowflake Cortex AI’s ability to extract valuable insights from unstructured documents using large language models. The lab uses examples of call center transcripts stored as PDFs. Participants will explore functions such as PARSE_DOCUMENT, COMPLETE, TRANSLATE, SENTIMENT, ENTITY_SENTIMENT, SUMMARIZE, and EXTRACT_ANSWER. These tools empower users to parse, translate, analyze, and query unstructured customer support data to uncover sentiment, highlight issues, and summarize conversations at scale.
 
 Whether you're a data engineer, business analyst, or AI enthusiast, this lab will help you understand how to turn raw documents into structured, actionable data using generative AI.
 
@@ -568,4 +568,208 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT;
 SELECT *
 FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_PRODUCTS;
 ```
+
+## Advanced Prompt Engineering with COMPLETE
+
+Duration: 0:08:00
+
+### Learning Outcome
+
+Learn how to use the `COMPLETE()` function with tailored prompts to generate structured outputs, ratings, insights, and content based on transcript text. Understand and apply prompt engineering techniques that significantly enhance result quality and relevance.
+
+---
+
+### Instructions
+
+The `COMPLETE()` function is one of the most flexible tools in the Snowflake Cortex LLM suite. It enables you to pass a custom prompt and receive freeform natural language or structured output in return. This is especially useful when your desired output doesn't fit neatly into predefined patterns like classification, summarization, or sentiment.
+
+You should use `COMPLETE()` when:
+
+* You want **full control** over the output structure
+* You need the model to **adopt a persona or role**
+* You're constructing content (e.g., bullet points, emails, JSON)
+* You're applying **prompt engineering** techniques for precision
+
+### Prompt Construction Technique
+
+A common and effective approach for using `COMPLETE()` is to build the **instructional portion of the prompt** as a string and then **append the actual transcript content**. This ensures that the prompt guides the model on what to do before presenting the data it should analyze.
+
+For example:
+
+```sql
+'You are a support assistant. Summarize this call in one sentence: ' || TRANSCRIPT
+```
+
+This technique ensures the model receives clear guidance **before** being presented with the unstructured input.
+
+### Set Snowflake Context
+
+```sql
+USE DATABASE LLM_CORTEX_DEMO_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+```
+
+---
+
+### Example 1: Simple One-Line Summary
+
+| Technique   | Prompt Line                                              |
+| ----------- | -------------------------------------------------------- |
+| Instruction | Summarize the following call transcript in one sentence: |
+| Data        | TRANSCRIPT                                               |
+
+```sql
+SELECT
+    FILE_NAME,
+    SNOWFLAKE.CORTEX.COMPLETE(
+        'snowflake-arctic',
+        'Summarize the following call transcript in one sentence: ' || TRANSCRIPT
+    ) AS CALL_SUMMARY
+FROM
+    LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT
+WHERE
+    FILE_NAME = 'audiofile11.pdf';
+```
+
+---
+
+### Example 2: Bullet Summary for Team Leader
+
+| Technique            | Prompt Line                                                                      |
+| -------------------- | -------------------------------------------------------------------------------- |
+| Role / Persona       | You are a senior support team lead.                                              |
+| Instruction          | Read the following transcript and summarize it into exactly three bullet points. |
+| Constraint           | Keep each bullet point under 15 words and use a professional tone.               |
+| Format Specification | Use hyphens for each bullet.                                                     |
+| Data                 | TRANSCRIPT                                                                       |
+
+```sql
+SELECT
+    FILE_NAME,
+    SNOWFLAKE.CORTEX.COMPLETE(
+        'snowflake-arctic',
+        'You are a senior support team lead.' ||
+        ' Read the following transcript and summarize it into exactly three bullet points.' ||
+        ' Keep each bullet point under 15 words and use a professional tone.' ||
+        ' Use hyphens for each bullet.' ||
+        ' Transcript: ' || TRANSCRIPT
+    ) AS BULLET_SUMMARY
+FROM
+    LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT
+WHERE
+    FILE_NAME = 'audiofile11.pdf';
+```
+
+---
+
+### Example 3: Escalation Detection
+
+| Technique      | Prompt Line                                          |
+| -------------- | ---------------------------------------------------- |
+| Role / Persona | You are a triage assistant.                          |
+| Instruction    | Does this call require escalation? Answer YES or NO. |
+| Constraint     | If YES, explain briefly in one sentence why.         |
+| Data           | TRANSCRIPT                                           |
+
+```sql
+SELECT
+    FILE_NAME,
+    SNOWFLAKE.CORTEX.COMPLETE(
+        'snowflake-arctic',
+        'You are a triage assistant.' ||
+        ' Does this call require escalation? Answer YES or NO.' ||
+        ' If YES, explain briefly in one sentence why.' ||
+        ' Transcript: ' || TRANSCRIPT
+    ) AS ESCALATION_FLAG
+FROM
+    LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT
+WHERE
+    FILE_NAME IN('audiofile11.pdf','audiofile79.pdf');
+```
+
+---
+
+### Example 4: Call Quality Scoring
+
+| Technique            | Prompt Line                                                                           |
+| -------------------- | ------------------------------------------------------------------------------------- |
+| Role / Persona       | You are a quality control AI.                                                         |
+| Instruction          | Rate the call on a scale of 1–5 stars based on clarity, empathy, and professionalism. |
+| Format Specification | Format as "Score: X/5 - Reason".                                                      |
+| Data                 | TRANSCRIPT                                                                            |
+
+```sql
+SELECT
+    FILE_NAME,
+    SNOWFLAKE.CORTEX.COMPLETE(
+        'snowflake-arctic',
+        'You are a quality control AI.' ||
+        ' Rate the call on a scale of 1–5 stars based on clarity, empathy, and professionalism.' ||
+        ' Format as "Score: X/5 - Reason".' ||
+        ' Transcript: ' || TRANSCRIPT
+    ) AS QUALITY_SCORE
+FROM
+    LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT
+WHERE
+    FILE_NAME = 'audiofile11.pdf';
+```
+
+---
+
+### Example 5: Follow-Up Email Draft
+
+| Technique      | Prompt Line                                                              |
+| -------------- | ------------------------------------------------------------------------ |
+| Role / Persona | You are a customer service agent.                                        |
+| Instruction    | Based on this transcript, write a short follow-up email under 100 words. |
+| Tone & Style   | Keep it friendly and professional.                                       |
+| Data           | TRANSCRIPT                                                               |
+
+```sql
+SELECT
+    FILE_NAME,
+    SNOWFLAKE.CORTEX.COMPLETE(
+        'snowflake-arctic',
+        'You are a customer service agent.' ||
+        ' Based on this transcript, write a short follow-up email under 100 words.' ||
+        ' Keep it friendly and professional.' ||
+        ' Transcript: ' || TRANSCRIPT
+    ) AS FOLLOW_UP_EMAIL
+FROM
+    LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT
+WHERE
+    FILE_NAME = 'audiofile11.pdf';
+```
+
+---
+
+### Example 6: Compliance Red Flag Detection
+
+| Technique            | Prompt Line                                                                                           |
+| -------------------- | ----------------------------------------------------------------------------------------------------- |
+| Role / Persona       | You are a risk compliance assistant.                                                                  |
+| Instruction          | Read the following transcript and identify any red flags (e.g., threats to cancel, abusive language). |
+| Constraint           | If no red flags are found, return "None".                                                             |
+| Format Specification | Use bullet points for each red flag.                                                                  |
+| Data                 | TRANSCRIPT                                                                                            |
+
+```sql
+SELECT
+    FILE_NAME,
+    SNOWFLAKE.CORTEX.COMPLETE(
+        'snowflake-arctic',
+        'You are a risk compliance assistant.' ||
+        ' Read the following transcript and identify any red flags (e.g., threats to cancel, abusive language, compliance issues).' ||
+        ' If no red flags are found, return "None".' ||
+        ' Use bullet points for each red flag.' ||
+        ' Transcript: ' || TRANSCRIPT
+    ) AS RED_FLAGS
+FROM
+    LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT
+WHERE
+    FILE_NAME = 'audiofile11.pdf';
+```
+
+---
 
