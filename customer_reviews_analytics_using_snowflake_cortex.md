@@ -25,7 +25,7 @@ This hands-on lab introduces participants to Snowflake Cortex AI’s ability to 
 
 Whether you're a data engineer, business analyst, or AI enthusiast, this lab will help you understand how to turn raw documents into structured, actionable data using generative AI.
 
-## What you'll learn
+### What you'll learn
 
 * Upload and manage unstructured documents in Snowflake.
 * Extract and transform transcript text with [`PARSE_DOCUMENT`](https://docs.snowflake.com/en/sql-reference/functions/parse_document-snowflake-cortex).
@@ -35,7 +35,7 @@ Whether you're a data engineer, business analyst, or AI enthusiast, this lab wil
 * Summarize content with [`SUMMARIZE`](https://docs.snowflake.com/en/sql-reference/functions/summarize-snowflake-cortex).
 * Extract answers using [`EXTRACT_ANSWER`](https://docs.snowflake.com/en/sql-reference/functions/extract_answer-snowflake-cortex).
 
-## Prerequisites
+### Prerequisites
 Duration: 0:01:00
 
 * A [Snowflake account](https://trial.snowflake.com/?owner=SPN-PID-452710) in a cloud region where **Snowflake Cortex LLM functions** are supported.
@@ -54,7 +54,7 @@ Create the core Snowflake resources needed to run the AI Lab. This includes a da
 
 ### Download Script
 
-Download he source code for this step [here](https://github.com/datalabsolutions/AI-Labs/tree/main/snowflake-cortex-callcenter-lab/scripts\01-AI-LAB-CONFIGURATION.sql). 
+Download the source code for this step [here](https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/01-AI-LAB-CONFIGURATION.sql). 
 
 ### Description
 
@@ -132,7 +132,7 @@ Use the `PARSE_DOCUMENT()` function to extract the contents of uploaded PDF file
 
 ### Download Script
 
-Download he source code for this step [here](https://github.com/datalabsolutions/AI-Labs/tree/main/snowflake-cortex-callcenter-lab/scripts\02-AI-LAB-PARSE_DOCUMENT.sql). 
+Download the source code for this step [here](https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/02-AI-LAB-PARSE_DOCUMENT.sql). 
 
 ### Instructions
 
