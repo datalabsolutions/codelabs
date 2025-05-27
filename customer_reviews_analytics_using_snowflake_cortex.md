@@ -18,7 +18,7 @@ products: ["Snowflake Cortex"]
 
 ## Overview
 
-**Duration**: 0:03:00
+Duration: 0:03:00
 
 ### Introduction
 This hands-on lab introduces participants to Snowflake Cortex AI’s ability to extract valuable insights from unstructured documents using large language models. The lab uses examples of call center transcripts stored as PDFs. Participants will explore functions such as PARSE\_DOCUMENT, COMPLETE, TRANSLATE, SENTIMENT, ENTITY\_SENTIMENT, CLASSIFY\_TEXT, SUMMARIZE, and EXTRACT\_ANSWER. These tools empower users to parse, translate, analyze, classify, and query unstructured customer support data to uncover sentiment, highlight issues, and summarize conversations at scale.
@@ -40,7 +40,7 @@ Download the source code for this lab [here] (https://github.com/datalabsolution
 
 ### Prerequisites
 
-**Duration**: 0:01:00
+Duration: 0:01:00
 
 * A [Snowflake account](https://trial.snowflake.com/?owner=SPN-PID-452710) in a region where **Snowflake Cortex LLM functions** are supported
 * Basic familiarity with SQL and the Snowflake UI
