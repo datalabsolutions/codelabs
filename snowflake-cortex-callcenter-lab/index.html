@@ -898,9 +898,8 @@ FROM
 
       </google-codelab-step>
     
-      <google-codelab-step label="FINAL" duration="0">
-        <p><strong>Duration</strong>: 0:07:00</p>
-<h2 is-upgraded>Learning Outcome</h2>
+      <google-codelab-step label="FINAL" duration="7">
+        <h2 is-upgraded>Learning Outcome</h2>
 <p>Bring together all outputs from previous steps—parsed transcripts, extracted answers, sentiment analysis, summaries, classifications, and completions—into a unified, queryable dataset. This is ideal for final reporting, QA review, dashboarding, or export.</p>
 <h2 is-upgraded>Download Script</h2>
 <p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/10-AI-LAB-FINAL.sql" target="_blank">here</a>.</p>
@@ -962,7 +961,7 @@ LEFT JOIN LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT E USING (FILE_NAM
 <h2 is-upgraded>Further Exploration</h2>
 <p>If you&#39;re interested in going deeper, consider exploring:</p>
 <ul>
-<li>Cortex <code>SEARCH()</code> service for semantic and vector search over large document collections</li>
+<li>Cortex Search Service for semantic and vector search over large document collections</li>
 <li>Implementing Retrieval-Augmented Generation (RAG) pipelines by combining Cortex Search with <code>COMPLETE()</code> for grounded, context-aware answers</li>
 <li>Creating your own chatbot in Streamlit using Snowflake Cortex and a vector store to answer customer queries with enterprise-specific knowledge</li>
 </ul>

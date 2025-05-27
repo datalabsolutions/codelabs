@@ -1093,7 +1093,7 @@ This final step transforms your structured dialogue JSON into a clean SQL table 
 ---
 ## FINAL
 
-**Duration**: 0:07:00
+Duration: 0:07:00
 
 ### Learning Outcome
 
@@ -1174,7 +1174,7 @@ These techniques are broadly applicable beyond call center transcripts. Here are
 
 If you're interested in going deeper, consider exploring:
 
-* Cortex `SEARCH()` service for semantic and vector search over large document collections
+* Cortex Search Service for semantic and vector search over large document collections
 * Implementing Retrieval-Augmented Generation (RAG) pipelines by combining Cortex Search with `COMPLETE()` for grounded, context-aware answers
 * Creating your own chatbot in Streamlit using Snowflake Cortex and a vector store to answer customer queries with enterprise-specific knowledge
 
