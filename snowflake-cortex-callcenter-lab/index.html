@@ -26,13 +26,18 @@
                   id="snowflake-cortex-callcenter-lab"
                   title="Snowflake Cortex AI for Call Center Transcript Analysis"
                   environment="web"
-                  feedback-link="">
+                  feedback-link="https://github.com/datalab-solutions/snowflake-codelabs/issues">
     
-      <google-codelab-step label="Overview" duration="1">
-        <p>This hands-on lab introduces participants to Snowflake Cortex AI&#39;s ability to extract valuable insights from unstructured documents using large language models. The lab uses examples of call center transcripts stored as PDFs. Participants will explore functions such as <a href="https://docs.snowflake.com/en/sql-reference/functions/parse_document" target="_blank"><code>PARSE_DOCUMENT</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/complete" target="_blank"><code>COMPLETE</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/translate" target="_blank"><code>TRANSLATE</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/sentiment" target="_blank"><code>SENTIMENT</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/entity_sentiment" target="_blank"><code>ENTITY_SENTIMENT</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/summarize" target="_blank"><code>SUMMARIZE</code></a>, and <a href="https://docs.snowflake.com/en/sql-reference/functions/extract_answer" target="_blank"><code>EXTRACT_ANSWER</code></a>. These tools empower users to parse, translate, analyze, and query unstructured customer support data to uncover sentiment, highlight issues, and summarize conversations at scale.</p>
+      <google-codelab-step label="Overview" duration="3">
+        <p><a href="https://github.com/datalabsolutions/AI-Labs/raw/main/snowflake-cortex-callcenter-lab/assets/audio-files.zip" target="_blank">Download Demo Files (ZIP)</a></p>
+<p>This hands-on lab introduces participants to Snowflake Cortex AI&#39;s ability to extract valuable insights from unstructured documents using large language models. The lab uses examples of call center transcripts stored as PDFs. Participants will explore functions such as <a href="https://docs.snowflake.com/en/sql-reference/functions/parse_document" target="_blank"><code>PARSE_DOCUMENT</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/complete" target="_blank"><code>COMPLETE</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/translate" target="_blank"><code>TRANSLATE</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/sentiment" target="_blank"><code>SENTIMENT</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/entity_sentiment" target="_blank"><code>ENTITY_SENTIMENT</code></a>, <a href="https://docs.snowflake.com/en/sql-reference/functions/summarize" target="_blank"><code>SUMMARIZE</code></a>, and <a href="https://docs.snowflake.com/en/sql-reference/functions/extract_answer" target="_blank"><code>EXTRACT_ANSWER</code></a>. These tools empower users to parse, translate, analyze, and query unstructured customer support data to uncover sentiment, highlight issues, and summarize conversations at scale.</p>
 <p>Whether you&#39;re a data engineer, business analyst, or AI enthusiast, this lab will help you understand how to turn raw documents into structured, actionable data using generative AI.</p>
-<h2 class="checklist" is-upgraded>What you&#39;ll learn</h2>
-<ul class="checklist">
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="What you&#39;ll learn" duration="0">
+        <ul>
 <li>Upload and manage unstructured documents in Snowflake.</li>
 <li>Extract and transform transcript text with <a href="https://docs.snowflake.com/en/sql-reference/functions/parse_document-snowflake-cortex" target="_blank"><code>PARSE_DOCUMENT</code></a>.</li>
 <li>Structure data using prompt engineering and the <a href="https://docs.snowflake.com/en/sql-reference/functions/complete-snowflake-cortex" target="_blank"><code>COMPLETE</code></a> function.</li>
@@ -41,9 +46,12 @@
 <li>Summarize content with <a href="https://docs.snowflake.com/en/sql-reference/functions/summarize-snowflake-cortex" target="_blank"><code>SUMMARIZE</code></a>.</li>
 <li>Extract answers using <a href="https://docs.snowflake.com/en/sql-reference/functions/extract_answer-snowflake-cortex" target="_blank"><code>EXTRACT_ANSWER</code></a>.</li>
 </ul>
-<h2 is-upgraded>Prerequisites</h2>
-<p>To complete this lab, you will need:</p>
-<ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Prerequisites" duration="1">
+        <ul>
 <li>A <a href="https://trial.snowflake.com/?owner=SPN-PID-452710" target="_blank">Snowflake account</a> in a cloud region where <strong>Snowflake Cortex LLM functions</strong> are supported.</li>
 <li>Basic familiarity with SQL and the Snowflake UI.</li>
 <li>Access all the scripts for this Lab <a href="https://github.com/datalabsolutions/AI-Labs/tree/main/snowflake-cortex-callcenter-lab" target="_blank">on Github</a></li>
@@ -56,6 +64,8 @@
       <google-codelab-step label="Environment Configuration" duration="5">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Create the core Snowflake resources needed to run the AI Lab. This includes a database, warehouse, schemas, and a stage for uploading PDFs.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download he source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/tree/main/snowflake-cortex-callcenter-lab/scripts%5C01-AI-LAB-CONFIGURATION.sql" target="_blank">here</a>.</p>
 <h2 is-upgraded>Description</h2>
 <p>This setup script prepares your Snowflake environment to ingest and process unstructured call center transcripts.</p>
 <ul>
@@ -108,6 +118,8 @@ CREATE SCHEMA IF NOT EXISTS LLM_CORTEX_DEMO_DB.STAGE;
       <google-codelab-step label="Parse Call Center Transcripts from PDF" duration="7">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Use the <code>PARSE_DOCUMENT()</code> function to extract the contents of uploaded PDF files from your internal stage and store them in a structured format.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download he source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/tree/main/snowflake-cortex-callcenter-lab/scripts%5C02-AI-LAB-PARSE_DOCUMENT.sql" target="_blank">here</a>.</p>
 <h2 is-upgraded>Instructions</h2>
 <p>You will now query the internal stage and use Snowflake Cortex to extract and parse the call center transcripts.</p>
 <h2 is-upgraded>Set Snowflake Context</h2>
@@ -156,6 +168,8 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT;
       <google-codelab-step label="Extract Answers Using EXTRACT_ANSWER" duration="7">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Use the <code>EXTRACT_ANSWER()</code> function to identify specific details in a transcript, such as the caller&#39;s name, call date, and duration, and store them in a structured table.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/03-AI-LAB-EXTRACT_ANSWER.sql" target="_blank">here</a>.</p>
 <h2 is-upgraded>Instructions</h2>
 <p>This process allows you to extract named attributes from each call center transcript using targeted natural language prompts.</p>
 <h2 is-upgraded>Set Snowflake Context</h2>
@@ -212,6 +226,8 @@ FROM
       <google-codelab-step label="Summarize Transcripts Using SUMMARIZE" duration="5">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Use the <code>SUMMARIZE()</code> function to generate a concise, natural language summary of each call center transcript.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/04-AI-LAB-SUMMARIZE.sql" target="_blank">here</a>.</p>
 <h2 is-upgraded>Instructions</h2>
 <p>This allows you to extract the high-level meaning of each conversation, which is useful for reporting, escalation, or triage workflows.</p>
 <h2 is-upgraded>Set Snowflake Context</h2>
@@ -249,6 +265,8 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SUMMARY;
       <google-codelab-step label="Analyze Overall Sentiment Using SENTIMENT" duration="5">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Use the <code>SENTIMENT()</code> function to detect the overall emotional tone of a transcript. This is especially helpful for assessing how a customer felt during a conversation.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/05-AI-LAB-SENTIMENT.sql" target="_blank">here</a>.</p>
 <h2 is-upgraded>Instructions</h2>
 <p>This function returns a numeric sentiment score ranging from -1 (very negative) to +1 (very positive), with 0 indicating neutral tone.</p>
 <h2 is-upgraded>Set Snowflake Context</h2>
@@ -285,6 +303,8 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SENTIMENT;
       <google-codelab-step label="Analyze Entity Sentiment Using ENTITY_SENTIMENT" duration="6">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Use the <code>ENTITY_SENTIMENT()</code> function to extract and evaluate how specific aspects — such as &#34;Tone of voice&#34;, &#34;Issue Resolved&#34;, and &#34;Follow up action&#34; — are discussed in each call transcript.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/06-AI-LAB-ENTITY_SENTIMENT.sql" target="_blank">here</a>.</p>
 <h2 is-upgraded>Instructions</h2>
 <p>This analysis focuses on targeted topics within transcripts and evaluates whether the sentiment around those entities is positive, neutral, or negative. The output is a JSON array that can be flattened to inspect each entity&#39;s sentiment.</p>
 <h2 is-upgraded>Set Snowflake Context</h2>
@@ -336,6 +356,8 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT,
       <google-codelab-step label="Classify Transcripts Using CLASSIFY_TEXT" duration="5">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Use the <code>CLASSIFY_TEXT()</code> function to categorize each call center transcript into predefined categories such as ‘Report Incident&#39;, ‘Complaint&#39;, or ‘Follow up&#39;.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/07-AI-LAB-CLASSIFY_TEXT.sql" target="_blank">here</a>.</p>
 <h2 is-upgraded>Instructions</h2>
 <p>This classification helps group calls by intent or purpose. The function compares transcript content to label categories and returns the most appropriate label based on semantic similarity.</p>
 <h2 is-upgraded>Set Snowflake Context</h2>

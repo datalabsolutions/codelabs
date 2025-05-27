@@ -3,7 +3,7 @@
   "format": "html",
   "prefix": "https://storage.googleapis.com",
   "mainga": "UA-49880327-14",
-  "updated": "2025-05-27T07:11:35+02:00",
+  "updated": "2025-05-27T07:35:19+02:00",
   "id": "snowflake-cortex-callcenter-lab",
   "duration": 51,
   "title": "Snowflake Cortex AI for Call Center Transcript Analysis",
@@ -27,6 +27,7 @@
     "“prompt-engineering”",
     "“sentiment-analysis”]"
   ],
+  "feedback": "https://github.com/datalab-solutions/snowflake-codelabs/issues",
   "ga": "UA-XXXXXXXXX-X",
   "url": "snowflake-cortex-callcenter-lab"
 }

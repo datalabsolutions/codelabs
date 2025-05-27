@@ -2,31 +2,30 @@ id: snowflake-cortex-callcenter-lab
 name: Snowflake Cortex AI for Call Center Transcript Analysis
 summary: A self-paced hands-on lab that teaches how to use Snowflake Cortex AI to ingest, extract, structure, translate, analyze, summarize, and answer questions from PDF call center transcripts.
 author: datalab-solutions
-categories: \["AI", "Cortex", "Call Center", "Text Analysis"]
+categories: ["AI", "Cortex", "Call Center", "Text Analysis"]
 environments: Web
 duration: 90
 status: Published
 license: Apache-2.0
-tags: \["snowflake", "cortex-ai", "prompt-engineering", "pdf-extraction", "sentiment-analysis"]
+tags: ["snowflake", "cortex-ai", "prompt-engineering", "pdf-extraction", "sentiment-analysis"]
 source: internal
 analytics account: UA-XXXXXXXXX-X
-feedback link: [https://github.com/datalab-solutions/snowflake-codelabs/issues](https://github.com/datalab-solutions/snowflake-codelabs/issues)
+feedback link: https://github.com/datalab-solutions/snowflake-codelabs/issues
 level: intermediate
-products: \["Snowflake Cortex"]
+products: ["Snowflake Cortex"]
 
 # Snowflake Cortex AI for Call Center Transcript Analysis
 
 ## Overview
-
 Duration: 0:03:00
+
+[Download Demo Files (ZIP)](https://github.com/datalabsolutions/AI-Labs/raw/main/snowflake-cortex-callcenter-lab/assets/audio-files.zip)
 
 This hands-on lab introduces participants to Snowflake Cortex AI’s ability to extract valuable insights from unstructured documents using large language models. The lab uses examples of call center transcripts stored as PDFs. Participants will explore functions such as [`PARSE_DOCUMENT`](https://docs.snowflake.com/en/sql-reference/functions/parse_document), [`COMPLETE`](https://docs.snowflake.com/en/sql-reference/functions/complete), [`TRANSLATE`](https://docs.snowflake.com/en/sql-reference/functions/translate), [`SENTIMENT`](https://docs.snowflake.com/en/sql-reference/functions/sentiment), [`ENTITY_SENTIMENT`](https://docs.snowflake.com/en/sql-reference/functions/entity_sentiment), [`SUMMARIZE`](https://docs.snowflake.com/en/sql-reference/functions/summarize), and [`EXTRACT_ANSWER`](https://docs.snowflake.com/en/sql-reference/functions/extract_answer). These tools empower users to parse, translate, analyze, and query unstructured customer support data to uncover sentiment, highlight issues, and summarize conversations at scale.
 
 Whether you're a data engineer, business analyst, or AI enthusiast, this lab will help you understand how to turn raw documents into structured, actionable data using generative AI.
 
----
-
-### What you'll learn
+## What you'll learn
 
 * Upload and manage unstructured documents in Snowflake.
 * Extract and transform transcript text with [`PARSE_DOCUMENT`](https://docs.snowflake.com/en/sql-reference/functions/parse_document-snowflake-cortex).
@@ -36,17 +35,12 @@ Whether you're a data engineer, business analyst, or AI enthusiast, this lab wil
 * Summarize content with [`SUMMARIZE`](https://docs.snowflake.com/en/sql-reference/functions/summarize-snowflake-cortex).
 * Extract answers using [`EXTRACT_ANSWER`](https://docs.snowflake.com/en/sql-reference/functions/extract_answer-snowflake-cortex).
 
----
-
-### Prerequisites
-
+## Prerequisites
 Duration: 0:01:00
-
-To complete this lab, you will need:
 
 * A [Snowflake account](https://trial.snowflake.com/?owner=SPN-PID-452710) in a cloud region where **Snowflake Cortex LLM functions** are supported.
 * Basic familiarity with SQL and the Snowflake UI.
-* Access all the scripts for this Lab [on Github](https://github.com/datalabsolutions/AI-Labs/tree/main/snowflake-cortex-callcenter-lab)  
+* Access all the scripts for this Lab [on Github](https://github.com/datalabsolutions/AI-Labs/tree/main/snowflake-cortex-callcenter-lab)
 
 > 💡 **Tip:** Not all Snowflake regions currently support Cortex LLM functions. Use the [LLM Function Availability](https://docs.snowflake.com/en/user-guide/snowflake-cortex-overview#llm-function-availability) page to check which cloud regions are supported before creating your account.
 
@@ -57,6 +51,10 @@ Duration: 0:05:00
 ### Learning Outcome
 
 Create the core Snowflake resources needed to run the AI Lab. This includes a database, warehouse, schemas, and a stage for uploading PDFs.
+
+### Download Script
+
+Download he source code for this step [here](https://github.com/datalabsolutions/AI-Labs/tree/main/snowflake-cortex-callcenter-lab/scripts\01-AI-LAB-CONFIGURATION.sql). 
 
 ### Description
 
@@ -132,6 +130,10 @@ Duration: 0:07:00
 
 Use the `PARSE_DOCUMENT()` function to extract the contents of uploaded PDF files from your internal stage and store them in a structured format.
 
+### Download Script
+
+Download he source code for this step [here](https://github.com/datalabsolutions/AI-Labs/tree/main/snowflake-cortex-callcenter-lab/scripts\02-AI-LAB-PARSE_DOCUMENT.sql). 
+
 ### Instructions
 
 You will now query the internal stage and use Snowflake Cortex to extract and parse the call center transcripts.
@@ -201,6 +203,10 @@ Duration: 0:07:00
 ### Learning Outcome
 
 Use the `EXTRACT_ANSWER()` function to identify specific details in a transcript, such as the caller’s name, call date, and duration, and store them in a structured table.
+
+### Download Script
+
+Download the source code for this step [here](https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/03-AI-LAB-EXTRACT_ANSWER.sql).
 
 ### Instructions
 
@@ -275,6 +281,10 @@ Duration: 0:05:00
 
 Use the `SUMMARIZE()` function to generate a concise, natural language summary of each call center transcript.
 
+### Download Script
+
+Download the source code for this step [here](https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/04-AI-LAB-SUMMARIZE.sql).
+
 ### Instructions
 
 This allows you to extract the high-level meaning of each conversation, which is useful for reporting, escalation, or triage workflows.
@@ -331,6 +341,10 @@ Duration: 0:05:00
 
 Use the `SENTIMENT()` function to detect the overall emotional tone of a transcript. This is especially helpful for assessing how a customer felt during a conversation.
 
+### Download Script
+
+Download the source code for this step [here](https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/05-AI-LAB-SENTIMENT.sql).
+
 ### Instructions
 
 This function returns a numeric sentiment score ranging from -1 (very negative) to +1 (very positive), with 0 indicating neutral tone.
@@ -384,6 +398,10 @@ Duration: 0:06:00
 ### Learning Outcome
 
 Use the `ENTITY_SENTIMENT()` function to extract and evaluate how specific aspects — such as "Tone of voice", "Issue Resolved", and "Follow up action" — are discussed in each call transcript.
+
+### Download Script
+
+Download the source code for this step [here](https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/06-AI-LAB-ENTITY_SENTIMENT.sql).
 
 ### Instructions
 
@@ -455,6 +473,10 @@ Duration: 0:05:00
 ### Learning Outcome
 
 Use the `CLASSIFY_TEXT()` function to categorize each call center transcript into predefined categories such as 'Report Incident', 'Complaint', or 'Follow up'.
+
+### Download Script
+
+Download the source code for this step [here](https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/07-AI-LAB-CLASSIFY_TEXT.sql).
 
 ### Instructions
 
