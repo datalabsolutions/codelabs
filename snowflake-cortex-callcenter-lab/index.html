@@ -53,32 +53,45 @@
 
       </google-codelab-step>
     
-      <google-codelab-step label="Setup Environment" duration="10">
+      <google-codelab-step label="Environment Configuration" duration="5">
         <h2 is-upgraded>Learning Outcome</h2>
-<p>Prepare your Snowflake environment by creating a new database, warehouse, schemas, and internal stage, and upload call center transcript PDFs to that stage.</p>
-<h2 is-upgraded>Step 1: Create Database Objects</h2>
-<pre><code language="language-sql" class="language-sql">-- Step 1: Create Database
-CREATE DATABASE IF NOT EXISTS LLM_CORTEX_DEMO_DB;
-
--- Step 2: Create Warehouse
-CREATE OR REPLACE WAREHOUSE USER_STD_XSMALL_WH
+<p>Create the core Snowflake resources needed to run the AI Lab. This includes a database, warehouse, schemas, and a stage for uploading PDFs.</p>
+<h2 is-upgraded>Description</h2>
+<p>This setup script prepares your Snowflake environment to ingest and process unstructured call center transcripts.</p>
+<ul>
+<li><code>CREATE DATABASE</code> ensures your lab operates in a clean and isolated environment.</li>
+<li><code>CREATE WAREHOUSE</code> provisions compute resources for running your queries. It&#39;s configured to minimize cost with automatic suspend/resume settings.</li>
+<li><code>CREATE SCHEMA</code> creates logical namespaces for raw files (<code>RAW</code>) and processed/intermediate data (<code>STAGE</code>).</li>
+<li><code>CREATE STAGE</code> sets up a secure location to upload PDF documents. It supports directory table creation and uses Snowflake-managed encryption.</li>
+</ul>
+<h2 is-upgraded>Set Snowflake Context</h2>
+<p>Before executing any commands, set your session to the appropriate context:</p>
+<pre><code language="language-sql" class="language-sql">USE DATABASE LLM_CORTEX_DEMO_DB;
+USE SCHEMA RAW;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+</code></pre>
+<h2 is-upgraded>Step 1: Create the Database</h2>
+<pre><code language="language-sql" class="language-sql">CREATE DATABASE IF NOT EXISTS LLM_CORTEX_DEMO_DB;
+</code></pre>
+<h2 is-upgraded>Step 2: Create a Compute Warehouse</h2>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE WAREHOUSE USER_STD_XSMALL_WH
 WITH
     WAREHOUSE_SIZE = &#39;XSMALL&#39;
     WAREHOUSE_TYPE = &#39;STANDARD&#39;
-    AUTO_SUSPEND = 60       -- suspend after 60 seconds of inactivity
+    AUTO_SUSPEND = 60
     AUTO_RESUME = TRUE
     INITIALLY_SUSPENDED = TRUE;
-
--- Step 3: Create Schemas
-CREATE SCHEMA IF NOT EXISTS LLM_CORTEX_DEMO_DB.RAW;
+</code></pre>
+<h2 is-upgraded>Step 3: Create Required Schemas</h2>
+<pre><code language="language-sql" class="language-sql">CREATE SCHEMA IF NOT EXISTS LLM_CORTEX_DEMO_DB.RAW;
 CREATE SCHEMA IF NOT EXISTS LLM_CORTEX_DEMO_DB.STAGE;
-
--- Step 4: Create Internal Stage for PDFs
-CREATE OR REPLACE STAGE LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW
+</code></pre>
+<h2 is-upgraded>Step 4: Create an Internal Stage for PDF Uploads</h2>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE STAGE LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW
     DIRECTORY = ( ENABLE = true )
     ENCRYPTION = ( TYPE = &#39;SNOWFLAKE_SSE&#39; );
 </code></pre>
-<h2 is-upgraded>Step 2: Upload PDF Files to the Internal Stage</h2>
+<h2 is-upgraded>Upload PDF Files to the Internal Stage</h2>
 <p>Your internal stage <code>LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW</code> is already set up.</p>
 <h3 is-upgraded>Using Snowsight:</h3>
 <ol type="1">
@@ -92,9 +105,9 @@ CREATE OR REPLACE STAGE LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW
 
       </google-codelab-step>
     
-      <google-codelab-step label="Parse PDF Documents" duration="7">
+      <google-codelab-step label="Parse Call Center Transcripts from PDF" duration="7">
         <h2 is-upgraded>Learning Outcome</h2>
-<p>Use the <code>PARSE_DOCUMENT()</code> function to extract the contents of uploaded PDF files from your internal stage and store them in a structured format as Markdown text.</p>
+<p>Use the <code>PARSE_DOCUMENT()</code> function to extract the contents of uploaded PDF files from your internal stage and store them in a structured format.</p>
 <h2 is-upgraded>Instructions</h2>
 <p>You will now query the internal stage and use Snowflake Cortex to extract and parse the call center transcripts.</p>
 <h2 is-upgraded>Set Snowflake Context</h2>
@@ -104,103 +117,128 @@ USE SCHEMA STAGE;
 USE WAREHOUSE USER_STD_XSMALL_WH;
 </code></pre>
 <h2 is-upgraded>Step 1: Create a Table for Parsed Results</h2>
-<p>This table will store the extracted Markdown content for each uploaded file:</p>
+<p>This table will store the extracted content for each uploaded file:</p>
 <pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT (
     FILE_NAME STRING,
-    TRANSCRIPT VARIANT
+    TRANSCRIPT VARCHAR
 );
 </code></pre>
 <h2 is-upgraded>Step 2: Extract PDF Content from Stage</h2>
-<p>The query below uses <code>PARSE_DOCUMENT()</code> to extract and convert each PDF to Markdown format. Ensure you run this in the same warehouse and context created earlier:</p>
+<p>The query below uses <code>PARSE_DOCUMENT()</code> to extract and convert each PDF to readable layout format:</p>
 <pre><code language="language-sql" class="language-sql">INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT
-SELECT
-    METADATA$FILENAME AS FILE_NAME,
-    TRANSCRIPT(
-        &#39;{&#34;format&#34;: &#34;markdown&#34;}&#39;,
-        $1
-    ) AS PARSED_CONTENT
-FROM @LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW;
+SELECT 
+    FILE_NAME,
+    TO_VARCHAR(
+        SNOWFLAKE.CORTEX.PARSE_DOCUMENT(
+            @LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW,
+            FILE_PATH,
+            { &#39;mode&#39;: &#39;LAYOUT&#39; }
+        ):content::string
+    ) AS TRANSCRIPT
+FROM
+(
+    SELECT DISTINCT
+        METADATA$FILENAME AS FILE_PATH,
+        SPLIT_PART(METADATA$FILENAME, &#39;/&#39;, -1) AS FILE_NAME
+    FROM @LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW/
+) AS A;
 </code></pre>
-<p>💡 <strong>Note:</strong> This approach stores both the filename and parsed content for downstream use. The Markdown format keeps the extracted structure readable for further processing.</p>
+<p>💡 <strong>Note:</strong> This approach stores both the filename and parsed content for downstream use.</p>
 <h2 is-upgraded>Step 3: View Parsed Results</h2>
 <p>Run the following query to view the extracted content from your PDF files:</p>
-<pre><code language="language-sql" class="language-sql">SELECT
-    FILE_NAME,
-    PARSED_CONTENT
-FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
+<pre><code language="language-sql" class="language-sql">SELECT FILE_NAME, TRANSCRIPT
+FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT;
 </code></pre>
 
 
       </google-codelab-step>
     
-      <google-codelab-step label="Identify Caller Using 
-EXTRACT_ANSWER" duration="5">
+      <google-codelab-step label="Extract Answers Using EXTRACT_ANSWER" duration="7">
         <h2 is-upgraded>Learning Outcome</h2>
-<p>Use <code>EXTRACT_ANSWER()</code> to extract the name of the customer (caller) from each parsed call center transcript.</p>
+<p>Use the <code>EXTRACT_ANSWER()</code> function to identify specific details in a transcript, such as the caller&#39;s name, call date, and duration, and store them in a structured table.</p>
+<h2 is-upgraded>Instructions</h2>
+<p>This process allows you to extract named attributes from each call center transcript using targeted natural language prompts.</p>
 <h2 is-upgraded>Set Snowflake Context</h2>
-<p>Before proceeding, make sure your session is using the correct database, schema, and warehouse:</p>
 <pre><code language="language-sql" class="language-sql">USE DATABASE LLM_CORTEX_DEMO_DB;
 USE SCHEMA STAGE;
 USE WAREHOUSE USER_STD_XSMALL_WH;
 </code></pre>
-<h2 is-upgraded>Step 1: Create a Table for Caller Names</h2>
-<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CALLER (
-    FILE_NAME STRING,
-    CALLER_NAME STRING,
-    TRANSCRIPT VARIANT
+<h2 is-upgraded>Step 1: Create a Table to Store Caller Metadata</h2>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CALLER 
+(
+    FILE_NAME VARCHAR,
+    CALLER_NAME VARCHAR,
+    CALL_DATE DATE,
+    CALL_DURATION FLOAT,
+    TRANSCRIPT VARCHAR
 );
 </code></pre>
-<h2 is-upgraded>Step 2: Use <code>EXTRACT_ANSWER()</code> to Find the Caller&#39;s Name</h2>
-<p>This query asks the model to extract the name of the customer involved in the conversation:</p>
-<pre><code language="language-sql" class="language-sql">INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CALLER
+<h2 is-upgraded>Step 2: Extract Caller Details with EXTRACT_ANSWER</h2>
+<p>This step uses <code>EXTRACT_ANSWER()</code> to isolate structured values from each transcript using natural language prompts. The function returns an array of response objects. We access the first element <code>[0]</code> of the array, and retrieve the actual <code>answer</code> using the <code>:answer::string</code> projection.</p>
+<ul>
+<li><code>CALLER_NAME</code> is extracted by asking a direct question and accessing the top-ranked answer.</li>
+<li><code>CALL_DATE</code> is converted to a valid date using <code>TRY_TO_DATE()</code> after cleaning whitespace.</li>
+<li><code>CALL_DURATION</code> is parsed as a number using <code>TRY_TO_NUMBER()</code> to make it usable for aggregation or filtering.</li>
+</ul>
+<pre><code language="language-sql" class="language-sql">INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CALLER  
 SELECT
     FILE_NAME,
-    EXTRACT_ANSWER(
-        &#39;gpt-4&#39;,
-        &#39;What is the name of the customer speaking in this transcript? Only return the name.&#39;,
-        PARSED_CONTENT:text
-    ) AS CALLER_NAME,
-    PARSED_CONTENT:text AS TRANSCRIPT
-FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
+    SNOWFLAKE.CORTEX.EXTRACT_ANSWER(
+        TRANSCRIPT,
+        &#39;What is the name of the caller?&#39;
+    )[0]:answer::string AS CALLER_NAME,
+
+    TRY_TO_DATE(REPLACE(SNOWFLAKE.CORTEX.EXTRACT_ANSWER(
+        TRANSCRIPT,
+        &#39;What is the Date of the call?&#39;
+    )[0]:answer::string,&#39; &#39;,&#39;&#39;)) AS CALL_DATE,
+
+    TRY_TO_NUMBER(REPLACE(SNOWFLAKE.CORTEX.EXTRACT_ANSWER(
+        TRANSCRIPT,
+        &#39;What is the call duration?&#39;
+    )[0]:answer::string,&#39; &#39;,&#39;&#39;)) AS CALL_DURATION,
+
+    TRANSCRIPT AS TRANSCRIPT
+FROM 
+    LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT;
 </code></pre>
-<h2 is-upgraded>Step 3: View Extracted Caller Names</h2>
-<pre><code language="language-sql" class="language-sql">SELECT *
-FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CALLER;
+<h2 is-upgraded>Step 3: View Extracted Caller Details</h2>
+<pre><code language="language-sql" class="language-sql">SELECT * FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CALLER;
 </code></pre>
 
 
       </google-codelab-step>
     
-      <google-codelab-step label="Identity Complaint using 
-SUMMARIZE" duration="5">
+      <google-codelab-step label="Summarize Transcripts Using SUMMARIZE" duration="5">
         <h2 is-upgraded>Learning Outcome</h2>
-<p>Use the <code>SUMMARIZE()</code> function to generate a concise summary of each call center transcript, with a focus on the main complaint raised by the customer.</p>
+<p>Use the <code>SUMMARIZE()</code> function to generate a concise, natural language summary of each call center transcript.</p>
+<h2 is-upgraded>Instructions</h2>
+<p>This allows you to extract the high-level meaning of each conversation, which is useful for reporting, escalation, or triage workflows.</p>
 <h2 is-upgraded>Set Snowflake Context</h2>
 <pre><code language="language-sql" class="language-sql">USE DATABASE LLM_CORTEX_DEMO_DB;
 USE SCHEMA STAGE;
 USE WAREHOUSE USER_STD_XSMALL_WH;
 </code></pre>
-<h2 is-upgraded>Step 1: Create Table for Summary Results</h2>
-<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SUMMARY (
-    FILE_NAME STRING,
-    MAIN_COMPLAINT STRING,
-    TRANSCRIPT VARIANT
+<h2 is-upgraded>Step 1: Create a Table to Store Summaries</h2>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SUMMARY 
+(
+    FILE_NAME VARCHAR,
+    TRANSCRIPT_SUMMARY VARCHAR,
+    TRANSCRIPT VARCHAR
 );
 </code></pre>
-<h2 is-upgraded>Step 2: Summarize Using <code>SUMMARIZE()</code></h2>
-<p>This prompt asks the model to focus on the customer&#39;s complaint:</p>
+<h2 is-upgraded>Step 2: Generate Summaries with SUMMARIZE</h2>
+<p>This step uses the <code>SUMMARIZE()</code> function to produce a natural language summary of the full transcript. It processes the call dialogue and returns a concise description of what the call was about — including main themes, complaints, resolutions, or support actions mentioned.</p>
+<p>The summary is especially useful for non-technical stakeholders, QA analysts, or automation workflows that depend on quick insights rather than full text review.</p>
 <pre><code language="language-sql" class="language-sql">INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SUMMARY
 SELECT
     FILE_NAME,
-    SUMMARIZE(
-        &#39;gpt-4&#39;,
-        &#39;Summarize the main complaint made by the customer in this transcript.&#39;,
-        PARSED_CONTENT:text
-    ) AS MAIN_COMPLAINT,
-    PARSED_CONTENT AS TRANSCRIPT
-FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
+    SNOWFLAKE.CORTEX.SUMMARIZE(TRANSCRIPT) AS TRANSCRIPT_SUMMARY,
+    TRANSCRIPT
+FROM 
+    LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT;
 </code></pre>
-<h2 is-upgraded>Step 3: View Summary Results</h2>
+<h2 is-upgraded>Step 3: View Summaries</h2>
 <pre><code language="language-sql" class="language-sql">SELECT *
 FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SUMMARY;
 </code></pre>
@@ -208,31 +246,35 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SUMMARY;
 
       </google-codelab-step>
     
-      <google-codelab-step label="Extract Product Sentiment Using 
-SENTIMENT" duration="3">
+      <google-codelab-step label="Analyze Overall Sentiment Using SENTIMENT" duration="5">
         <h2 is-upgraded>Learning Outcome</h2>
-<p>Use Snowflake Cortex&#39;s <code>SENTIMENT()</code> function to evaluate the general emotional tone of each call center transcript.</p>
+<p>Use the <code>SENTIMENT()</code> function to detect the overall emotional tone of a transcript. This is especially helpful for assessing how a customer felt during a conversation.</p>
+<h2 is-upgraded>Instructions</h2>
+<p>This function returns a numeric sentiment score ranging from -1 (very negative) to +1 (very positive), with 0 indicating neutral tone.</p>
 <h2 is-upgraded>Set Snowflake Context</h2>
 <pre><code language="language-sql" class="language-sql">USE DATABASE LLM_CORTEX_DEMO_DB;
 USE SCHEMA STAGE;
 USE WAREHOUSE USER_STD_XSMALL_WH;
 </code></pre>
-<h2 is-upgraded>Step 1: Create Table for Overall Sentiment</h2>
-<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SENTIMENT (
-    FILE_NAME STRING,
-    OVERALL_SENTIMENT STRING,
-    TRANSCRIPT VARIANT
+<h2 is-upgraded>Step 1: Create a Table to Store Sentiment Scores</h2>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SENTIMENT 
+(
+    FILE_NAME VARCHAR,
+    OVERALL_SENTIMENT FLOAT,
+    TRANSCRIPT VARCHAR
 );
 </code></pre>
-<h2 is-upgraded>Step 2: Run Sentiment Analysis</h2>
+<h2 is-upgraded>Step 2: Apply SENTIMENT Function to Transcripts</h2>
+<p>Each transcript is analyzed to produce an overall sentiment score. This step runs <code>SENTIMENT()</code> against all rows in the transcript table and stores results for downstream insights.</p>
 <pre><code language="language-sql" class="language-sql">INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SENTIMENT
 SELECT
     FILE_NAME,
-    SENTIMENT(PARSED_CONTENT:text) AS OVERALL_SENTIMENT,
-    PARSED_CONTENT AS TRANSCRIPT
-FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
+    SNOWFLAKE.CORTEX.SENTIMENT(TRANSCRIPT) AS OVERALL_SENTIMENT,
+    TRANSCRIPT
+FROM 
+    LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT;
 </code></pre>
-<h2 is-upgraded>Step 3: View Sentiment Results</h2>
+<h2 is-upgraded>Step 3: View Sentiment Scores</h2>
 <pre><code language="language-sql" class="language-sql">SELECT *
 FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SENTIMENT;
 </code></pre>
@@ -240,37 +282,45 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_SENTIMENT;
 
       </google-codelab-step>
     
-      <google-codelab-step label="Extract Product Sentiment Using 
-ENTITY_SENTIMENT" duration="3">
+      <google-codelab-step label="Analyze Entity Sentiment Using ENTITY_SENTIMENT" duration="6">
         <h2 is-upgraded>Learning Outcome</h2>
-<p>Use Snowflake Cortex&#39;s <code>ENTITY_SENTIMENT()</code> function to identify and analyze sentiment directed at specific products mentioned in each transcript.</p>
+<p>Use the <code>ENTITY_SENTIMENT()</code> function to extract and evaluate how specific aspects — such as &#34;Tone of voice&#34;, &#34;Issue Resolved&#34;, and &#34;Follow up action&#34; — are discussed in each call transcript.</p>
+<h2 is-upgraded>Instructions</h2>
+<p>This analysis focuses on targeted topics within transcripts and evaluates whether the sentiment around those entities is positive, neutral, or negative. The output is a JSON array that can be flattened to inspect each entity&#39;s sentiment.</p>
 <h2 is-upgraded>Set Snowflake Context</h2>
 <pre><code language="language-sql" class="language-sql">USE DATABASE LLM_CORTEX_DEMO_DB;
 USE SCHEMA STAGE;
 USE WAREHOUSE USER_STD_XSMALL_WH;
 </code></pre>
-<h2 is-upgraded>Step 1: Create Table for Product Entity Sentiment</h2>
+<h2 is-upgraded>Step 1: Create a Table for Entity-Level Sentiment</h2>
 <pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT (
     FILE_NAME STRING,
     PRODUCT_ENTITY_SENTIMENT VARIANT,
     TRANSCRIPT VARIANT
 );
 </code></pre>
-<h2 is-upgraded>Step 2: Extract Entity Sentiment</h2>
-<p>This step applies the <code>ENTITY_SENTIMENT()</code> function to analyze how the transcript discusses key business concepts — specifically <code>Cost</code>, <code>Quality</code>, and <code>Delivery Time</code>. The result is a structured array with entity names, associated sentiment (e.g., positive, neutral, negative), and confidence scores.</p>
+<h2 is-upgraded>Step 2: Extract Sentiment for Specific Entities</h2>
+<p>This query applies the <code>ENTITY_SENTIMENT()</code> function to analyze sentiment for targeted entities within each transcript.</p>
+<p>The <code>ARRAY_CONSTRUCT()</code> function is used to define the list of entity labels we want Cortex to evaluate. In this case, we specify:</p>
+<ul>
+<li><code>Tone of voice</code></li>
+<li><code>Issue Resolved</code></li>
+<li><code>Follow up action</code></li>
+</ul>
+<p>These are passed into the function as an array input. Cortex will search for each of these in the transcript and return structured sentiment scores (positive, neutral, or negative) with confidence values.</p>
 <pre><code language="language-sql" class="language-sql">INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT
 SELECT
     FILE_NAME,
-    ENTITY_SENTIMENT(
-        PARSED_CONTENT:text,
-        ARRAY_CONSTRUCT(&#39;Cost&#39;, &#39;Quality&#39;, &#39;Delivery Time&#39;)
+    SNOWFLAKE.CORTEX.ENTITY_SENTIMENT(
+        TRANSCRIPT,
+        ARRAY_CONSTRUCT(&#39;Tone of voice&#39;, &#39;Issue Resolved&#39;, &#39;Follow up action&#39;)
     ) AS PRODUCT_ENTITY_SENTIMENT,
-    PARSED_CONTENT AS TRANSCRIPT
-FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
+    TRANSCRIPT AS TRANSCRIPT
+FROM
+    LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT;
 </code></pre>
-<h2 is-upgraded>Step 3: View Entity Sentiment Results</h2>
-<p>The <code>PRODUCT_ENTITY_SENTIMENT</code> column contains an array of JSON objects. In this query, we use the <code>FLATTEN</code> table function to expand that array into individual rows, so each product entity is listed with its corresponding sentiment and confidence score.</p>
-<p>To expand the <code>PRODUCT_ENTITY_SENTIMENT</code> array into rows for each entity:</p>
+<h2 is-upgraded>Step 3: View Flattened Sentiment by Entity</h2>
+<p>Use the following query to transform the JSON result into a row-per-entity view using <code>FLATTEN()</code>:</p>
 <pre><code language="language-sql" class="language-sql">SELECT
     FILE_NAME,
     flattened.value:entity::STRING AS ENTITY,
@@ -279,54 +329,75 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
 FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT,
      LATERAL FLATTEN(INPUT =&gt; PRODUCT_ENTITY_SENTIMENT) AS flattened;
 </code></pre>
-<h2 is-upgraded>Step 4: Create Flattened Table with Individual Sentiment Columns</h2>
-<p>This step prepares a structured table where each column corresponds to one of the target entities (<code>Cost</code>, <code>Quality</code>, <code>Delivery Time</code>). This makes it easier to compare sentiment across transcripts.</p>
-<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_COLUMNS AS
-SELECT
-    FILE_NAME,
-    TRANSCRIPT,
-    MAX(CASE WHEN flattened.value:entity::STRING = &#39;Cost&#39; THEN flattened.value:sentiment::STRING END) AS COST,
-    MAX(CASE WHEN flattened.value:entity::STRING = &#39;Quality&#39; THEN flattened.value:sentiment::STRING END) AS QUALITY,
-    MAX(CASE WHEN flattened.value:entity::STRING = &#39;Delivery Time&#39; THEN flattened.value:sentiment::STRING END) AS DELIVERY_TIME
-FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_SENTIMENT,
-     LATERAL FLATTEN(INPUT =&gt; PRODUCT_ENTITY_SENTIMENT) AS flattened
-GROUP BY FILE_NAME, TRANSCRIPT;
-</code></pre>
-<h2 is-upgraded>Step 5: Query Sentiment by Entity</h2>
-<p>This query lets you retrieve the structured results per transcript with the sentiment classification for each of the three product-related dimensions.</p>
-<pre><code language="language-sql" class="language-sql">SELECT *
-FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_ENTITY_COLUMNS;
-</code></pre>
 
 
       </google-codelab-step>
     
-      <google-codelab-step label="Extract Product Information Using 
-COMPLETE" duration="6">
+      <google-codelab-step label="Classify Transcripts Using CLASSIFY_TEXT" duration="5">
         <h2 is-upgraded>Learning Outcome</h2>
-<p>Use the <code>COMPLETE()</code> function to extract structured product-related information from each call center transcript. This can include product names, features discussed, complaints, or inquiries made by the customer.</p>
+<p>Use the <code>CLASSIFY_TEXT()</code> function to categorize each call center transcript into predefined categories such as ‘Report Incident&#39;, ‘Complaint&#39;, or ‘Follow up&#39;.</p>
+<h2 is-upgraded>Instructions</h2>
+<p>This classification helps group calls by intent or purpose. The function compares transcript content to label categories and returns the most appropriate label based on semantic similarity.</p>
 <h2 is-upgraded>Set Snowflake Context</h2>
 <pre><code language="language-sql" class="language-sql">USE DATABASE LLM_CORTEX_DEMO_DB;
 USE SCHEMA STAGE;
 USE WAREHOUSE USER_STD_XSMALL_WH;
 </code></pre>
-<h2 is-upgraded>Step 1: Create Table to Store Extracted Product Data</h2>
+<h2 is-upgraded>Step 1: Create a Table for Transcript Classification</h2>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CLASSIFICATION 
+(
+    FILE_NAME VARCHAR,
+    CALL_CLASSIFICATION VARCHAR,
+    TRANSCRIPT VARCHAR
+);
+</code></pre>
+<h2 is-upgraded>Step 2: Classify Transcripts Using CLASSIFY_TEXT</h2>
+<p>This step uses the <code>CLASSIFY_TEXT()</code> function with a predefined list of labels. It stores the most probable label into the classification table.</p>
+<pre><code language="language-sql" class="language-sql">INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CLASSIFICATION 
+SELECT
+    FILE_NAME,
+    SNOWFLAKE.CORTEX.CLASSIFY_TEXT(
+        TRANSCRIPT,
+        ARRAY_CONSTRUCT(&#39;Report Incident&#39;, &#39;Complaint&#39;, &#39;Follow up&#39;)
+    ):label::string AS CALL_CLASSIFICATION,
+    TRANSCRIPT
+FROM
+    LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT;
+</code></pre>
+<h2 is-upgraded>Step 3: View Classified Results</h2>
+<pre><code language="language-sql" class="language-sql">SELECT *
+FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CLASSIFICATION;
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Extract Structured Product Information Using COMPLETE" duration="7">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Use the <code>COMPLETE()</code> function to extract detailed product references from transcripts and store the output as a structured JSON.</p>
+<h2 is-upgraded>Instructions</h2>
+<p>This function enables you to generate custom, structured outputs by engineering a prompt that guides the model to return specific fields. This is useful when extracting data that doesn&#39;t fit predefined functions.</p>
+<h2 is-upgraded>Set Snowflake Context</h2>
+<pre><code language="language-sql" class="language-sql">USE DATABASE LLM_CORTEX_DEMO_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+</code></pre>
+<h2 is-upgraded>Step 1: Create a Table to Store Product Details</h2>
 <pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_PRODUCTS AS
 SELECT
     FILE_NAME,
-    COMPLETE(
+    SNOWFLAKE.CORTEX.COMPLETE(
       &#39;gpt-4&#39;,
       &#39;Extract a JSON list of all products mentioned in this transcript. For each product, include the name, any feature discussed, and a short description of what the customer said about it.&#39;,
-      PARSED_CONTENT:text
+      TRANSCRIPT
     ) AS PRODUCT_DETAILS,
-    PARSED_CONTENT AS TRANSCRIPT
-FROM LLM_CORTEX_DEMO_DB.STAGE.PARSED_TRANSCRIPTS;
+    TRANSCRIPT
+FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT;
 </code></pre>
-<h2 is-upgraded>Step 2: View Extracted Product Details</h2>
+<h2 is-upgraded>Step 2: View Extracted Product Information</h2>
 <pre><code language="language-sql" class="language-sql">SELECT *
 FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_PRODUCTS;
 </code></pre>
-<p>💡 <strong>Tip:</strong> The <code>COMPLETE()</code> function allows flexible prompt engineering — you can adjust the prompt to extract more specific attributes like pricing, satisfaction levels, or support needs.</p>
 
 
       </google-codelab-step>
