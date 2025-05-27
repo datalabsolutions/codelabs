@@ -528,7 +528,6 @@ FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CLASSIFICATION;
 ---
 
 ## COMPLETE
-## Advanced Prompt Engineering with COMPLETE
 
 Duration: 0:08:00
 
@@ -536,7 +535,6 @@ Duration: 0:08:00
 
 Learn how to use the `COMPLETE()` function with tailored prompts to generate structured outputs, ratings, insights, and content based on transcript text. Understand and apply prompt engineering techniques that significantly enhance result quality and relevance.
 
----
 
 ### Instructions
 
@@ -578,6 +576,7 @@ USE WAREHOUSE USER_STD_XSMALL_WH;
 | Instruction   | Summarize the following call transcript in one sentence: |
 | Data          | TRANSCRIPT                                               |
 
+
 ```sql
 SELECT
     FILE_NAME,
@@ -591,6 +590,8 @@ WHERE
     FILE_NAME = 'audiofile11.pdf';
 ```
 
+---
+
 ### Example 2: Bullet Summary for Team Leader
 
 | **Technique**        | **Prompt Line**                                                                  |
@@ -600,6 +601,7 @@ WHERE
 | Constraint           | Keep each bullet point under 15 words and use a professional tone.               |
 | Format Specification | Use hyphens for each bullet.                                                     |
 | Data                 | TRANSCRIPT                                                                       |
+
 
 ```sql
 SELECT
@@ -617,6 +619,8 @@ FROM
 WHERE
     FILE_NAME = 'audiofile11.pdf';
 ```
+
+---
 
 ### Example 3: Escalation Detection
 
@@ -643,6 +647,8 @@ WHERE
     FILE_NAME IN('audiofile11.pdf','audiofile79.pdf');
 ```
 
+---
+
 ### Example 4: Call Quality Scoring
 
 | **Technique**        | **Prompt Line**                                                                       |
@@ -667,6 +673,8 @@ FROM
 WHERE
     FILE_NAME = 'audiofile11.pdf';
 ```
+
+---
 
 ### Example 5: Follow-Up Email Draft
 
@@ -693,6 +701,8 @@ WHERE
     FILE_NAME = 'audiofile11.pdf';
 ```
 
+---
+
 ### Example 6: Compliance Red Flag Detection
 
 | **Technique**        | **Prompt Line**                                                                                       |
@@ -702,6 +712,8 @@ WHERE
 | Constraint           | If no red flags are found, return "None".                                                             |
 | Format Specification | Use bullet points for each red flag.                                                                  |
 | Data                 | TRANSCRIPT                                                                                            |
+
+
 
 ```sql
 SELECT
@@ -719,5 +731,3 @@ FROM
 WHERE
     FILE_NAME = 'audiofile11.pdf';
 ```
-
----
