@@ -69,16 +69,6 @@ This setup script prepares your Snowflake environment to ingest and process unst
 * `CREATE SCHEMA` creates logical namespaces for raw files (`RAW`) and processed/intermediate data (`STAGE`).
 * `CREATE STAGE` sets up a secure location to upload PDF documents. It supports directory table creation and uses Snowflake-managed encryption.
 
-### Set Snowflake Context
-
-Before executing any commands, set your session to the appropriate context:
-
-```sql
-USE DATABASE LLM_CORTEX_DEMO_DB;
-USE SCHEMA RAW;
-USE WAREHOUSE USER_STD_XSMALL_WH;
-```
-
 ### Step 1: Create the Database
 
 This command creates a new database named `LLM_CORTEX_DEMO_DB` if it doesn't already exist. Using `IF NOT EXISTS` ensures the script is idempotent and can be rerun safely without causing errors if the database already exists.
@@ -980,11 +970,11 @@ SELECT
         }
     ) AS EMAIL_RESPONSE_JSON,
     EMAIL_RESPONSE_JSON:choices[0]:messages::string AS EMAIL_RESPONSE,
-    TRY_TO_TIMESTAMP(EMAIL_RESPONSE:created::string) AS CREATED,
-    EMAIL_RESPONSE:model::string AS MODEL,
-    EMAIL_RESPONSE:usage:completion_tokens::number AS COMPLETION_TOKENS,
-    EMAIL_RESPONSE:usage:prompt_tokens::number AS PROMPT_TOKENS,
-    EMAIL_RESPONSE:usage:total_tokens::number AS TOTAL_TOKENS
+    TRY_TO_TIMESTAMP(EMAIL_RESPONSE_JSON:created::string) AS CREATED,
+    EMAIL_RESPONSE_JSON:model::string AS MODEL,
+    EMAIL_RESPONSE_JSON:usage:completion_tokens::number AS COMPLETION_TOKENS,
+    EMAIL_RESPONSE_JSON:usage:prompt_tokens::number AS PROMPT_TOKENS,
+    EMAIL_RESPONSE_JSON:usage:total_tokens::number AS TOTAL_TOKENS
 FROM
     LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT
 WHERE FILE_NAME = 'audiofile11.pdf';
@@ -1051,9 +1041,9 @@ SELECT
                                     'order': { 'type': 'integer' },
                                     'role': { 'type': 'string' },
                                     'name': { 'type': 'string' },
-                                    'speach': { 'type': 'string' }
+                                    'speech': { 'type': 'string' }
                                 },
-                                'required': ['order', 'role', 'name', 'speach']
+                                'required': ['order', 'role', 'name', 'speech']
                             }
                         }
                     },
@@ -1079,7 +1069,7 @@ SELECT
     FILE_NAME,    
     d.value:"role"::STRING AS "ROLE",
     d.value:"name"::STRING  AS "NAME",
-    d.value:"speach"::STRING AS "SPEACH",
+    d.value:"speech"::STRING AS "SPEECH",
     d.value:"order"::NUMBER AS "ORDER"
 FROM
     LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_DIALOGUE,

@@ -68,12 +68,6 @@
 <li><code>CREATE SCHEMA</code> creates logical namespaces for raw files (<code>RAW</code>) and processed/intermediate data (<code>STAGE</code>).</li>
 <li><code>CREATE STAGE</code> sets up a secure location to upload PDF documents. It supports directory table creation and uses Snowflake-managed encryption.</li>
 </ul>
-<h2 is-upgraded>Set Snowflake Context</h2>
-<p>Before executing any commands, set your session to the appropriate context:</p>
-<pre><code language="language-sql" class="language-sql">USE DATABASE LLM_CORTEX_DEMO_DB;
-USE SCHEMA RAW;
-USE WAREHOUSE USER_STD_XSMALL_WH;
-</code></pre>
 <h2 is-upgraded>Step 1: Create the Database</h2>
 <p>This command creates a new database named <code>LLM_CORTEX_DEMO_DB</code> if it doesn&#39;t already exist. Using <code>IF NOT EXISTS</code> ensures the script is idempotent and can be rerun safely without causing errors if the database already exists.</p>
 <pre><code language="language-sql" class="language-sql">CREATE DATABASE IF NOT EXISTS LLM_CORTEX_DEMO_DB;
@@ -802,11 +796,11 @@ WHERE FILE_NAME = &#39;audiofile11.pdf&#39;;
         }
     ) AS EMAIL_RESPONSE_JSON,
     EMAIL_RESPONSE_JSON:choices[0]:messages::string AS EMAIL_RESPONSE,
-    TRY_TO_TIMESTAMP(EMAIL_RESPONSE:created::string) AS CREATED,
-    EMAIL_RESPONSE:model::string AS MODEL,
-    EMAIL_RESPONSE:usage:completion_tokens::number AS COMPLETION_TOKENS,
-    EMAIL_RESPONSE:usage:prompt_tokens::number AS PROMPT_TOKENS,
-    EMAIL_RESPONSE:usage:total_tokens::number AS TOTAL_TOKENS
+    TRY_TO_TIMESTAMP(EMAIL_RESPONSE_JSON:created::string) AS CREATED,
+    EMAIL_RESPONSE_JSON:model::string AS MODEL,
+    EMAIL_RESPONSE_JSON:usage:completion_tokens::number AS COMPLETION_TOKENS,
+    EMAIL_RESPONSE_JSON:usage:prompt_tokens::number AS PROMPT_TOKENS,
+    EMAIL_RESPONSE_JSON:usage:total_tokens::number AS TOTAL_TOKENS
 FROM
     LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT
 WHERE FILE_NAME = &#39;audiofile11.pdf&#39;;
@@ -867,9 +861,9 @@ SELECT
                                     &#39;order&#39;: { &#39;type&#39;: &#39;integer&#39; },
                                     &#39;role&#39;: { &#39;type&#39;: &#39;string&#39; },
                                     &#39;name&#39;: { &#39;type&#39;: &#39;string&#39; },
-                                    &#39;speach&#39;: { &#39;type&#39;: &#39;string&#39; }
+                                    &#39;speech&#39;: { &#39;type&#39;: &#39;string&#39; }
                                 },
-                                &#39;required&#39;: [&#39;order&#39;, &#39;role&#39;, &#39;name&#39;, &#39;speach&#39;]
+                                &#39;required&#39;: [&#39;order&#39;, &#39;role&#39;, &#39;name&#39;, &#39;speech&#39;]
                             }
                         }
                     },
@@ -889,7 +883,7 @@ WHERE FILE_NAME = &#39;audiofile11.pdf&#39;;
     FILE_NAME,    
     d.value:&#34;role&#34;::STRING AS &#34;ROLE&#34;,
     d.value:&#34;name&#34;::STRING  AS &#34;NAME&#34;,
-    d.value:&#34;speach&#34;::STRING AS &#34;SPEACH&#34;,
+    d.value:&#34;speech&#34;::STRING AS &#34;SPEECH&#34;,
     d.value:&#34;order&#34;::NUMBER AS &#34;ORDER&#34;
 FROM
     LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_DIALOGUE,
