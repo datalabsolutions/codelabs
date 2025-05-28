@@ -407,7 +407,7 @@ Review the generated summaries to validate their tone and informativeness. These
 
 ---
 
-### SENTIMENT
+## SENTIMENT
 
 Duration: 0:05:00
 
