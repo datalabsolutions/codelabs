@@ -36,7 +36,7 @@ This hands-on lab introduces participants to Snowflake Cortex AI’s ability to 
 
 ### Download Code
 
-Download the source code for this lab [here] (https://github.com/datalabsolutions/AI-Labs/raw/main/snowflake-cortex-callcenter-lab/assets/audio-files.zip)
+Download the source code for this lab [here](https://github.com/datalabsolutions/AI-Labs/raw/main/snowflake-cortex-callcenter-lab/assets/audio-files.zip)
 
 ### Prerequisites
 
