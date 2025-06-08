@@ -1,0 +1,134 @@
+[
+  {
+    "id": "1",
+    "title": "Introduction to Snowflake Cortex LLM",
+    "description": "Explore how to leverage Snowflake Cortex for large language model (LLM) capabilities directly within Snowflake.",
+    "tags": ["Snowflake", "Cortex", "LLM", "AI", "Machine Learning"],
+    "category": "Snowflake",
+    "link": "https://learning.datalab.co.za/snowflake-cortex-callcenter-lab",
+    "duration": 60,
+    "difficulty": "Beginner",
+    "featured": true
+  },
+  {
+    "id": "2",
+    "title": "Building a dbt Project on Snowflake",
+    "description": "Understand how to transform data in Snowflake using dbt. This lab guides you through setting up and running your first dbt models.",
+    "tags": ["dbt", "data transformation", "etl", "intermediate"],
+    "category": "dbt",
+    "link": "https://quickstarts.snowflake.com/guide/dbt_essentials",
+    "duration": 90,
+    "difficulty": "Intermediate",
+    "featured": true
+  },
+  {
+    "id": "3",
+    "title": "Streamlit Applications with Snowflake",
+    "description": "Create interactive data applications using Streamlit and connect to Snowflake. Explore how to build and deploy simple dashboards.",
+    "tags": ["streamlit", "python", "data apps", "frontend"],
+    "category": "Snowflake",
+    "link": "https://quickstarts.snowflake.com/guide/build_a_streamlit_app",
+    "duration": 45,
+    "difficulty": "Beginner",
+    "featured": false
+  },
+  {
+    "id": "4",
+    "title": "Machine Learning with Snowpark",
+    "description": "Explore building and deploying machine learning models directly in Snowflake with Snowpark. A deep dive into in-database ML.",
+    "tags": ["snowpark", "machine learning", "python", "data science"],
+    "category": "Snowflake",
+    "link": "https://quickstarts.snowflake.com/guide/snowpark_ml",
+    "duration": 120,
+    "difficulty": "Advanced",
+    "featured": true
+  },
+  {
+    "id": "5",
+    "title": "Introduction to Data Governance in Snowflake",
+    "description": "Learn about data governance features like masking policies and row access policies to secure your data in Snowflake.",
+    "tags": ["governance", "security", "data management", "admin"],
+    "category": "Snowflake",
+    "link": "https://quickstarts.snowflake.com/guide/data_governance",
+    "duration": 75,
+    "difficulty": "Intermediate",
+    "featured": false
+  },
+  {
+    "id": "6",
+    "title": "Connecting Power BI to Snowflake",
+    "description": "Integrate Snowflake with Power BI for powerful data visualization and reporting. Learn to connect and build dashboards.",
+    "tags": ["power bi", "bi", "visualization", "integration"],
+    "category": "Power BI",
+    "link": "https://quickstarts.snowflake.com/guide/power_bi_integration",
+    "duration": 55,
+    "difficulty": "Beginner",
+    "featured": true
+  },
+  {
+    "id": "7",
+    "title": "Advanced SQL Techniques in Snowflake",
+    "description": "Master advanced SQL functions and concepts, including window functions and CTEs, for complex data analysis.",
+    "tags": ["sql", "advanced", "query optimization"],
+    "category": "Snowflake",
+    "link": "https://quickstarts.snowflake.com/guide/advanced_sql",
+    "duration": 80,
+    "difficulty": "Advanced",
+    "featured": false
+  },
+  {
+    "id": "8",
+    "title": "Secure Data Sharing with Snowflake",
+    "description": "Understand how to securely share data with consumers using Snowflake's native data sharing capabilities.",
+    "tags": ["data sharing", "security", "collaboration"],
+    "category": "Snowflake",
+    "link": "https://quickstarts.snowflake.com/guide/secure_data_sharing",
+    "duration": 50,
+    "difficulty": "Intermediate",
+    "featured": false
+  },
+  {
+    "id": "9",
+    "title": "Data Pipelines with dbt and Snowflake",
+    "description": "Build automated data pipelines in Snowflake using dbt for efficient data processing.",
+    "tags": ["data pipeline", "automation", "dbt", "streams"],
+    "category": "dbt",
+    "link": "https://quickstarts.snowflake.com/guide/data_pipelines",
+    "duration": 70,
+    "difficulty": "Intermediate",
+    "featured": true
+  },
+  {
+    "id": "10",
+    "title": "Power BI with Advanced Reporting",
+    "description": "Dive into advanced features of Power BI to create insightful and interactive reports from Snowflake data.",
+    "tags": ["power bi", "reporting", "visualization"],
+    "category": "Power BI",
+    "link": "https://quickstarts.snowflake.com/guide/power_bi_advanced_reporting",
+    "duration": 100,
+    "difficulty": "Advanced",
+    "featured": false
+  },
+  {
+    "id": "11",
+    "title": "Using External Functions in Snowflake",
+    "description": "Extend Snowflake's capabilities by calling external services from your SQL queries using external functions.",
+    "tags": ["external functions", "api", "integration", "advanced"],
+    "category": "Snowflake",
+    "link": "https://quickstarts.snowflake.com/guide/external_functions",
+    "duration": 65,
+    "difficulty": "Advanced",
+    "featured": false
+  },
+  {
+    "id": "12",
+    "title": "Optimizing dbt Models for Performance",
+    "description": "Learn techniques and best practices to optimize your dbt models and ensure efficient data transformation.",
+    "tags": ["dbt", "performance", "optimization", "tuning"],
+    "category": "dbt",
+    "link": "https://quickstarts.snowflake.com/guide/dbt_performance_tuning",
+    "duration": 110,
+    "difficulty": "Advanced",
+    "featured": false
+  }
+]
