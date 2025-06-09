@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Page Not Found - Redirecting...</title>
+    <script type="text/javascript">
+      // This script redirects all 404s to the root index.html with the original path
+      // appended to the hash, allowing React Router to handle it.
+      // This is essential for BrowserRouter on GitHub Pages with a custom domain at the root.
+      var path = window.location.pathname;
+      var search = window.location.search;
+      var hash = window.location.hash; // In case there's already a hash
+
+      // Construct the new URL: protocol + host + root path ('/') + '#' + original_path + original_query
+      var newUrl = window.location.protocol + "//" + window.location.host + '/' + '#' + path + search;
+
+      window.location.replace(newUrl);
+    </script>
+  </head>
+  <body>
+    <p>Redirecting you to the correct page...</p>
+  </body>
+</html>
