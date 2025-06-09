@@ -5,7 +5,7 @@
     "description": "Explore how to leverage Snowflake Cortex for large language model (LLM) capabilities directly within Snowflake.",
     "tags": ["Snowflake", "Cortex", "LLM", "AI", "Machine Learning"],
     "category": "Snowflake",
-    "link": "https://learning.datalab.co.za/snowflake-cortex-callcenter-lab",
+    "link": "/snowflake-cortex-callcenter-lab/index.html",
     "duration": 60,
     "difficulty": "Beginner",
     "featured": true
