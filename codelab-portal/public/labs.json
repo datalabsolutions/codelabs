@@ -1,7 +1,7 @@
 [
   {
     "id": "1",
-    "title": "Introduction to Snowflake Cortex LLM",
+    "title": "Snowflake Cortex AI for Call Center Transcript Analysis",
     "description": "Explore how to leverage Snowflake Cortex for large language model (LLM) capabilities directly within Snowflake.",
     "tags": ["Snowflake", "Cortex", "LLM", "AI", "Machine Learning"],
     "category": "Snowflake",
@@ -16,7 +16,7 @@
     "description": "Understand how to transform data in Snowflake using dbt. This lab guides you through setting up and running your first dbt models.",
     "tags": ["dbt", "data transformation", "etl", "intermediate"],
     "category": "dbt",
-    "link": "https://quickstarts.snowflake.com/guide/dbt_essentials",
+    "link": "",
     "duration": 90,
     "difficulty": "Intermediate",
     "featured": true

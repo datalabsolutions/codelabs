@@ -220,7 +220,8 @@ export default function App() {
   );
 
   useEffect(() => {
-    fetch("/labs.json")
+    // Corrected fetch path for labs.json to work with GitHub Pages sub-directory deployment
+    fetch(process.env.PUBLIC_URL + "/labs.json")
       .then((res) => {
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
@@ -323,7 +324,7 @@ export default function App() {
     <div className="min-h-screen bg-[#F6F8FC] font-sans text-gray-900 antialiased">
       <Header
         siteTitle=""
-        logoSrc="/logo-white.png"
+        logoSrc={process.env.PUBLIC_URL + "/logo-white.png"}
         navLinks={[
           { label: "Home", href: "https://www.datalabsolutions.co.uk" },
           { label: "Contact", href: "https://www.datalabsolutions.co.uk/contact" }
@@ -331,7 +332,7 @@ export default function App() {
       />
 
       {/* Hero Section: Description of DataLab Labs */}
-      <section className="bg-white py-16 px-6 rounded-xl shadow-lg mx-auto max-w-7xl mt-12"> {/* Updated styling for hero section to be white and added mt-12 for space */}
+      <section className="bg-white py-16 px-6 rounded-xl shadow-lg mx-auto max-w-7xl mt-12"> {/* Updated styling for hero section to be white */}
         <div className="text-center">
           <h2 className="text-4xl font-bold tracking-tight text-[#0B2254] mb-4">DataLab: Where Data Mastery Begins!</h2>
           <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
