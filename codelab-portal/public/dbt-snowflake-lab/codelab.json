@@ -1,0 +1,33 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-06-18T12:11:27+02:00",
+  "id": "dbt-snowflake-lab",
+  "duration": 0,
+  "title": "dbt with Snowflake Quickstart",
+  "summary": "A self-paced hands-on lab that teaches how to use dbt with Snowflake for data transformation and modeling.",
+  "source": "dbt-snowflake-lab.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "[“dbt”",
+    "“snowflake”",
+    "“elt”",
+    "“datatransformation”",
+    "“datamodeling”]"
+  ],
+  "tags": [
+    "[“snowflake”",
+    "web",
+    "“data-modeling”]",
+    "“data-transformation”",
+    "“dbt”"
+  ],
+  "feedback": "https://github.com/datalab-solutions/snowflake-codelabs/issues",
+  "ga": "UA-XXXXXXXXX-X",
+  "url": "dbt-snowflake-lab"
+}

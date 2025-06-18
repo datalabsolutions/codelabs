@@ -16,7 +16,7 @@
     "description": "Understand how to transform data in Snowflake using dbt. This lab guides you through setting up and running your first dbt models.",
     "tags": ["dbt", "data transformation", "etl", "intermediate"],
     "category": "dbt",
-    "link": "",
+    "link": "/dbt-snowflake-lab/",
     "duration": 90,
     "difficulty": "Intermediate",
     "featured": true
