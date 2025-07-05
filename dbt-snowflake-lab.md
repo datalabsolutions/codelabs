@@ -1,7 +1,7 @@
 id: dbt-snowflake-lab
 name: dbt with Snowflake
 summary: A self-paced hands-on lab that teaches how to use dbt with Snowflake for data transformation and modeling.
-author: datalab-solutions
+author: De Wet Conradie
 categories: ["dbt", "Snowflake", "ELT", "data transformation", "data modeling"]
 environments: Web
 duration: 90

@@ -1,17 +1,30 @@
 [
   {
     "id": "1",
-    "title": "Snowflake Cortex AI for Call Center Transcript Analysis",
+    "title": "Snowflake Cortex AI Functions for Call Center Transcript Analysis",
     "description": "Explore how to leverage Snowflake Cortex for large language model (LLM) capabilities directly within Snowflake.",
     "tags": ["Snowflake", "Cortex", "LLM", "AI", "Machine Learning"],
     "category": "Snowflake",
-    "link": "/snowflake-cortex-callcenter-lab/",
+    "link": "/snowflake-cortex-functions-callcenter-lab/",
     "duration": 60,
     "difficulty": "Beginner",
-    "featured": true
+    "featured": true,
+    "author": "Douglas Day"
   },
   {
     "id": "2",
+    "title": "Snowflake Cortex Analyst for Stock Trading Analyssis",
+    "description": "Create interactive data applications using Streamlit and connect to Snowflake. Explore how to build and deploy simple dashboards.",
+    "tags": ["Snowflake", "Cortex", "LLM", "AI", "MCP"],
+    "category": "Snowflake",
+    "link": "/snowflake-cortex-analyst-lab/",
+    "duration": 60,
+    "difficulty": "Intermediate",
+    "featured": true,
+    "author": "Douglas Day"
+  },
+  {
+    "id": "3",
     "title": "Building a dbt Project on Snowflake",
     "description": "Understand how to transform data in Snowflake using dbt. This lab guides you through setting up and running your first dbt models.",
     "tags": ["dbt", "data transformation", "etl", "intermediate"],
@@ -19,18 +32,8 @@
     "link": "/dbt-snowflake-lab/",
     "duration": 90,
     "difficulty": "Intermediate",
-    "featured": true
-  },
-  {
-    "id": "3",
-    "title": "Streamlit Applications with Snowflake",
-    "description": "Create interactive data applications using Streamlit and connect to Snowflake. Explore how to build and deploy simple dashboards.",
-    "tags": ["streamlit", "python", "data apps", "frontend"],
-    "category": "Snowflake",
-    "link": "",
-    "duration": 45,
-    "difficulty": "Beginner",
-    "featured": false
+    "featured": true,
+    "author": "De Wet Conradie"
   },
   {
     "id": "4",
@@ -41,7 +44,8 @@
     "link": "",
     "duration": 120,
     "difficulty": "Advanced",
-    "featured": true
+    "featured": true,
+    "author": ""
   },
   {
     "id": "5",
@@ -52,7 +56,8 @@
     "link": "",
     "duration": 75,
     "difficulty": "Intermediate",
-    "featured": false
+    "featured": false,
+    "author": ""
   },
   {
     "id": "6",
@@ -63,6 +68,7 @@
     "link": "",
     "duration": 55,
     "difficulty": "Beginner",
-    "featured": true
+    "featured": true,
+    "author": ""
   }
 ]

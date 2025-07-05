@@ -1,0 +1,33 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-07-05T14:53:53+02:00",
+  "id": "snowflake-cortex-analyst-lab",
+  "duration": 0,
+  "title": "Snowflake Cortex Analyst: Querying NASDAQ Trading Data",
+  "summary": "A self-paced, hands-on lab guiding you through ingesting, transforming, modeling, and analyzing NASDAQ trading data using Snowflake. Learn to leverage Snowflake Cortex Analyst for natural language interaction with your financial datasets.",
+  "source": "snowflake-cortex-analyst-trading-data.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "[“ai”",
+    "“cortex”",
+    "“finance”",
+    "“textanalysis”]"
+  ],
+  "tags": [
+    "[“snowflake”",
+    "web",
+    "“cortex-analyst”",
+    "“financial-data”]",
+    "“prompt-engineering”",
+    "“semantic-modeling”"
+  ],
+  "feedback": "https://github.com/datalab-solutions/snowflake-codelabs/issues",
+  "ga": "UA-XXXXXXXXX-X",
+  "url": "snowflake-cortex-analyst-lab"
+}
