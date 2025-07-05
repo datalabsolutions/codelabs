@@ -1,7 +1,7 @@
 id: snowflake-cortex-callcenter-lab
 name: Snowflake Cortex AI for Call Center Transcript Analysis
 summary: A self-paced hands-on lab that teaches how to use Snowflake Cortex AI to ingest, extract, structure, translate, analyze, summarize, and answer questions from PDF call center transcripts.
-author: datalab-solutions
+author: Douglas Day
 categories: ["AI", "Cortex", "Call Center", "Text Analysis"]
 environments: Web
 duration: 90
@@ -12,7 +12,7 @@ source: internal
 analytics account: UA-XXXXXXXXX-X
 feedback link: https://github.com/datalab-solutions/snowflake-codelabs/issues
 level: intermediate
-products: ["Snowflake Cortex"]
+products: ["Snowflake Cortex Functions"]
 
 # Snowflake Cortex AI for Call Center Transcript Analysis
 

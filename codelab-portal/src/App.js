@@ -13,6 +13,7 @@ import { createRoot } from 'react-dom/client';
  * @property {number} duration // Added duration in minutes
  * @property {string} difficulty // Added difficulty (e.g., "Beginner", "Intermediate", "Advanced")
  * @property {boolean} featured // Added featured flag
+ * @property {string} author // Added author field
  */
 
 // Define category color mapping for modern accents using provided CSS HEX values
@@ -117,6 +118,16 @@ const LabCard = ({ lab, isFeatured = false }) => { // Added isFeatured prop
       <div className="mb-4">
         <h3 className="text-xl font-bold leading-snug mb-2" style={{ color: colors.main }}>{lab.title}</h3>
         <p className="text-sm text-gray-600 font-medium italic mb-2">{lab.category}</p>
+        
+        {/* Author information */}
+        {lab.author && (
+          <p className="text-sm text-gray-500 mb-2 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            By {lab.author}
+          </p>
+        )}
         
         {/* Difficulty indicator */}
         {lab.difficulty && (
