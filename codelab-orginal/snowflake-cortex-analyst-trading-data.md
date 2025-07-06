@@ -237,6 +237,10 @@ Duration: 0:15:00
 
 Create a semantic model using the Snowflake UI to define your data's structure, measures, and dimensions for natural language querying in Cortex Analyst.
 
+### Download Script
+
+Download the source code for this step [here](https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/01-AI-LAB-CONFIGURATION.sql).
+
 ### Description
 
 A semantic model defines:
@@ -506,26 +510,6 @@ ORDER BY DAILY_VOLATILITY_PERCENTAGE DESC
 LIMIT 10;
 ```
 
-#### Highest Volatility Day Per Stock
-
-| Field               | Value                                                                                                         |
-| ------------------- | ------------------------------------------------------------------------------------------------------------- |
-| Verified Query Name | Highest Volatility Trading Day Per Stock                                                                      |
-| Question            | What day did each of the top 10 most volatile stocks have their highest daily volatility in the last 90 days? |
-| Use in Onboarding   | ✔ Yes                                                                                                         |
-
-```sql
-SELECT TICKER,
-       DATE,
-       (HIGH_PRICE - LOW_PRICE) / NULLIF(OPEN_PRICE, 0) AS DAILY_VOLATILITY_PCT
-FROM STOCK_PRICE
-WHERE DATE >= CURRENT_DATE - 90
-  AND OPEN_PRICE <> 0
-QUALIFY ROW_NUMBER() OVER (PARTITION BY TICKER ORDER BY DAILY_VOLATILITY_PCT DESC) = 1
-ORDER BY DAILY_VOLATILITY_PCT DESC
-LIMIT 10;
-```
-
 > 📘 Add each verified query through the Cortex UI using the **Add Query** interface.
 
 ## Improving Output Presentation with Custom Formatting
@@ -592,6 +576,56 @@ What day did each of the top 10 most volatile stocks have their highest daily vo
 ---
 
 > ✅ Custom formatting improves clarity and makes dashboards more business-user friendly.
+
+
+## Deploying a Streamlit Chat Bot
+
+Duration: 0:07:00
+
+### Learning Outcome
+Create a basic chatbot interface connected to your Cortex Analyst semantic model using Streamlit in Snowflake.
+
+### Download Script
+
+Download the source code for this step [here](https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-analyst-nasdaq-trading-data/streamlit/trading-chat-bot.py).
+
+### Description
+In this section, you'll deploy a Streamlit app that connects directly to your semantic model and enables users to interact with financial data using natural language prompts.
+
+---
+
+### Step-by-Step Instructions
+
+#### Step 1: Navigate to Streamlit Projects
+
+1. In the **left navigation menu**, click on **Projects** → **Streamlit**
+
+#### Step 2: Create a New Streamlit App
+
+1. In the Streamlit screen, click the **+ Streamlit App** button in the top-right corner
+2. In the pop-up modal, enter the following details:
+
+   | Field             | Value                 |
+   |------------------|-----------------------|
+   | App Title        | Trading Chat Bot      |
+   | Database         | CORTEX_ANALYST_DB     |
+   | Schema           | DATA                  |
+   | App Warehouse    | USER_STD_XSMALL_WH    |
+
+#### Step 3: Add the Chatbot Code
+
+1. Open the Streamlit chatbot source file [here](https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-analyst-nasdaq-trading-data/streamlit/trading-chat-bot.py)
+2. Copy and paste the full code into the editor window of the newly created Streamlit app
+
+#### Step 4: Run Your App
+
+1. Click the **Run** button
+2. If you see any warnings or errors, click the **burger menu** (three dots in the top-right corner) and choose **Reboot**
+
+You now have a fully functional chatbot powered by Snowflake Cortex Analyst and accessible via Streamlit.
+
+> 💬 Use this interface to ask financial questions in plain English, backed by your semantic model!
+
 
 ## Conclusion and Next Steps
 

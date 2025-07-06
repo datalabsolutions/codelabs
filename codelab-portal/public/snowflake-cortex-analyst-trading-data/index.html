@@ -199,6 +199,8 @@ AS
       <google-codelab-step label="Creating a Semantic Model in Snowflake" duration="15">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Create a semantic model using the Snowflake UI to define your data&#39;s structure, measures, and dimensions for natural language querying in Cortex Analyst.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-callcenter-lab/scripts/01-AI-LAB-CONFIGURATION.sql" target="_blank">here</a>.</p>
 <h2 is-upgraded>Description</h2>
 <p>A semantic model defines:</p>
 <ul>
@@ -458,31 +460,6 @@ HAVING NOT IS_NULL_VALUE(DAILY_VOLATILITY_PERCENTAGE)
 ORDER BY DAILY_VOLATILITY_PERCENTAGE DESC
 LIMIT 10;
 </code></pre>
-<h3 is-upgraded>Highest Volatility Day Per Stock</h3>
-<table>
-<tr><td colspan="1" rowspan="1"><p>Field</p>
-</td><td colspan="1" rowspan="1"><p>Value</p>
-</td></tr>
-<tr><td colspan="1" rowspan="1"><p>Verified Query Name</p>
-</td><td colspan="1" rowspan="1"><p>Highest Volatility Trading Day Per Stock</p>
-</td></tr>
-<tr><td colspan="1" rowspan="1"><p>Question</p>
-</td><td colspan="1" rowspan="1"><p>What day did each of the top 10 most volatile stocks have their highest daily volatility in the last 90 days?</p>
-</td></tr>
-<tr><td colspan="1" rowspan="1"><p>Use in Onboarding</p>
-</td><td colspan="1" rowspan="1"><p>✔ Yes</p>
-</td></tr>
-</table>
-<pre><code language="language-sql" class="language-sql">SELECT TICKER,
-       DATE,
-       (HIGH_PRICE - LOW_PRICE) / NULLIF(OPEN_PRICE, 0) AS DAILY_VOLATILITY_PCT
-FROM STOCK_PRICE
-WHERE DATE &gt;= CURRENT_DATE - 90
-  AND OPEN_PRICE &lt;&gt; 0
-QUALIFY ROW_NUMBER() OVER (PARTITION BY TICKER ORDER BY DAILY_VOLATILITY_PCT DESC) = 1
-ORDER BY DAILY_VOLATILITY_PCT DESC
-LIMIT 10;
-</code></pre>
 <p>📘 Add each verified query through the Cortex UI using the <strong>Add Query</strong> interface.</p>
 
 
@@ -528,6 +505,56 @@ Any Price numbers must be formatted as: 1,000.00
 <li><code>Prices</code> with decimal precision: <code>2,345.00</code></li>
 </ul>
 <p>✅ Custom formatting improves clarity and makes dashboards more business-user friendly.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Deploying a Streamlit Chat Bot" duration="7">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Create a basic chatbot interface connected to your Cortex Analyst semantic model using Streamlit in Snowflake.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-analyst-nasdaq-trading-data/streamlit/trading-chat-bot.py" target="_blank">here</a>.</p>
+<h2 is-upgraded>Description</h2>
+<p>In this section, you&#39;ll deploy a Streamlit app that connects directly to your semantic model and enables users to interact with financial data using natural language prompts.</p>
+<h2 is-upgraded>Step-by-Step Instructions</h2>
+<h3 is-upgraded>Step 1: Navigate to Streamlit Projects</h3>
+<ol type="1">
+<li>In the <strong>left navigation menu</strong>, click on <strong>Projects</strong> → <strong>Streamlit</strong></li>
+</ol>
+<h3 is-upgraded>Step 2: Create a New Streamlit App</h3>
+<ol type="1">
+<li>In the Streamlit screen, click the <strong>+ Streamlit App</strong> button in the top-right corner</li>
+<li>In the pop-up modal, enter the following details: <table>
+<tr><td colspan="1" rowspan="1"><p>Field</p>
+</td><td colspan="1" rowspan="1"><p>Value</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>App Title</p>
+</td><td colspan="1" rowspan="1"><p>Trading Chat Bot</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Database</p>
+</td><td colspan="1" rowspan="1"><p>CORTEX_ANALYST_DB</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Schema</p>
+</td><td colspan="1" rowspan="1"><p>DATA</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>App Warehouse</p>
+</td><td colspan="1" rowspan="1"><p>USER_STD_XSMALL_WH</p>
+</td></tr>
+</table>
+</li>
+</ol>
+<h3 is-upgraded>Step 3: Add the Chatbot Code</h3>
+<ol type="1">
+<li>Open the Streamlit chatbot source file <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-analyst-nasdaq-trading-data/streamlit/trading-chat-bot.py" target="_blank">here</a></li>
+<li>Copy and paste the full code into the editor window of the newly created Streamlit app</li>
+</ol>
+<h3 is-upgraded>Step 4: Run Your App</h3>
+<ol type="1">
+<li>Click the <strong>Run</strong> button</li>
+<li>If you see any warnings or errors, click the <strong>burger menu</strong> (three dots in the top-right corner) and choose <strong>Reboot</strong></li>
+</ol>
+<p>You now have a fully functional chatbot powered by Snowflake Cortex Analyst and accessible via Streamlit.</p>
+<p>💬 Use this interface to ask financial questions in plain English, backed by your semantic model!</p>
 
 
       </google-codelab-step>
