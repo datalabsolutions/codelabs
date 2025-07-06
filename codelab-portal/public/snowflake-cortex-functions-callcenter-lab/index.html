@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
   <meta name="theme-color" content="#4F7DC9">
   <meta charset="UTF-8">
-  <title>Snowflake Cortex AI for Call Center Transcript Analysis</title>
+  <title>Snowflake Cortex AI Functions: Call Center Transcript Analysis</title>
   <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
   <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
   <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
@@ -20,11 +20,10 @@
   </style>
 </head>
 <body>
-  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
   <google-codelab codelab-gaid="UA-XXXXXXXXX-X"
-                  codelab-ga4id=""
-                  id="snowflake-cortex-callcenter-lab"
-                  title="Snowflake Cortex AI for Call Center Transcript Analysis"
+                  id="snowflake-cortex-functions-callcenter-lab"
+                  title="Snowflake Cortex AI Functions: Call Center Transcript Analysis"
                   environment="web"
                   feedback-link="https://github.com/datalab-solutions/snowflake-codelabs/issues">
     
@@ -50,12 +49,13 @@
 <li>Basic familiarity with SQL and the Snowflake UI</li>
 <li>Access all the scripts for this Lab <a href="https://github.com/datalabsolutions/AI-Labs/tree/main/snowflake-cortex-callcenter-lab" target="_blank">on GitHub</a></li>
 </ul>
+<p>💡 <strong>Tip:</strong> Explore this interactive walkthrough to learn how to sign up for a <a href="https://app.supademo.com/demo/cmbw9nmxe0606xw0izxyku479" target="_blank">Snowflake account</a>.</p>
 <p>💡 <strong>Tip:</strong> Use the <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#availability" target="_blank">LLM Function Availability</a> page to check which cloud regions are supported.</p>
 
 
       </google-codelab-step>
     
-      <google-codelab-step label="Environment Configuration" duration="5">
+      <google-codelab-step label="Environment Configuration" duration="4">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Create the core Snowflake resources needed to run the AI Lab. This includes a database, warehouse, schemas, and a stage for uploading PDFs.</p>
 <h2 is-upgraded>Download Script</h2>
@@ -124,7 +124,7 @@ CREATE SCHEMA IF NOT EXISTS LLM_CORTEX_DEMO_DB.STAGE;
 
       </google-codelab-step>
     
-      <google-codelab-step label="PARSE_DOCUMENT" duration="7">
+      <google-codelab-step label="PARSE_DOCUMENT" duration="6">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Use the <code>PARSE_DOCUMENT()</code> function to extract the textual content from uploaded PDF files stored in the internal stage, and load that content into a structured table. This allows unstructured documents to be processed and queried using SQL.</p>
 <h2 is-upgraded>Download Script</h2>
@@ -187,7 +187,7 @@ FROM (
 
       </google-codelab-step>
     
-      <google-codelab-step label="EXTRACT_ANSWER" duration="7">
+      <google-codelab-step label="EXTRACT_ANSWER" duration="6">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Use the <code>EXTRACT_ANSWER()</code> function to identify specific information from each call center transcript, such as the caller&#39;s name, the date of the call, and its duration. This lets you transform long-form conversational data into structured, queryable columns.</p>
 <h2 is-upgraded>Download Script</h2>
@@ -255,7 +255,7 @@ FROM
 
       </google-codelab-step>
     
-      <google-codelab-step label="SUMMARIZE" duration="5">
+      <google-codelab-step label="SUMMARIZE" duration="4">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Use the <code>SUMMARIZE()</code> function to create a natural-language summary of each call center transcript. Summaries help reduce long conversations into concise descriptions that capture the main themes, customer issues, resolutions, and actions taken.</p>
 <h2 is-upgraded>Download Script</h2>
@@ -302,7 +302,7 @@ FROM
 
       </google-codelab-step>
     
-      <google-codelab-step label="SENTIMENT" duration="5">
+      <google-codelab-step label="SENTIMENT" duration="4">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Use the <code>SENTIMENT()</code> function to measure the emotional tone of a call transcript. This function returns a numerical score between -1 and 1, indicating negative, neutral, or positive sentiment. This analysis helps identify frustrated customers or celebrate excellent service.</p>
 <h2 is-upgraded>Download Script</h2>
@@ -348,7 +348,7 @@ FROM
 
       </google-codelab-step>
     
-      <google-codelab-step label="ENTITY_SENTIMENT" duration="6">
+      <google-codelab-step label="ENTITY_SENTIMENT" duration="5">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Use the <code>ENTITY_SENTIMENT()</code> function to assess how specific elements (&#34;Tone of voice&#34;, &#34;Issue Resolved&#34;, &#34;Follow up action&#34;) are discussed in each call transcript. Unlike <code>SENTIMENT()</code> which provides an overall mood score, <code>ENTITY_SENTIMENT()</code> offers sentiment feedback for specific labeled concepts.</p>
 <h2 is-upgraded>Download Script</h2>
@@ -419,7 +419,7 @@ GROUP BY FILE_NAME;
 
       </google-codelab-step>
     
-      <google-codelab-step label="CLASSIFY_TEXT" duration="5">
+      <google-codelab-step label="CLASSIFY_TEXT" duration="4">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Use the <code>CLASSIFY_TEXT()</code> function to categorize each transcript into a predefined set of labels. This helps you organize transcripts by intent or topic, enabling faster filtering, tagging, and operational response.</p>
 <h2 is-upgraded>Download Script</h2>
@@ -468,7 +468,7 @@ FROM
 
       </google-codelab-step>
     
-      <google-codelab-step label="COMPLETE" duration="8">
+      <google-codelab-step label="COMPLETE" duration="6">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Learn how to use the <code>COMPLETE()</code> function with tailored prompts to generate structured outputs, summaries, ratings, and red flag detection based on transcript text. This step introduces prompt engineering to control the model&#39;s output format and tone.</p>
 <h2 is-upgraded>Download Script</h2>
@@ -677,7 +677,7 @@ WHERE FILE_NAME = &#39;audiofile11.pdf&#39;;
 
       </google-codelab-step>
     
-      <google-codelab-step label="COMPLETE ADVANCED" duration="8">
+      <google-codelab-step label="COMPLETE ADVANCED" duration="6">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Apply advanced prompt engineering techniques with the <code>COMPLETE()</code> function using multi-message format and model-specific parameters. Learn to:</p>
 <ul>
@@ -896,7 +896,7 @@ FROM
 
       </google-codelab-step>
     
-      <google-codelab-step label="FINAL" duration="7">
+      <google-codelab-step label="FINAL" duration="4">
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Bring together all outputs from previous steps—parsed transcripts, extracted answers, sentiment analysis, summaries, classifications, and completions—into a unified, queryable dataset. This is ideal for final reporting, QA review, dashboarding, or export.</p>
 <h2 is-upgraded>Download Script</h2>

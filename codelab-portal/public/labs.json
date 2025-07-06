@@ -1,74 +1,80 @@
 [
   {
     "id": "1",
-    "title": "Snowflake Cortex AI Functions for Call Center Transcript Analysis",
+    "title": "Snowflake Cortex AI Functions: Call Center Transcript Analysis",
     "description": "Explore how to leverage Snowflake Cortex for large language model (LLM) capabilities directly within Snowflake.",
-    "tags": ["Snowflake", "Cortex", "LLM", "AI", "Machine Learning"],
+    "tags": ["Snowflake", "Cortex", "Cortex Functions", "LLM", "AI", "Machine Learning"],
     "category": "Snowflake",
     "link": "/snowflake-cortex-functions-callcenter-lab/",
     "duration": 60,
     "difficulty": "Beginner",
     "featured": true,
-    "author": "Douglas Day"
+    "author": "Douglas Day",
+    "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/"
   },
   {
     "id": "2",
-    "title": "Snowflake Cortex Analyst for Stock Trading Analyssis",
-    "description": "Create interactive data applications using Streamlit and connect to Snowflake. Explore how to build and deploy simple dashboards.",
-    "tags": ["Snowflake", "Cortex", "LLM", "AI", "MCP"],
+    "title": "Snowflake Cortex Analyst: Querying NASDAQ Trading Data",
+    "description": "Explore how to use Snowflake Cortex Analyst to query, model, and analyze NASDAQ trading data with natural language in Snowflake.",
+    "tags": ["Snowflake", "Cortex", "Cortex Analyst", "LLM", "AI", "Semantic Modeling"],
     "category": "Snowflake",
-    "link": "/snowflake-cortex-analyst-lab/",
+    "link": "/snowflake-cortex-analyst-trading-data/",
     "duration": 60,
-    "difficulty": "Intermediate",
+    "difficulty": "Beginner",
     "featured": true,
-    "author": "Douglas Day"
+    "author": "Douglas Day",
+    "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/"
   },
   {
     "id": "3",
-    "title": "Building a dbt Project on Snowflake",
-    "description": "Understand how to transform data in Snowflake using dbt. This lab guides you through setting up and running your first dbt models.",
-    "tags": ["dbt", "data transformation", "etl", "intermediate"],
+    "title": "Snowflake and DBT: Building Your First Project",
+    "description": "Explore how to transform data in Snowflake using dbt and build your first data models step by step.",
+    "tags": ["Snowflake", "dbt", "data transformation", "ELT"],
     "category": "dbt",
-    "link": "/dbt-snowflake-lab/",
+    "link": "/snowflake-introduction-to-dbt-lab/",
     "duration": 90,
     "difficulty": "Intermediate",
     "featured": true,
-    "author": "De Wet Conradie"
+    "author": "De Wet Conradie",
+    "authorLinkedIn": "https://www.linkedin.com/in/de-wet-conradie-21b02b42"
   },
   {
     "id": "4",
-    "title": "Machine Learning with Snowpark",
-    "description": "Explore building and deploying machine learning models directly in Snowflake with Snowpark. A deep dive into in-database ML.",
-    "tags": ["snowpark", "machine learning", "python", "data science"],
+    "title": "Snowflake Worksheets: A User Guide",
+    "description": "Explore how to use Snowflake Worksheets for data exploration, SQL development, and collaboration in Snowflake.",
+    "tags": ["Snowflake", "Worksheets", "SQL", "productivity", "collaboration"],
     "category": "Snowflake",
     "link": "",
-    "duration": 120,
-    "difficulty": "Advanced",
+    "duration": 60,
+    "difficulty": "Beginner",
     "featured": true,
-    "author": ""
+    "author": "Douglas Day",
+    "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/"
   },
   {
     "id": "5",
-    "title": "Introduction to Data Governance in Snowflake",
-    "description": "Learn about data governance features like masking policies and row access policies to secure your data in Snowflake.",
-    "tags": ["governance", "security", "data management", "admin"],
-    "category": "Snowflake",
+    "title": "Power BI: Best Practices with Snowflake Direct Query",
+    "description": "Explore best practices for using Power BI with Snowflake Direct Query for performance and security.",
+    "tags": ["Power BI", "Snowflake", "Direct Query", "best practices", "performance", "security"],
+    "category": "Power BI",
     "link": "",
     "duration": 75,
     "difficulty": "Intermediate",
     "featured": false,
-    "author": ""
+    "author": "Douglas Day",
+    "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/"
   },
   {
     "id": "6",
-    "title": "Connecting Power BI to Snowflake",
-    "description": "Integrate Snowflake with Power BI for powerful data visualization and reporting. Learn to connect and build dashboards.",
-    "tags": ["power bi", "bi", "visualization", "integration"],
-    "category": "Power BI",
+    "title": "Snowflake Agents: Interacting with Corporate Data in Natural Language",
+    "description": "Explore how to use Snowflake Agents to interact with and analyze corporate data using natural language and automation.",
+    "tags": ["Snowflake", "Agents", "AI", "automation", "corporate data"],
+    "category": "Snowflake",
     "link": "",
-    "duration": 55,
+    "duration": 60,
     "difficulty": "Beginner",
     "featured": true,
-    "author": ""
+    "author": "Douglas Day",
+    "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/"
   }
 ]
