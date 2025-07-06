@@ -1,0 +1,589 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Snowflake Cortex Analyst: Querying NASDAQ Trading Data</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+  <google-codelab codelab-gaid="UA-XXXXXXXXX-X"
+                  id="snowflake-cortex-analyst-trading-data"
+                  title="Snowflake Cortex Analyst: Querying NASDAQ Trading Data"
+                  environment="web"
+                  feedback-link="https://github.com/datalab-solutions/snowflake-codelabs/issues">
+    
+      <google-codelab-step label="Overview" duration="5">
+        <h2 is-upgraded>Introduction</h2>
+<p>This AI Lab introduces <strong>Snowflake Cortex Analyst</strong>, a powerful natural language interface that allows users to ask questions about structured data without writing SQL. You&#39;ll learn how to prepare your environment, transform trading time series data, and query it using Cortex Analyst.</p>
+<h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+<ul class="checklist">
+<li>How to set up your Snowflake environment for Cortex Analyst</li>
+<li>How to access the Finance &amp; Economics data from the Marketplace</li>
+<li>How to reshape data using dynamic tables for efficient querying</li>
+<li>How to build a semantic model and interact with it using natural language prompts</li>
+<li>How to enhance your semantic model with custom metrics and verified queries</li>
+<li>How to set up an MCP server for AI agent integration</li>
+</ul>
+<h2 is-upgraded>Prerequisites</h2>
+<ul>
+<li>A <a href="https://trial.snowflake.com/?owner=SPN-PID-452710" target="_blank">Snowflake account</a> with access to <strong>Snowflake Cortex Analyst</strong></li>
+<li><code>ACCOUNTADMIN</code> role or a custom role with necessary privileges</li>
+<li>Familiarity with SQL and your organization&#39;s data</li>
+</ul>
+<p>💡 <strong>Tip:</strong> Explore this interactive walkthrough to learn how to sign up for a <a href="https://app.supademo.com/demo/cmbw9nmxe0606xw0izxyku479" target="_blank">Snowflake account</a>.</p>
+<p>💡 <strong>Tip:</strong> Confirm Cortex Analyst availability in your region via the <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst#region-availability" target="_blank">Feature Availability</a> page.</p>
+<h2 is-upgraded>Lab Duration</h2>
+<p>Approximately 60–90 minutes</p>
+<h2 is-upgraded>Download Code</h2>
+<p>Download the scripts and prompts <a href="https://github.com/datalabsolutions/AI-Labs/tree/main/snowflake-cortex-analyst-nasdaq-trading-data" target="_blank">here</a></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Environment Configuration" duration="10">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Create the core Snowflake resources needed to run the AI Lab. This includes a database, warehouse, schemas, and a stage for uploading semantic model files.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the environment setup script <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-analyst-nasdaq-trading-data/scripts/01-AI-LAB-CONFIGURATION.sql" target="_blank">here</a>.</p>
+<h2 is-upgraded>Description</h2>
+<p>This setup script prepares your Snowflake environment to work with financial time series data using Cortex Analyst.</p>
+<ul>
+<li><code>CREATE DATABASE</code> ensures your lab operates in a clean and isolated environment.</li>
+<li><code>CREATE WAREHOUSE</code> provisions compute resources for running your queries. It&#39;s configured to minimize cost with automatic suspend/resume settings.</li>
+<li><code>CREATE SCHEMA</code> creates a logical namespace for Cortex-specific tables and models.</li>
+<li><code>CREATE STAGE</code> sets up a secure location to upload semantic YAML model definitions.</li>
+</ul>
+<h2 is-upgraded>Step 1: Create the Database</h2>
+<p>This command creates a new database named <code>CORTEX_ANALYST_DB</code> if it doesn&#39;t already exist. Using <code>IF NOT EXISTS</code> ensures the script is idempotent and can be rerun safely.</p>
+<pre><code language="language-sql" class="language-sql">CREATE DATABASE IF NOT EXISTS CORTEX_ANALYST_DB;
+</code></pre>
+<h2 is-upgraded>Step 2: Create a Compute Warehouse</h2>
+<p>This step provisions a virtual compute warehouse named <code>USER_STD_XSMALL_WH</code>. It is configured with the following parameters:</p>
+<ul>
+<li><strong>Size</strong>: <code>XSMALL</code> – small and cost-effective for light workloads.</li>
+<li><strong>Type</strong>: <code>STANDARD</code> – supports most use cases.</li>
+<li><strong>Auto Suspend</strong>: <code>60 seconds</code> – pauses automatically after inactivity.</li>
+<li><strong>Auto Resume</strong>: <code>TRUE</code> – resumes automatically when a query is submitted.</li>
+<li><strong>Initially Suspended</strong>: <code>TRUE</code> – starts in a paused state until needed.</li>
+</ul>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE WAREHOUSE USER_STD_XSMALL_WH
+  WAREHOUSE_SIZE = XSMALL
+  WAREHOUSE_TYPE = STANDARD
+  AUTO_SUSPEND = 60
+  AUTO_RESUME = TRUE
+  INITIALLY_SUSPENDED = TRUE;
+</code></pre>
+<h2 is-upgraded>Step 3: Create Logical Schema</h2>
+<p>Schemas are used to logically separate and organize objects within a database. This script creates the <code>DATA</code> schema for your semantic model and transformed data.</p>
+<pre><code language="language-sql" class="language-sql">CREATE SCHEMA IF NOT EXISTS CORTEX_ANALYST_DB.DATA;
+</code></pre>
+<h2 is-upgraded>Step 4: Create Internal Stage</h2>
+<p>This internal stage acts as a Snowflake-managed file storage area for uploading semantic model YAML files. It is configured to:</p>
+<ul>
+<li>Support directory-style file access</li>
+<li>Encrypt uploaded files using Snowflake&#39;s <strong>Server-Side Encryption (SSE)</strong></li>
+</ul>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE STAGE CORTEX_ANALYST_DB.DATA.SEMANTIC_MODEL
+  DIRECTORY = ( ENABLE = TRUE )
+  ENCRYPTION = ( TYPE = &#39;SNOWFLAKE_SSE&#39; );
+</code></pre>
+<h2 is-upgraded>Step 5: Subscribe to Finance &amp; Economics Dataset</h2>
+<p>To access financial data:</p>
+<ol type="1">
+<li>Navigate to <strong>Data Products &gt; Marketplace</strong> in Snowsight</li>
+<li>Search and select <strong>Finance &amp; Economics</strong></li>
+<li>Click <strong>Get</strong>, name the database <code>FINANCE_ECONOMICS</code>, and assign to role <code>PUBLIC</code></li>
+</ol>
+<p>📘 This dataset includes macroeconomic indicators such as interest rates, employment, and GDP. It fuels your Cortex Analyst lab experience.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Preparing the Data" duration="12">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Transform raw long-format stock price data into an analyst-friendly wide format using a dynamic table. This prepares the dataset for natural language querying via Cortex Analyst.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-cortex-analyst-nasdaq-trading-data/scripts/02-AI-LAB-PREPARING-DATA.sql" target="_blank">here</a>.</p>
+<h2 is-upgraded>Description</h2>
+<p>The source table contains long-format time series data for NASDAQ tickers, where each row represents a single variable for a specific date and ticker. In this section, you&#39;ll pivot this data into wide format using a dynamic table.</p>
+<ul>
+<li><code>SELECT *</code> lets you inspect the raw schema.</li>
+<li><code>MAX(CASE WHEN ...)</code> is used to deterministically pivot variable rows into columns.</li>
+<li><code>DYNAMIC TABLE</code> ensures the transformed dataset refreshes automatically.</li>
+</ul>
+<h2 is-upgraded>Step 1: Explore the Source Table</h2>
+<p>The table <code>FINANCE_ECONOMICS.CYBERSYN.STOCK_PRICE_TIMESERIES</code> stores variable-based measurements for each ticker per day.</p>
+<p>Run the query below to view the structure:</p>
+<pre><code language="language-sql" class="language-sql">SELECT *
+FROM FINANCE_ECONOMICS.CYBERSYN.STOCK_PRICE_TIMESERIES;
+</code></pre>
+<p>Key columns include:</p>
+<ul>
+<li><code>DATE</code></li>
+<li><code>TICKER</code></li>
+<li><code>VARIABLE</code> (e.g., nasdaq_volume, all-day_high)</li>
+<li><code>VALUE</code> (numeric measure)</li>
+</ul>
+<p>Each variable is stored as a separate row, typical of long-format data.</p>
+<h2 is-upgraded>Step 2: Transform to Wide Format with a Dynamic Table</h2>
+<p>We will use a dynamic table to convert this into a wide format for easier querying.</p>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE DYNAMIC TABLE CORTEX_ANALYST_DB.DATA.STOCK_PRICE
+(
+    DATE,
+    TICKER,
+    ASSET_CLASS,
+    PRIMARY_EXCHANGE_CODE,
+    PRIMARY_EXCHANGE_NAME,
+    VOLUME,
+    OPEN_PRICE,
+    LOW_PRICE,
+    HIGH_PRICE,
+    CLOSE_PRICE
+)
+TARGET_LAG = &#39;1 day&#39;
+REFRESH_MODE = AUTO
+INITIALIZE = ON_CREATE
+WAREHOUSE = USER_STD_XSMALL_WH
+AS      
+    SELECT
+        DATE,
+        TICKER,
+        ASSET_CLASS,
+        PRIMARY_EXCHANGE_CODE,
+        PRIMARY_EXCHANGE_NAME,
+        MAX(CASE WHEN VARIABLE = &#39;nasdaq_volume&#39; THEN VALUE ELSE NULL END) AS VOLUME,
+        MAX(CASE WHEN VARIABLE = &#39;pre-market_open&#39; THEN VALUE ELSE NULL END) AS OPEN_PRICE,
+        MAX(CASE WHEN VARIABLE = &#39;all-day_low&#39; THEN VALUE ELSE NULL END) AS LOW_PRICE,
+        MAX(CASE WHEN VARIABLE = &#39;all-day_high&#39; THEN VALUE ELSE NULL END) AS HIGH_PRICE,
+        MAX(CASE WHEN VARIABLE = &#39;post-market_close&#39; THEN VALUE ELSE NULL END) AS CLOSE_PRICE
+    FROM
+        FINANCE_ECONOMICS.CYBERSYN.STOCK_PRICE_TIMESERIES
+    WHERE
+        DATE &gt;= DATE_FROM_PARTS(YEAR(CURRENT_DATE()) - 2, 1, 1)
+    GROUP BY
+        DATE,
+        TICKER,
+        ASSET_CLASS,
+        PRIMARY_EXCHANGE_CODE,
+        PRIMARY_EXCHANGE_NAME;
+</code></pre>
+<h2 is-upgraded>Explanation</h2>
+<ul>
+<li><strong>Dynamic Table</strong>: Refreshes daily based on the <code>TARGET_LAG = '1 day'</code> setting.</li>
+<li><strong>Pivoting Logic</strong>: Uses <code>MAX(CASE WHEN ...)</code> to convert row-based variables into columns.</li>
+<li><strong>Date Filter</strong>: Restricts data to the last two years.</li>
+<li><strong>Grouping</strong>: Ensures uniqueness for each ticker-date combo.</li>
+</ul>
+<h2 is-upgraded>Why Use <code>CASE</code> Instead of <code>PIVOT</code></h2>
+<p>Snowflake&#39;s <code>PIVOT</code> and <code>UNPIVOT</code> aren&#39;t fully deterministic within dynamic tables. Instead, use <code>MAX(CASE WHEN ...)</code> expressions, which are reliable for refreshable objects.</p>
+<p>📘 Your transformed table <code>CORTEX_ANALYST_DB.DATA.STOCK_PRICE</code> is now ready for semantic modeling in Cortex Analyst.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Creating a Semantic Model in Snowflake" duration="15">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Create a semantic model using the Snowflake UI to define your data&#39;s structure, measures, and dimensions for natural language querying in Cortex Analyst.</p>
+<h2 is-upgraded>Description</h2>
+<p>A semantic model defines:</p>
+<ul>
+<li>Tables and columns available for analysis</li>
+<li>Business logic like metrics and aggregations</li>
+<li>Dimensions such as time, ticker, or exchange</li>
+<li>Metadata that helps interpret natural language prompts</li>
+</ul>
+<p>This section walks through creating the model using the <strong>Cortex Analyst</strong> interface.</p>
+<h2 is-upgraded>Step 1: Navigate to Cortex Analyst</h2>
+<ol type="1">
+<li>In Snowsight, open the <strong>left-hand navigation pane</strong></li>
+<li>Click <strong>AI &amp; ML</strong>, then select <strong>Cortex Analyst</strong></li>
+</ol>
+<h2 is-upgraded>Step 2: Switch to Semantic Models View</h2>
+<p>Ensure the view is set to <strong>Semantic Models</strong>, not <strong>Semantic Views</strong>.</p>
+<h2 is-upgraded>Step 3: Select Database and Schema</h2>
+<ol type="1">
+<li>From the top-center selectors:<ul>
+<li>Set the database to <code>CORTEX_ANALYST_DB</code></li>
+<li>Set the schema to <code>DATA</code></li>
+</ul>
+</li>
+</ol>
+<h2 is-upgraded>Step 4: Create a New Semantic Model</h2>
+<ol type="1">
+<li>Click <strong>Create New Model</strong> in the top-right corner</li>
+<li>In the wizard that appears:<ul>
+<li><strong>Select from</strong>: <code>Stages</code></li>
+<li><strong>Database</strong>: <code>CORTEX_ANALYST_DB</code></li>
+<li><strong>Schema</strong>: <code>DATA</code></li>
+<li><strong>Stage</strong>: <code>SEMANTIC_MODEL</code></li>
+<li><strong>Name</strong>: <code>stock_prices</code></li>
+<li><strong>Description</strong>: <code>Daily NASDAQ Stock Price data</code></li>
+<li><strong>File name</strong>: <code>stock_prices.yaml</code></li>
+</ul>
+</li>
+<li>Click <strong>Next: Select tables</strong></li>
+</ol>
+<h2 is-upgraded>Step 5: Select Tables</h2>
+<p>Navigate to <code>CORTEX_ANALYST_DB > DATA > Dynamic Tables</code>, and check the box for <code>STOCK_PRICE</code>. Click <strong>Next: Select columns</strong>.</p>
+<h2 is-upgraded>Step 6: Select Columns</h2>
+<p>From the <code>STOCK_PRICE</code> table, select:</p>
+<ul>
+<li><code>DATE</code></li>
+<li><code>TICKER</code></li>
+<li><code>ASSET_CLASS</code></li>
+<li><code>PRIMARY_EXCHANGE_CODE</code></li>
+<li><code>PRIMARY_EXCHANGE_NAME</code></li>
+<li><code>VOLUME</code></li>
+<li><code>OPEN_PRICE</code></li>
+<li><code>LOW_PRICE</code></li>
+<li><code>HIGH_PRICE</code></li>
+<li><code>CLOSE_PRICE</code></li>
+</ul>
+<p>Check the option to include sample data from selected columns. Click <strong>Create and Save</strong> to publish the model.</p>
+<h2 is-upgraded>Next Steps</h2>
+<p>To improve performance and usability:</p>
+<ul>
+<li>Edit the YAML to add column descriptions and synonyms</li>
+<li>Define metrics and verified queries in later sections</li>
+</ul>
+<p>📘 Once saved, your semantic model is available for Cortex Analyst to interpret natural language prompts.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Exploring Data Using Natural Language Prompts" duration="8">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Use natural language prompts in Cortex Analyst to query your semantic model and explore stock data interactively.</p>
+<h2 is-upgraded>Description</h2>
+<p>With your semantic model published, you can now interact with your stock price data using simple English prompts. Cortex Analyst translates these into SQL behind the scenes and returns results in table or chart form.</p>
+<h2 is-upgraded>Step 1: Launch Prompt Interface</h2>
+<ol type="1">
+<li>Open your saved semantic model</li>
+<li>On the right-hand side, find the <strong>&#34;Enter prompt&#34;</strong> box</li>
+<li>Type your question and click <strong>Run</strong> to submit</li>
+</ol>
+<p>💡 Cortex Analyst automatically converts your prompt to SQL and displays the results along with the generated query.</p>
+<h2 is-upgraded>Sample Prompts to Try</h2>
+<h3 is-upgraded>Basic Queries</h3>
+<pre><code language="language-plaintext" class="language-plaintext">What is the price of AAPL stock?
+</code></pre>
+<p>Returns the most recent open, high, low, and close prices for Apple.</p>
+<pre><code language="language-plaintext" class="language-plaintext">Show the closing price of AAPL for the last 5 trading days.
+</code></pre>
+<p>Displays the daily closing price for Apple over the last 5 dates.</p>
+<pre><code language="language-plaintext" class="language-plaintext">Which stock had the highest trading volume on the last trading day?
+</code></pre>
+<p>Identifies the ticker with the highest <code>VOLUME</code> on the most recent date.</p>
+<p>📘 You can also copy and reuse the SQL generated by Analyst if needed.</p>
+<p>You&#39;re now ready to explore time series data interactively using natural language.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Adding Advanced Metrics and Verified Queries" duration="20">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Enhance your semantic model with custom metrics and verified queries to improve accuracy and user experience during analysis.</p>
+<h2 is-upgraded>Description</h2>
+<p>This section covers how to define business metrics (e.g., ticker count) and verified queries (predefined questions with SQL) in Cortex Analyst.</p>
+<h2 is-upgraded>Part 1: Add a Custom Metric</h2>
+<h3 is-upgraded>Use Case</h3>
+<p>Define a metric that counts unique tickers in the dataset.</p>
+<h3 is-upgraded>Steps</h3>
+<ol type="1">
+<li>In <strong>Semantic Models</strong>, open the <code>stock_prices</code> model.</li>
+<li>Scroll to <strong>Metrics</strong> and click <strong>Add Metric</strong>.</li>
+<li>Fill out the metric details:</li>
+</ol>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Field</p>
+</td><td colspan="1" rowspan="1"><p>Value</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Expression</p>
+</td><td colspan="1" rowspan="1"><p><code>COUNT(DISTINCT TICKER)</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Metric Name</p>
+</td><td colspan="1" rowspan="1"><p><code>STOCK_COUNT</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Description</p>
+</td><td colspan="1" rowspan="1"><p><code>Stock Count</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Synonyms</p>
+</td><td colspan="1" rowspan="1"><p><code>number of tickers</code>, <code>ticker count</code>, <code>stock total</code></p>
+</td></tr>
+</table>
+<ol type="1" start="4">
+<li>Click <strong>Save</strong>.</li>
+</ol>
+<h3 is-upgraded>Try It</h3>
+<pre><code language="language-plaintext" class="language-plaintext">How many stocks are included in the dataset?
+</code></pre>
+<pre><code language="language-plaintext" class="language-plaintext">Show the stock count per asset class.
+</code></pre>
+<h2 is-upgraded>Part 2: Add Verified Queries</h2>
+<h3 is-upgraded>Use Case</h3>
+<p>Create verified examples that show users what kinds of questions they can ask and map them to trusted SQL.</p>
+<h3 is-upgraded>Steps</h3>
+<ol type="1">
+<li>Open your semantic model in Cortex Analyst.</li>
+<li>Scroll to the <strong>Verified Queries</strong> section.</li>
+<li>Click <strong>Add Query</strong>.</li>
+<li>Fill in:</li>
+</ol>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Field</p>
+</td><td colspan="1" rowspan="1"><p>Example Value</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Verified Query Name</p>
+</td><td colspan="1" rowspan="1"><p>Average Stock Price</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Question</p>
+</td><td colspan="1" rowspan="1"><p>What is the average closing price for Apple in 2025?</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Use in Onboarding</p>
+</td><td colspan="1" rowspan="1"><p>✔ Checked</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Semantic Query (SQL)</p>
+</td><td colspan="1" rowspan="1"><p>See SQL below</p>
+</td></tr>
+</table>
+<pre><code language="language-sql" class="language-sql">SELECT AVG(CLOSE_PRICE)
+FROM STOCK_PRICE
+WHERE TICKER = &#39;AAPL&#39; AND YEAR(DATE) = 2025;
+</code></pre>
+<ol type="1" start="5">
+<li>Test and save the query.</li>
+</ol>
+<h2 is-upgraded>Additional Verified Query Examples</h2>
+<h3 is-upgraded>Top 5 Stocks by Volume (last 30 days)</h3>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Field</p>
+</td><td colspan="1" rowspan="1"><p>Value</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Verified Query Name</p>
+</td><td colspan="1" rowspan="1"><p>Top 5 Stocks by Volume</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Question</p>
+</td><td colspan="1" rowspan="1"><p>Show the top 5 stocks by volume in the last 30 days</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Use in Onboarding</p>
+</td><td colspan="1" rowspan="1"><p>❌ No</p>
+</td></tr>
+</table>
+<pre><code language="language-sql" class="language-sql">SELECT TICKER, SUM(VOLUME) AS TOTAL_VOLUME
+FROM STOCK_PRICE
+WHERE DATE &gt;= CURRENT_DATE - 30
+GROUP BY TICKER
+ORDER BY TOTAL_VOLUME DESC
+LIMIT 5;
+</code></pre>
+<h3 is-upgraded>Tesla High Price in January</h3>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Field</p>
+</td><td colspan="1" rowspan="1"><p>Value</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Verified Query Name</p>
+</td><td colspan="1" rowspan="1"><p>Tesla High Price in January</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Question</p>
+</td><td colspan="1" rowspan="1"><p>What was the highest price for Tesla in January 2024?</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Use in Onboarding</p>
+</td><td colspan="1" rowspan="1"><p>❌ No</p>
+</td></tr>
+</table>
+<pre><code language="language-sql" class="language-sql">SELECT MAX(HIGH_PRICE)
+FROM STOCK_PRICE
+WHERE TICKER = &#39;TSLA&#39;
+AND DATE BETWEEN &#39;2024-01-01&#39; AND &#39;2024-01-31&#39;;
+</code></pre>
+<h3 is-upgraded>Best Performing Stock by Daily Return</h3>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Field</p>
+</td><td colspan="1" rowspan="1"><p>Value</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Verified Query Name</p>
+</td><td colspan="1" rowspan="1"><p>Best Performing Stock by Return</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Question</p>
+</td><td colspan="1" rowspan="1"><p>Which stock had the highest average daily return over the past year?</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Use in Onboarding</p>
+</td><td colspan="1" rowspan="1"><p>❌ No</p>
+</td></tr>
+</table>
+<pre><code language="language-sql" class="language-sql">SELECT TICKER,
+       AVG((CLOSE_PRICE - OPEN_PRICE)/NULLIF(OPEN_PRICE, 0)) AS AVG_RETURN
+FROM STOCK_PRICE
+WHERE DATE &gt;= CURRENT_DATE - 365
+GROUP BY TICKER
+ORDER BY AVG_RETURN DESC
+LIMIT 1;
+</code></pre>
+<h3 is-upgraded>Top 10 Most Volatile Stocks</h3>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Field</p>
+</td><td colspan="1" rowspan="1"><p>Value</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Verified Query Name</p>
+</td><td colspan="1" rowspan="1"><p>Top 10 Most Volatile Stocks by Max Daily Range</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Question</p>
+</td><td colspan="1" rowspan="1"><p>Which 10 stocks had the highest daily trading volatility percentage in the last 90 days?</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Use in Onboarding</p>
+</td><td colspan="1" rowspan="1"><p>✔ Yes</p>
+</td></tr>
+</table>
+<pre><code language="language-sql" class="language-sql">SELECT TICKER,
+       MAX((HIGH_PRICE - LOW_PRICE) / NULLIF(OPEN_PRICE, 0)) AS DAILY_VOLATILITY_PERCENTAGE
+FROM STOCK_PRICE
+WHERE DATE &gt;= CURRENT_DATE - 90
+GROUP BY TICKER
+HAVING NOT IS_NULL_VALUE(DAILY_VOLATILITY_PERCENTAGE)
+ORDER BY DAILY_VOLATILITY_PERCENTAGE DESC
+LIMIT 10;
+</code></pre>
+<h3 is-upgraded>Highest Volatility Day Per Stock</h3>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Field</p>
+</td><td colspan="1" rowspan="1"><p>Value</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Verified Query Name</p>
+</td><td colspan="1" rowspan="1"><p>Highest Volatility Trading Day Per Stock</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Question</p>
+</td><td colspan="1" rowspan="1"><p>What day did each of the top 10 most volatile stocks have their highest daily volatility in the last 90 days?</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Use in Onboarding</p>
+</td><td colspan="1" rowspan="1"><p>✔ Yes</p>
+</td></tr>
+</table>
+<pre><code language="language-sql" class="language-sql">SELECT TICKER,
+       DATE,
+       (HIGH_PRICE - LOW_PRICE) / NULLIF(OPEN_PRICE, 0) AS DAILY_VOLATILITY_PCT
+FROM STOCK_PRICE
+WHERE DATE &gt;= CURRENT_DATE - 90
+  AND OPEN_PRICE &lt;&gt; 0
+QUALIFY ROW_NUMBER() OVER (PARTITION BY TICKER ORDER BY DAILY_VOLATILITY_PCT DESC) = 1
+ORDER BY DAILY_VOLATILITY_PCT DESC
+LIMIT 10;
+</code></pre>
+<p>📘 Add each verified query through the Cortex UI using the <strong>Add Query</strong> interface.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Improving Output Presentation with Custom Formatting" duration="7">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Improve user experience by defining formatting rules to display numerical results as percentages, volumes, and currency values.</p>
+<h2 is-upgraded>Description</h2>
+<p>This step shows how to control the formatting of Cortex Analyst query results by adding custom instructions to your semantic model.</p>
+<h2 is-upgraded>Step 1: Identify Formatting Gaps</h2>
+<p>Run the following prompt in Cortex Analyst:</p>
+<pre><code language="language-plaintext" class="language-plaintext">What day did each of the top 10 most volatile stocks have their highest daily volatility in the last 90 days?
+</code></pre>
+<p>Observe the formatting issues:</p>
+<ul>
+<li>Percentages appear as decimals (e.g. <code>0.234567</code> instead of <code>23.46%</code>)</li>
+<li>Volumes lack thousands separators (e.g. <code>5234560</code> instead of <code>5,234,560</code>)</li>
+<li>Prices may display unformatted (e.g. <code>4521.6</code> instead of <code>4,521.60</code>)</li>
+</ul>
+<h2 is-upgraded>Step 2: Add Custom Formatting Instructions</h2>
+<ol type="1">
+<li>Open your semantic model in <strong>Snowsight</strong></li>
+<li>Click <strong>Edit</strong></li>
+<li>Locate the <strong>Custom Instructions</strong> section</li>
+<li>Enter:</li>
+</ol>
+<pre><code>Any percentages must be displayed in the format: 10.00%
+Any Volume numbers must be formatted as: 1,000
+Any Price numbers must be formatted as: 1,000.00
+</code></pre>
+<ol type="1" start="5">
+<li>Click <strong>Apply</strong>, then <strong>Save</strong> the semantic model</li>
+</ol>
+<h2 is-upgraded>Step 3: Re-run the Prompt</h2>
+<p>Use the same question to verify formatting improvements:</p>
+<pre><code language="language-plaintext" class="language-plaintext">What day did each of the top 10 most volatile stocks have their highest daily volatility in the last 90 days?
+</code></pre>
+<p><strong>Now the output should show:</strong></p>
+<ul>
+<li><code>Volatility</code> as percentages like <code>12.43%</code></li>
+<li><code>Volumes</code> with commas: <code>1,245,678</code></li>
+<li><code>Prices</code> with decimal precision: <code>2,345.00</code></li>
+</ul>
+<p>✅ Custom formatting improves clarity and makes dashboards more business-user friendly.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Conclusion and Next Steps" duration="3">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Summarize the key takeaways from the lab and outline next steps to apply Snowflake Cortex Analyst in real-world scenarios.</p>
+<h2 is-upgraded>Description</h2>
+<p>You&#39;ve completed a full hands-on walkthrough of Snowflake Cortex Analyst for financial data. This section recaps your accomplishments and points you toward further enhancements.</p>
+<h2 is-upgraded>What You&#39;ve Accomplished</h2>
+<ul>
+<li>Configured your Snowflake environment for Cortex Analyst</li>
+<li>Accessed and transformed financial data from the Snowflake Marketplace</li>
+<li>Created a dynamic table to reshape stock time series data</li>
+<li>Built and deployed a semantic model for natural language querying</li>
+<li>Added custom metrics and verified queries for consistent analysis</li>
+<li>Improved result formatting for better business readability</li>
+</ul>
+<h2 is-upgraded>Next Steps</h2>
+<ol type="1">
+<li><strong>Expand Your Data Sources</strong><ul>
+<li>Add more financial and economic tables</li>
+<li>Integrate internal enterprise data</li>
+</ul>
+</li>
+<li><strong>Enhance Your Semantic Models</strong><ul>
+<li>Define more custom metrics and business logic</li>
+<li>Build relationships across multiple tables</li>
+<li>Include verified queries for key use cases</li>
+</ul>
+</li>
+<li><strong>Integrate with Applications</strong><ul>
+<li>Use Cortex Analyst in dashboards and apps</li>
+<li>Combine with chatbots or agentic AI workflows</li>
+<li>Automate reporting using Analyst outputs</li>
+</ul>
+</li>
+</ol>
+<h2 is-upgraded>Additional Resources</h2>
+<ul>
+<li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst" target="_blank">Snowflake Cortex Analyst Docs</a></li>
+<li><a href="https://spec.modelcontextprotocol.io/" target="_blank">MCP Protocol Specification</a></li>
+<li><a href="https://app.snowflake.com/marketplace" target="_blank">Snowflake Marketplace</a></li>
+</ul>
+<p>🎉 You&#39;re now ready to bring natural language interaction into your analytics workflow using Snowflake Cortex Analyst!</p>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+</html>

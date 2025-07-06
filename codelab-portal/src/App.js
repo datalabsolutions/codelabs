@@ -34,10 +34,10 @@ const difficultyBarColors = {
 
 // Header Component
 const Header = ({ siteTitle, logoSrc, navLinks }) => (
-  <header className="bg-gradient-to-r from-[#0B2254] to-[#18406C] text-white py-4 shadow-lg rounded-b-xl"> {/* Gradient background */}
+  <header className="bg-gradient-to-r from-[#0B2254] to-[#18406C] text-white py-4 shadow-lg rounded-b-xl">
     <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
       <div className="flex items-center space-x-3">
-        {logoSrc && <img src={logoSrc} alt="Snowflake Logo" className="h-9 w-auto filter drop-shadow-md" />}
+        {logoSrc && <img src={logoSrc} alt="Logo" className="h-9 w-auto filter drop-shadow-md" />}
         {siteTitle && <h1 className="text-3xl font-extrabold tracking-tight text-white">{siteTitle}</h1>}
       </div>
       <nav className="space-x-6 text-sm font-medium">
@@ -122,10 +122,19 @@ const LabCard = ({ lab, isFeatured = false }) => { // Added isFeatured prop
         {/* Author information */}
         {lab.author && (
           <p className="text-sm text-gray-500 mb-2 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            By {lab.author}
+            <a
+              href={lab.authorLinkedIn}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center hover:underline"
+              title={`View ${lab.author}'s LinkedIn profile`}
+            >
+              {/* LinkedIn SVG Icon */}
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11 19h-3v-10h3v10zm-1.5-11.268c-.966 0-1.75-.784-1.75-1.75s.784-1.75 1.75-1.75 1.75.784 1.75 1.75-.784 1.75-1.75 1.75zm15.5 11.268h-3v-5.604c0-1.337-.025-3.063-1.868-3.063-1.868 0-2.154 1.459-2.154 2.967v5.7h-3v-10h2.881v1.367h.041c.401-.761 1.379-1.563 2.841-1.563 3.04 0 3.601 2.002 3.601 4.604v5.592z"/>
+              </svg>
+              By {lab.author}
+            </a>
           </p>
         )}
         
@@ -341,21 +350,25 @@ export default function App() {
           { label: "Contact", href: "https://www.datalabsolutions.co.uk/contact" }
         ]}
       />
+      
+        <section className="bg-white py-16 px-6 rounded-xl shadow-lg mx-auto max-w-7xl mt-8">
+          <div className="text-center">
+            <img
+          src={process.env.PUBLIC_URL + "/logo-blue.png"}
+          alt="datalab logo"
+          className="h-24 w-auto mx-auto mb-6 drop-shadow-lg"
+            />
+            <h2 className="text-4xl font-bold tracking-tight text-[#0B2254] mb-4">Where Data Mastery Begins!</h2>
+            <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
+          Dive into practical, hands-on labs designed to help you master various data technologies.
+          Whether you're exploring Snowflake, building with dbt, or visualizing data with Power BI,
+          our guided labs provide step-by-step instructions to enhance your skills.
+            </p>
+          </div>
+        </section>
 
-      {/* Hero Section: Description of DataLab Labs */}
-      <section className="bg-white py-16 px-6 rounded-xl shadow-lg mx-auto max-w-7xl mt-12"> {/* Updated styling for hero section to be white */}
-        <div className="text-center">
-          <h2 className="text-4xl font-bold tracking-tight text-[#0B2254] mb-4">DataLab: Where Data Mastery Begins!</h2>
-          <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
-            Dive into practical, hands-on labs designed to help you master various data technologies.
-            Whether you're exploring Snowflake, building with dbt, or visualizing data with Power BI,
-            our guided labs provide step-by-step instructions to enhance your skills.
-          </p>
-        </div>
-      </section>
-
-      <main className="max-w-7xl mx-auto px-6 py-16">
-        {/* Featured Labs Section */}
+        <main className="max-w-7xl mx-auto px-6 py-16">
+          {/* Featured Labs Section */}
         {featuredLabs.length > 0 && (
           <div className="mb-16 bg-blue-50 p-8 rounded-xl shadow-lg"> {/* Background remains bg-blue-50 */}
             <h2 className="text-3xl font-bold tracking-tight text-[#0B2254] mb-8 text-center">Featured Labs</h2>
@@ -378,7 +391,7 @@ export default function App() {
               onClear={() => setSearch("")}
               placeholder="Search by title, tag, or category..."
             />
-            {/* Category filter dropdown with visible label for clarity */}
+            {/* Category filter dropdown */}
             <div className="relative flex flex-col items-start">
               <label htmlFor="category-select" className="block text-sm font-medium text-gray-700 mb-1">Category</label>
               <select
@@ -395,7 +408,7 @@ export default function App() {
                 <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
               </div>
             </div>
-            {/* Duration filter dropdown with visible label for clarity */}
+            {/* Duration filter dropdown with visible label */}
             <div className="relative flex flex-col items-start">
               <label htmlFor="duration-select" className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
               <select

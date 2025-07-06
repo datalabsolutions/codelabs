@@ -1,10 +1,10 @@
-id: snowflake-cortex-callcenter-lab
-name: Snowflake Cortex AI for Call Center Transcript Analysis
+id: snowflake-cortex-functions-callcenter-lab
+name: Snowflake Cortex AI Functions: Call Center Transcript Analysis
 summary: A self-paced hands-on lab that teaches how to use Snowflake Cortex AI to ingest, extract, structure, translate, analyze, summarize, and answer questions from PDF call center transcripts.
 author: Douglas Day
 categories: ["AI", "Cortex", "Call Center", "Text Analysis"]
 environments: Web
-duration: 90
+duration: 60
 status: Published
 license: Apache-2.0
 tags: ["snowflake", "cortex-ai", "prompt-engineering", "pdf-extraction", "sentiment-analysis"]
@@ -14,11 +14,11 @@ feedback link: https://github.com/datalab-solutions/snowflake-codelabs/issues
 level: intermediate
 products: ["Snowflake Cortex Functions"]
 
-# Snowflake Cortex AI for Call Center Transcript Analysis
+# Snowflake Cortex AI Functions: Call Center Transcript Analysis
 
 ## Overview
 
-Duration: 0:03:00
+Duration: 0:02:00
 
 ### Introduction
 This hands-on lab introduces participants to Snowflake Cortex AI’s ability to extract valuable insights from unstructured documents using large language models. The lab uses examples of call center transcripts stored as PDFs. Participants will explore functions such as PARSE\_DOCUMENT, COMPLETE, TRANSLATE, SENTIMENT, ENTITY\_SENTIMENT, CLASSIFY\_TEXT, SUMMARIZE, and EXTRACT\_ANSWER. These tools empower users to parse, translate, analyze, classify, and query unstructured customer support data to uncover sentiment, highlight issues, and summarize conversations at scale.
@@ -46,11 +46,13 @@ Duration: 0:01:00
 * Basic familiarity with SQL and the Snowflake UI
 * Access all the scripts for this Lab [on GitHub](https://github.com/datalabsolutions/AI-Labs/tree/main/snowflake-cortex-callcenter-lab)
 
+> 💡 **Tip:** Explore this interactive walkthrough to learn how to sign up for a [Snowflake account](https://app.supademo.com/demo/cmbw9nmxe0606xw0izxyku479).
+
 > 💡 **Tip:** Use the [LLM Function Availability](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#availability) page to check which cloud regions are supported.
 
 ## Environment Configuration
 
-Duration: 0:05:00
+Duration: 0:04:00
 
 ### Learning Outcome
 
@@ -142,7 +144,7 @@ Your internal stage `LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW` is already set up
 
 ## PARSE\_DOCUMENT
 
-Duration: 0:07:00
+Duration: 0:06:00
 
 ### Learning Outcome
 
@@ -233,7 +235,7 @@ You should see each uploaded file with its corresponding parsed text ready for f
 
 ## EXTRACT\_ANSWER
 
-Duration: 0:07:00
+Duration: 0:06:00
 
 ### Learning Outcome
 
@@ -327,7 +329,7 @@ This will display the extracted metadata next to the transcript — ready for fu
 
 ## SUMMARIZE
 
-Duration: 0:05:00
+Duration: 0:04:00
 
 ### Learning Outcome
 
@@ -399,7 +401,7 @@ Review the generated summaries to validate their tone and informativeness. These
 
 ## SENTIMENT
 
-Duration: 0:05:00
+Duration: 0:04:00
 
 ### Learning Outcome
 
@@ -470,7 +472,7 @@ You should see each file with a numeric sentiment score that reflects the custom
 
 ## ENTITY\_SENTIMENT
 
-Duration: 0:06:00
+Duration: 0:05:00
 
 ### Learning Outcome
 
@@ -570,7 +572,7 @@ GROUP BY FILE_NAME;
 
 ## CLASSIFY\_TEXT
 
-Duration: 0:05:00
+Duration: 0:04:00
 
 ### Learning Outcome
 
@@ -644,7 +646,7 @@ This allows you to segment and route calls based on their classification, improv
 
 ## COMPLETE
 
-Duration: 0:08:00
+Duration: 0:06:00
 
 ### Learning Outcome
 
@@ -828,7 +830,7 @@ WHERE FILE_NAME = 'audiofile11.pdf';
 
 ## COMPLETE ADVANCED
 
-Duration: 0:08:00
+Duration: 0:06:00
 
 ### Learning Outcome
 
@@ -1083,7 +1085,7 @@ This final step transforms your structured dialogue JSON into a clean SQL table 
 ---
 ## FINAL
 
-Duration: 0:07:00
+Duration: 0:04:00
 
 ### Learning Outcome
 
