@@ -162,20 +162,19 @@ USE WAREHOUSE USER_STD_XSMALL_WH;
 <p>We use <code>TO_VARCHAR(...:content::string)</code> to safely extract the content portion from the returned JSON variant.</p>
 <pre><code language="language-sql" class="language-sql">INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT
 SELECT 
-    FILE_NAME,
-    TO_VARCHAR(
+    SPLIT_PART(RELATIVE_PATH, &#39;/&#39;, -1) AS FILE_NAME,
+    TO_VARCHAR
+    (
         SNOWFLAKE.CORTEX.PARSE_DOCUMENT(
-            @LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW,
-            FILE_PATH,
-            { &#39;mode&#39;: &#39;LAYOUT&#39; }
+            &#39;@LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW&#39;,
+            RELATIVE_PATH,
+            { &#39;mode&#39;: &#39;LAYOUT&#39; }  
         ):content::string
     ) AS TRANSCRIPT
-FROM (
-    SELECT DISTINCT
-        METADATA$FILENAME AS FILE_PATH,
-        SPLIT_PART(METADATA$FILENAME, &#39;/&#39;, -1) AS FILE_NAME
-    FROM @LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW/
-) A;
+FROM
+    DIRECTORY(&#39;@LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW&#39;)
+WHERE
+    RELATIVE_PATH LIKE &#39;%.pdf&#39;;
 </code></pre>
 <p>🔍 <code>LAYOUT</code> mode retains line breaks and layout structure — useful for keeping the dialogue or sections readable. ⚠️ Scanned image-based PDFs won&#39;t extract correctly. Consider running OCR first if the file contains no embedded text.</p>
 <h2 is-upgraded>Step 3: View Parsed Results</h2>
