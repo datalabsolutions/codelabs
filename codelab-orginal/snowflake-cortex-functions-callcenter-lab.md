@@ -202,20 +202,19 @@ We use `TO_VARCHAR(...:content::string)` to safely extract the content portion f
 ```sql
 INSERT INTO LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT
 SELECT 
-    FILE_NAME,
-    TO_VARCHAR(
+    SPLIT_PART(RELATIVE_PATH, '/', -1) AS FILE_NAME,
+    TO_VARCHAR
+    (
         SNOWFLAKE.CORTEX.PARSE_DOCUMENT(
-            @LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW,
-            FILE_PATH,
-            { 'mode': 'LAYOUT' }
+            '@LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW',
+            RELATIVE_PATH,
+            { 'mode': 'LAYOUT' }  
         ):content::string
     ) AS TRANSCRIPT
-FROM (
-    SELECT DISTINCT
-        METADATA$FILENAME AS FILE_PATH,
-        SPLIT_PART(METADATA$FILENAME, '/', -1) AS FILE_NAME
-    FROM @LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW/
-) A;
+FROM
+    DIRECTORY('@LLM_CORTEX_DEMO_DB.RAW.INT_STAGE_DOC_RAW')
+WHERE
+    RELATIVE_PATH LIKE '%.pdf';
 ```
 
 > 🔍 `LAYOUT` mode retains line breaks and layout structure — useful for keeping the dialogue or sections readable.
