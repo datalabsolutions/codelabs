@@ -34,9 +34,9 @@ This hands-on lab introduces participants to Snowflake Cortex AI’s ability to 
 * Summarize content with [`SUMMARIZE`](https://docs.snowflake.com/en/sql-reference/functions/summarize-snowflake-cortex)
 * Extract answers using [`EXTRACT_ANSWER`](https://docs.snowflake.com/en/sql-reference/functions/extract_answer-snowflake-cortex)
 
-### Download Code
+### Download Source Files
 
-Download the source code for this lab [here](https://github.com/datalabsolutions/AI-Labs/raw/main/snowflake-cortex-callcenter-lab/assets/audio-files.zip)
+Download the PDF files for this lab [here](https://github.com/datalabsolutions/AI-Labs/raw/main/snowflake-cortex-callcenter-lab/assets/audio-files.zip)
 
 ### Prerequisites
 
@@ -1138,45 +1138,52 @@ SELECT * FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_FINAL;
 
 ## Conclusion
 
-Congratulations on completing the Snowflake Cortex AI for Call Center Transcript Analysis lab!
+Congratulations on completing the **Snowflake Cortex AI — Call Center Analytics with AI Agents** lab!
 
 ### What You Learned
 
-Throughout this lab, you explored a wide range of Snowflake Cortex LLM functions including:
+You worked end‑to‑end across Snowflake Aisql, Cortex Analyst, Cortex Search Services, and Agentic features:
 
-* `PARSE_DOCUMENT()` – Extract structured text from unstructured PDF documents
-* `EXTRACT_ANSWER()` – Pull specific fields from call transcripts using natural language
-* `SUMMARIZE()` – Generate concise overviews of long conversations
-* `SENTIMENT()` and `ENTITY_SENTIMENT()` – Analyze tone and target-specific emotional signals
-* `CLASSIFY_TEXT()` – Categorize transcripts into meaningful labels
-* `COMPLETE()` – Use prompt engineering to create summaries, flags, and structured outputs
+* `AI_TRANSCRIBE()` – Convert staged audio (MP3/WAV) into text transcripts for downstream analytics.
+* `EXTRACT_ANSWER()` – Pull precise fields (e.g., agent name) from transcripts using natural language.
+* `SUMMARIZE()` – Generate concise overviews of long conversations.
+* `SENTIMENT()` and `AI_SENTIMENT()` – Score overall tone and per‑category sentiment (e.g., Brand, Cost, Product).
+* `AI_CLASSIFY()` – Categorize calls into business‑relevant labels with task descriptions, enums, and few‑shot examples.
+* `AI_COMPLETE()` + `PROMPT()` – Produce both free‑text and **structured JSON** outputs.
+
+* **Semantic View (Cortex Analyst)** – Model dimensions, metrics, and named filters and verified queries.
+* **Cortex Search Service** – Create a semantic search index over `TRANSCRIPT` with filterable attributes.
+* **Cortex Agents & Snowflake Intelligence** – Orchestrate tools (Analyst + Search) and expose a governed chat experience.
 
 ### Alternate Use Cases
 
-These techniques are broadly applicable beyond call center transcripts. Here are a few examples:
+These techniques extend far beyond call centers:
 
-* Legal document summarization
-* Customer support email triage
-* Interview transcription analysis
-* Insurance claim intake and validation
+* Legal brief and case‑file summarization
+* Customer support email triage and routing
+* Interview/meeting transcription analysis
+* Insurance claims intake & validation
 * Product review classification and scoring
 
 ### Further Exploration
 
-If you're interested in going deeper, consider exploring:
+Dive deeper with these docs and ideas:
 
-* Cortex Search Service for semantic and vector search over large document collections
-* Implementing Retrieval-Augmented Generation (RAG) pipelines by combining Cortex Search with `COMPLETE()` for grounded, context-aware answers
-* Creating your own chatbot in Streamlit using Snowflake Cortex and a vector store to answer customer queries with enterprise-specific knowledge
+* [**AISQL**](https://docs.snowflake.com/en/user-guide/snowflake-cortex/aisql)
+* [**Semantic Views**](https://docs.snowflake.com/en/user-guide/views-semantic/overview)
+* [**Cortex Analyst**](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst)
+* [**Cortex Search Service**](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-search/cortex-search-overview)
+* [**Cortex Agents**](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents)
+* [**Snowflake Intelligence**](https://docs.snowflake.com/en/user-guide/snowflake-cortex/snowflake-intelligence)
 
----
 
-> 🎓 If you participated in this lab as part of a Datalab AI training session, you should receive a certified badge of attendance.
-
-Thank you very much for joining us!
-
-Visit us at [www.datalab.co.za](https://www.datalab.co.za) to learn more about our AI training programs and data analytics solutions.
-
-Stay connected and get updates on new labs by following us on [LinkedIn](https://www.linkedin.com/company/datalabsolutions).
 
 ---
+
+> 🎓 If you joined this lab as part of a AI Lab training session, you’ll receive a certified badge of attendance.
+
+Thank you for spending time with us!
+
+Visit **datalab** at [**www.datalab.co.za**](https://www.datalab.co.za) to learn more about our AI training and analytics solutions.
+
+Follow us on [**LinkedIn**](https://www.linkedin.com/company/datalabsolutions) for new labs and updates.

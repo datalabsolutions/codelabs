@@ -1,0 +1,2123 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Snowflake Intelligence: Call Centre Analytics with AI Agents</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+  <google-codelab codelab-gaid="UA-XXXXXXXXX-X"
+                  id="snowflake-intelligence-callcenter-lab"
+                  title="Snowflake Intelligence: Call Centre Analytics with AI Agents"
+                  environment="web"
+                  feedback-link="https://github.com/datalab-solutions/snowflake-codelabs/issues">
+    
+      <google-codelab-step label="Overview" duration="1">
+        <h2 is-upgraded>Introduction</h2>
+<p>This hands-on lab introduces participants to <strong>Snowflake Cortex AI&#39;s ability to analyze unstructured call center conversations</strong> using large language models. Unlike traditional BI workflows, this lab shows how to ingest, transcribe, enrich, and structure <strong>raw audio recordings (.wav/.mp3)</strong> and transcript documents (.txt/.pdf) directly inside Snowflake. You will explore functions such as <code>AI_TRANSCRIBE</code>, <code>SUMMARIZE</code>, <code>SENTIMENT</code>, <code>AI_SENTIMENT</code>, <code>AI_CLASSIFY</code>, <code>AI_COMPLETE</code>, and <code>EXTRACT_ANSWER</code>. These tools empower you to:</p>
+<ul>
+<li>Convert call recordings into searchable transcripts.</li>
+<li>Summarize long conversations into concise overviews.</li>
+<li>Measure overall and entity-specific sentiment.</li>
+<li>Classify call types by intent (complaint, query, sales, cancellation, etc.).</li>
+<li>Extract key answers like customer name, call reason, or resolution.</li>
+<li>Generate structured insights, action items, and follow-ups using completions.</li>
+</ul>
+<p>In addition, you will:</p>
+<ul>
+<li>Create a <strong>Semantic View</strong> that unifies transcripts, classifications, and sentiment into a single dataset for BI or Cortex Analyst.</li>
+<li>Deploy a <strong>Cortex Search Service</strong> to perform contextual, vector-based retrieval across transcripts.</li>
+<li>Use <strong>Cortex Analyst</strong> to enable guided, natural language Q&amp;A on call data.</li>
+</ul>
+<p>By the end of this lab, you will have transformed <strong>raw call recordings</strong> into <strong>actionable business intelligence</strong>, equipping analysts and support managers with the ability to identify trends, improve service quality, and uncover insights faster.</p>
+<h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+<h3 is-upgraded>AI SQL</h3>
+<ul>
+<li>Upload and manage unstructured call center data in Snowflake</li>
+<li>Transcribe audio with <a href="https://docs.snowflake.com/en/sql-reference/functions/ai_transcribe" target="_blank"><code>AI_TRANSCRIBE</code></a></li>
+<li>Summarize transcripts with <a href="https://docs.snowflake.com/en/sql-reference/functions/summarize-snowflake-cortex" target="_blank"><code>SUMMARIZE</code></a></li>
+<li>Analyze sentiment using <a href="https://docs.snowflake.com/en/sql-reference/functions/sentiment-snowflake-cortex" target="_blank"><code>SENTIMENT</code></a> and <a href="https://docs.snowflake.com/en/sql-reference/functions/ai_sentiment" target="_blank"><code>AI_SENTIMENT</code></a></li>
+<li>Classify call intent with <a href="https://docs.snowflake.com/en/sql-reference/functions/ai_classify" target="_blank"><code>AI_CLASSIFY</code></a></li>
+<li>Extract structured details with <a href="https://docs.snowflake.com/en/sql-reference/functions/extract_answer-snowflake-cortex" target="_blank"><code>EXTRACT_ANSWER</code></a></li>
+<li>Perform advanced completions with <a href="https://docs.snowflake.com/en/sql-reference/functions/ai_complete" target="_blank"><code>AI_COMPLETE</code></a></li>
+<li>Explore prompt building with <a href="https://docs.snowflake.com/en/sql-reference/functions/prompt" target="_blank"><code>PROMPT</code></a> to simplify and structure code</li>
+<li>Aggregate textual data and generate concise summaries with <a href="https://docs.snowflake.com/en/sql-reference/functions/ai_agg" target="_blank"><code>AI_AGG</code></a></li>
+</ul>
+<h3 is-upgraded>CORTEX ANALYST</h3>
+<ul>
+<li>Assemble insights into a unified <a href="https://docs.snowflake.com/en/sql-reference/sql/create-semantic-view" target="_blank">SEMANTIC VIEW</a> for BI and Q&amp;A</li>
+<li>Enable guided Q&amp;A with <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst" target="_blank">CORTEX ANALYST</a></li>
+</ul>
+<h3 is-upgraded>CORTEX SEARCH</h3>
+<ul>
+<li>Deploy a <a href="https://docs.snowflake.com/en/sql-reference/sql/create-cortex-search" target="_blank">CORTEX SEARCH SERVICE</a> for transcript retrieval</li>
+</ul>
+<h3 is-upgraded>AGENTS</h3>
+<ul>
+<li>Build <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents" target="_blank">CORTEX AGENTS</a> to orchestrate across both structured and unstructured data sources to deliver insights.</li>
+</ul>
+<h3 is-upgraded>SNOWFLAKE INTELLIGENCE</h3>
+<ul>
+<li>Combine <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst" target="_blank">CORTEX ANALYST</a>, <a href="https://docs.snowflake.com/en/sql-reference/sql/create-cortex-search" target="_blank">CORTEX SEARCH SERVICE</a>, and <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents" target="_blank">CORTEX AGENTS</a> into a single <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/snowflake-intelligence" target="_blank">SNOWFLAKE INTELLIGENCE</a> chat experience that powers advanced call center analytics.</li>
+</ul>
+<h2 is-upgraded>Download Source Files</h2>
+<p>Download the Audio files for this lab <a href="https://github.com/datalabsolutions/AI-Labs/tree/main/snowflake-snowflake-intelligence-callcenter-lab/assets/audio_files" target="_blank">here</a></p>
+<h2 is-upgraded>Prerequisites</h2>
+<ul>
+<li>A <a href="https://trial.snowflake.com/?owner=SPN-PID-452710" target="_blank">Snowflake account</a> in a region where <strong>Snowflake Cortex LLM functions</strong> are supported</li>
+<li>Basic familiarity with SQL and the Snowflake UI</li>
+<li>Access all the scripts for this Lab <a href="https://github.com/datalabsolutions/AI-Labs/tree/main/snowflake-snowflake-intelligence-callcenter-lab" target="_blank">on GitHub</a></li>
+<li><a href="https://github.com/datalabsolutions/AI-Labs/blob/a27daf7c5d6f72949cc73c820351348d755bbd9c/snowflake-snowflake-intelligence-callcenter-lab/assets/audio_files/audio-files.zip?raw=1" target="_blank">Download all the audio files</a></li>
+</ul>
+<p>💡 <strong>Tip:</strong> Explore this interactive walkthrough to learn how to sign up for a <a href="https://app.supademo.com/demo/cmbw9nmxe0606xw0izxyku479" target="_blank">Snowflake account</a>.</p>
+<p>💡 <strong>Tip:</strong> Use the <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#availability" target="_blank">LLM Function Availability</a> page to check which cloud regions are supported.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Environment Configuration" duration="4">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Create the core Snowflake resources needed to run the AI Lab. This includes a database, warehouse, schemas, and a stage for uploading audio and transcript files.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-snowflake-intelligence-callcenter-lab/scripts/01-AI-LAB-CONFIGURATION.sql" target="_blank">here</a>.</p>
+<h2 is-upgraded>Description</h2>
+<p>This setup script prepares your Snowflake environment to ingest and process unstructured call center data.</p>
+<ul>
+<li><code>CREATE DATABASE</code> ensures your lab operates in a clean, isolated environment.</li>
+<li><code>CREATE WAREHOUSE</code> provisions compute resources for your queries and is configured to minimize cost via automatic suspend/resume.</li>
+<li><code>CREATE SCHEMA</code> creates logical namespaces for raw files (<code>RAW</code>), processed/intermediate data (<code>STAGE</code>), and consolidated analytics objects (<code>ANALYTICS</code>).</li>
+<li><code>CREATE STAGE</code> sets up a secure location to upload audio and transcript documents (<code>.mp3</code>, <code>.wav</code>, <code>.pdf</code>, <code>.txt</code>), supports directory-style access, and uses Snowflake‑managed encryption.</li>
+</ul>
+<h2 is-upgraded>Step 1: Create the Database</h2>
+<p>This command creates a database named <code>CALL_CENTER_DB</code> if it doesn&#39;t already exist. Using <code>IF NOT EXISTS</code> ensures the script is idempotent and safe to rerun.</p>
+<pre><code language="language-sql" class="language-sql">CREATE DATABASE IF NOT EXISTS CALL_CENTER_DB;
+</code></pre>
+<h2 is-upgraded>Step 2: Create a Compute Warehouse</h2>
+<p>This step provisions a warehouse named <code>USER_STD_XSMALL_WH</code> with cost‑efficient settings:</p>
+<ul>
+<li>Size: <code>XSMALL</code> — small and cost‑effective for light workloads.</li>
+<li>Type: <code>STANDARD</code> — supports most use cases.</li>
+<li>Auto Suspend: <code>60</code> seconds — saves credits after inactivity.</li>
+<li>Auto Resume: <code>TRUE</code> — resumes automatically on query.</li>
+<li>Initially Suspended: <code>TRUE</code> — starts paused until needed.</li>
+</ul>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE WAREHOUSE USER_STD_XSMALL_WH
+WITH
+    WAREHOUSE_SIZE = &#39;XSMALL&#39;
+    WAREHOUSE_TYPE = &#39;STANDARD&#39;
+    AUTO_SUSPEND = 60
+    AUTO_RESUME = TRUE
+    INITIALLY_SUSPENDED = TRUE;
+</code></pre>
+<p>💡 <strong>Tip:</strong> Auto-suspend after 60 seconds prevents unnecessary credit usage. Auto-resume ensures queries always run when needed.</p>
+<h2 is-upgraded>Step 3: Create Required Schemas</h2>
+<p>Schemas help organize your database objects.</p>
+<pre><code language="language-sql" class="language-sql">CREATE SCHEMA IF NOT EXISTS CALL_CENTER_DB.RAW;
+CREATE SCHEMA IF NOT EXISTS CALL_CENTER_DB.STAGE;
+CREATE SCHEMA IF NOT EXISTS CALL_CENTER_DB.ANALYTICS;
+</code></pre>
+<ul>
+<li><code>RAW</code> stores the ingested audio and transcript files.</li>
+<li><code>STAGE</code> is used for parsed, structured, or AI-enriched data.</li>
+<li><code>ANALYTICS</code> is reserved for semantic views, aggregated results, and reporting tables.</li>
+</ul>
+<p>Using <code>IF NOT EXISTS</code> prevents duplication errors and makes the script safe to rerun.</p>
+<h2 is-upgraded>Step 4: Create an Internal Stage for Uploads</h2>
+<p>The internal stage is where you will upload audio files.</p>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE STAGE CALL_CENTER_DB.RAW.INT_STAGE_DOC_RAW
+    DIRECTORY = ( ENABLE = true )
+    ENCRYPTION = ( TYPE = &#39;SNOWFLAKE_SSE&#39; );
+</code></pre>
+<p>🔒 <strong>Note:</strong> Files uploaded here are secured with Snowflake&#39;s Server-Side Encryption (SSE).</p>
+<h2 is-upgraded>Step 5: Configure Snowflake Intelligence Database</h2>
+<p>Ensure that the Snowflake Intelligence database exists.  If this does not exist you will not be able to create agents later in the lab.</p>
+<pre><code language="language-sql" class="language-sql">CREATE DATABASE IF NOT EXISTS SNOWFLAKE_INTELLIGENCE;
+GRANT USAGE ON DATABASE SNOWFLAKE_INTELLIGENCE TO ROLE PUBLIC;
+
+CREATE SCHEMA IF NOT EXISTS SNOWFLAKE_INTELLIGENCE.AGENTS;
+GRANT USAGE ON SCHEMA SNOWFLAKE_INTELLIGENCE.AGENTS TO ROLE PUBLIC;
+</code></pre>
+<h2 is-upgraded>Step 6: Upload Files to the Stage</h2>
+<p>Your internal stage <code>CALL_CENTER_DB.RAW.INT_STAGE_DOC_RAW</code> is now set up.</p>
+<ol type="1">
+<li>In Snowsight, go to <strong>Databases</strong>.</li>
+<li>Select <code>CALL_CENTER_DB</code> → <code>RAW</code> → <strong>Stages</strong>.</li>
+<li>Click on <code>INT_STAGE_DOC_RAW</code>.</li>
+<li>Click <strong>+ Files</strong> and upload one or more audio recordings (MP3/WAV).</li>
+</ol>
+<p>🔒 <strong>Note:</strong> The zip file that you <a href="https://github.com/datalabsolutions/AI-Labs/blob/a27daf7c5d6f72949cc73c820351348d755bbd9c/snowflake-snowflake-intelligence-callcenter-lab/assets/audio_files/audio-files.zip?raw=1" target="_blank">downloaded</a> will need to be unzipped.  You need to upload the individual files.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="AI_TRANSCRIBE" duration="6">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Use the <code>AI_TRANSCRIBE()</code> function to convert staged audio files into structured transcripts. This process enables downstream analytics by transforming unstructured <code>.wav</code> and <code>.mp3</code> recordings into searchable text.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-snowflake-intelligence-callcenter-lab/scripts/02-AI-LAB-CORTEX-AI_TRANSCRIBE.sql" target="_blank">here</a>.</p>
+<h2 is-upgraded>Description</h2>
+<p>The <code>AI_TRANSCRIBE()</code> function allows Snowflake to process audio files directly from a stage and generate text transcripts. This is a critical step for working with call center data, as it turns raw recordings into usable data for summarization, sentiment analysis, classification, and search.</p>
+<p>In this step, you will:</p>
+<ul>
+<li>List staged audio files available for transcription.</li>
+<li>Create a table (<code>AUDIO_FILES</code>) to manage file metadata.</li>
+<li>Run transcription jobs using <code>AI_TRANSCRIBE()</code>.</li>
+<li>Persist results into a new table with transcripts, quality checks, and basic metrics.</li>
+</ul>
+<h2 is-upgraded>Step 1: Set Snowflake Context</h2>
+<p>Ensure you are working in the correct database, schema, and warehouse. Run each of these commands before executing subsequent queries:</p>
+<pre><code language="language-sql" class="language-sql">USE DATABASE CALL_CENTER_DB;
+USE SCHEMA RAW;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+</code></pre>
+<h2 is-upgraded>Step 2: List Staged Audio Files</h2>
+<p>Check which audio files are staged and available for transcription.</p>
+<pre><code language="language-sql" class="language-sql">LIST @CALL_CENTER_DB.RAW.INT_STAGE_DOC_RAW/;
+</code></pre>
+<h2 is-upgraded>Step 3: Create an Audio Files Table</h2>
+<p>Here we create a table that <strong>references the staged files</strong> and captures essential metadata like file path, size, last modified date, extension, and a generated <code>CALL_ID</code>. This table acts as a catalog of files and will be used later to feed into <code>AI_TRANSCRIBE()</code>.</p>
+<p>Two important functions are used here:</p>
+<ul>
+<li><strong><code>DIRECTORY()</code></strong> – returns metadata about files in an internal stage, including file path, size, and modification time.</li>
+<li><strong><code>TO_FILE()</code></strong> – creates a Snowflake <code>FILE</code> object from a file in a stage, which can then be passed into functions like <code>AI_TRANSCRIBE()</code> to read the actual content.</li>
+</ul>
+<p>By combining these, we are building a structured reference table that both <strong>tracks the metadata</strong> and <strong>stores handles to the actual staged audio files</strong>.</p>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE CALL_CENTER_DB.RAW.AUDIO_FILES 
+AS
+    SELECT 
+        RELATIVE_PATH AS &#34;FILE_PATH&#34;,
+        TO_FILE(&#39;@CALL_CENTER_DB.RAW.INT_STAGE_DOC_RAW&#39;, RELATIVE_PATH) AS &#34;AUDIO_FILE&#34;,
+        BUILD_STAGE_FILE_URL(&#39;@CALL_CENTER_DB.RAW.INT_STAGE_DOC_RAW&#39;,RELATIVE_PATH) AS &#34;AUDIO_FILE_URL&#34;,
+        SIZE AS &#34;FILE_SIZE&#34;,
+        LAST_MODIFIED,
+        SPLIT_PART(RELATIVE_PATH, &#39;.&#39;, -1) AS &#34;FILE_EXTENSION&#34;,
+        REPLACE(RELATIVE_PATH, &#39;.mp3&#39;, &#39;&#39;) AS &#34;CALL_ID&#34;
+    FROM 
+        DIRECTORY(&#39;@CALL_CENTER_DB.RAW.INT_STAGE_DOC_RAW&#39;)
+    WHERE 
+        RELATIVE_PATH ILIKE &#39;%.mp3&#39; 
+    OR  RELATIVE_PATH ILIKE &#39;%.wav&#39;;
+</code></pre>
+<h2 is-upgraded>Step 4: Preview Audio Files</h2>
+<p>Verify that the <code>AUDIO_FILES</code> table was populated correctly.</p>
+<pre><code language="language-sql" class="language-sql">SELECT * FROM CALL_CENTER_DB.RAW.AUDIO_FILES LIMIT 1;
+</code></pre>
+<h2 is-upgraded>Step 5: Transcribe Audio Files</h2>
+<p>Here we use the <code>AI_TRANSCRIBE()</code> function to process each <code>AUDIO_FILE</code> and return a <strong>JSON object</strong> containing transcript text and metadata. We then extract the transcript text from the JSON using:</p>
+<pre><code language="language-sql" class="language-sql">TRANSCRIPT_JSON:text::STRING AS &#34;TRANSCRIPT&#34;
+</code></pre>
+<p>To enrich the results further, we calculate additional metrics:</p>
+<ul>
+<li><strong><code>LENGTH(TRANSCRIPT)</code></strong> – counts the total number of characters in the transcript.</li>
+<li><strong><code>ARRAY_SIZE(SPLIT(TRANSCRIPT, ' '))</code></strong> – splits the transcript on spaces and counts the resulting array size, effectively giving a <strong>word count</strong>.</li>
+<li>A <strong>status flag</strong> (<code>SUCCESS</code>, <code>FAILED</code>, <code>SHORT</code>) is added to quickly validate transcription quality.</li>
+</ul>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES 
+AS
+    SELECT 
+        CALL_ID,
+        FILE_PATH,
+        AUDIO_FILE_URL,
+        FILE_SIZE,
+        LAST_MODIFIED,
+        AI_TRANSCRIBE(AUDIO_FILE) AS &#34;TRANSCRIPT_JSON&#34;,
+        TRANSCRIPT_JSON:audio_duration::FLOAT AS &#34;DURATION&#34;,
+        TRANSCRIPT_JSON:text::STRING AS &#34;TRANSCRIPT&#34;,
+        CURRENT_TIMESTAMP() AS &#34;TRANSCRIPTION_DATE&#34;,
+        LENGTH(TRANSCRIPT) AS &#34;CHARACTER_COUNT&#34;,
+        ARRAY_SIZE(SPLIT(TRANSCRIPT, &#39; &#39;)) AS &#34;WORD_COUNT&#34;,
+        CASE 
+            WHEN TRANSCRIPT IS NULL THEN &#39;FAILED&#39;
+            WHEN CHARACTER_COUNT &lt; 10 THEN &#39;SHORT&#39;
+            ELSE &#39;SUCCESS&#39;
+        END AS &#34;TRANSCRIPT_STATUS&#34;
+    FROM 
+        CALL_CENTER_DB.RAW.AUDIO_FILES
+    ORDER BY
+        FILE_SIZE ASC; 
+</code></pre>
+<h2 is-upgraded>Step 6: Preview Transcriptions</h2>
+<p>Check the results of your transcription job.</p>
+<pre><code language="language-sql" class="language-sql">SELECT * FROM CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES LIMIT 10;
+</code></pre>
+<p>You now have raw audio recordings transcribed into searchable text, complete with metadata, character counts, and word counts. This table will serve as the foundation for the next steps, including summarization, sentiment analysis, classification, and Q&amp;A.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="EXTRACT_ANSWER" duration="5">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Use <code>SNOWFLAKE.CORTEX.EXTRACT_ANSWER()</code> to pull precise facts from call transcripts (e.g., the call center agent&#39;s name), and persist those answers for downstream analytics.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-snowflake-intelligence-callcenter-lab/scripts/03-AI-LAB-CORTEX-EXTRACT_ANSWER.sql" target="_blank">here</a>.</p>
+<h2 is-upgraded>Description</h2>
+<p><code>EXTRACT_ANSWER()</code> performs question‑answering over text and returns an <strong>array of candidate answers</strong>, each with an <strong>answer string</strong> and a <strong>relevance score</strong>. We&#39;ll:</p>
+<ul>
+<li>Ask a targeted question against each transcript.</li>
+<li>Parse the first (highest‑ranked) answer and its score.</li>
+<li>Persist the extracted value for reuse in later steps.</li>
+</ul>
+<p>💡 <strong>Tip:</strong> Start with a small subset (e.g., one <code>CALL_ID</code>) to validate accuracy, then run across the dataset.</p>
+<h2 is-upgraded>Step 1: Set Snowflake Context</h2>
+<p>Run each statement to ensure you&#39;re in the correct database, schema, and warehouse.</p>
+<pre><code language="language-sql" class="language-sql">USE DATABASE CALL_CENTER_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+</code></pre>
+<h2 is-upgraded>Step 2: Extract the Agent&#39;s Name from Each Transcript</h2>
+<p>Here we ask: <strong>&#34;What is the name of the call center agent?&#34;</strong> The function returns an array; we select the top candidate&#39;s <code>answer</code> and <code>score</code>.</p>
+<pre><code language="language-sql" class="language-sql">SELECT
+    CALL_ID,
+    TRANSCRIPT,
+    SNOWFLAKE.CORTEX.EXTRACT_ANSWER(
+        TRANSCRIPT,
+        &#39;What is the name of the call center agent?&#39;
+    ) AS AGENT_JSON,
+    AGENT_JSON[0]:answer::TEXT AS CALL_CENTER_AGENT,
+    AGENT_JSON[0]:score::TEXT  AS CALL_CENTER_AGENT_SCORE
+FROM
+    CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES;
+</code></pre>
+<p>🔎 <strong>Why array indexing? </strong><code>EXTRACT_ANSWER()</code> may return multiple candidates. <code>AGENT_JSON[0]</code> selects the best‑scoring one.</p>
+<h2 is-upgraded>Step 3: Persist Extracted Answers</h2>
+<p>Store the agent&#39;s name (and keep the transcript if you want easy verification later). This makes the result reusable by other steps and BI tools.</p>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES_AGENT AS
+
+WITH CTE_AGENT AS (
+    SELECT
+        CALL_ID,
+        TRANSCRIPT,
+        SNOWFLAKE.CORTEX.EXTRACT_ANSWER(
+            TRANSCRIPT,
+            &#39;What is the name of the call center agent?&#39;
+        ) AS AGENT_JSON,
+        AGENT_JSON[0]:answer::TEXT AS CALL_CENTER_AGENT
+    FROM CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES
+)
+
+SELECT
+    CALL_ID,
+    TRANSCRIPT,
+    CALL_CENTER_AGENT
+FROM CTE_AGENT;
+</code></pre>
+<h2 is-upgraded>Step 4: Preview Saved Results</h2>
+<p>Confirm that the table contains expected values.</p>
+<pre><code language="language-sql" class="language-sql">SELECT * FROM CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES_AGENT LIMIT 10;
+</code></pre>
+<h2 is-upgraded>Notes &amp; Troubleshooting</h2>
+<ul>
+<li><strong>Ambiguous names:</strong> If the transcript includes multiple people, refine the question (e.g., &#34;What is the <strong>agent&#39;s</strong> name?&#34; vs. &#34;What is the <strong>customer&#39;s</strong> name?&#34;).</li>
+<li><strong>Missing values:</strong> Some calls may not explicitly mention a name; the model may return an empty array. Consider adding a <code>WHERE</code> filter or default value logic when persisting.</li>
+<li><strong>Extend the pattern:</strong> You can repeat the same approach to extract <strong>customer name</strong>, <strong>account number</strong>, <strong>ticket ID</strong>, or <strong>promise‑to‑pay date</strong>—simply change the question.</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="AI_CLASSIFY" duration="6">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Use <code>SNOWFLAKE.CORTEX.AI_CLASSIFY()</code> to assign each transcript to a business‑relevant class (e.g., Complaint, Query, Sales). You&#39;ll progress from a quick single‑row test to a robust, persisted classification table—learning how task descriptions, label descriptions, output modes, and few‑shot examples improve quality.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-snowflake-intelligence-callcenter-lab/scripts/04-AI-LAB-CORTEX-AI_CLASSIFY.sql" target="_blank">here</a>.</p>
+<h2 is-upgraded>Description</h2>
+<p><code>AI_CLASSIFY()</code> maps unstructured text to one or more labels and returns <strong>JSON</strong> with a <code>labels</code> array (and, when enabled, scores and details). Importantly, the function can be used at <strong>increasing levels of sophistication</strong> to shape and control the output. In this module we <strong>build the final query step‑by‑step</strong> so you can see how each parameter influences the result—improving confidence, reducing drift, and producing stable, explainable outputs suitable for BI and QA workflows.</p>
+<ul>
+<li>Start simple with only a <strong>label list</strong> and a short <strong>task_description</strong> (fast sanity check).</li>
+<li>Add <strong>label descriptions</strong> to tighten decision boundaries and resolve ambiguity.</li>
+<li>Set <strong>output_mode</strong> (<code>'single'</code> vs <code>'multi'</code>) to fit your taxonomy.</li>
+<li>Provide <strong>few‑shot examples</strong> to steer borderline cases and improve consistency.</li>
+</ul>
+<p>💡 <strong>Tip:</strong> Begin with a single <code>CALL_ID</code> to validate definitions and examples before scaling up.</p>
+<h2 is-upgraded>Step 1: Set Snowflake Context</h2>
+<p>Run each statement in order so queries execute in the correct context.</p>
+<pre><code language="language-sql" class="language-sql">USE DATABASE CALL_CENTER_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+</code></pre>
+<h2 is-upgraded>Step 2: Quick Classification (Single Row)</h2>
+<p><strong>Key addition:</strong> Introduce a <strong>task_description</strong> to make the objective explicit.</p>
+<pre><code language="language-sql" class="language-sql">SELECT
+    CALL_ID,
+    TRANSCRIPT,
+    SNOWFLAKE.CORTEX.AI_CLASSIFY
+    (
+        TRANSCRIPT,
+        [&#39;Complaint&#39;, &#39;Query&#39;, &#39;Support Request&#39;, &#39;Sales&#39;, &#39;Cancellation&#39;,&#39;Other&#39;],
+        {
+            &#39;task_description&#39;: &#39;Classify the type of customer service call&#39;
+        }
+    ) AS CALL_TYPE_JSON,
+    CALL_TYPE_JSON:labels[0]::TEXT AS CALL_TYPE
+FROM
+    CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES
+WHERE   
+    CALL_ID = &#39;CALL_20250728_10050&#39;;
+</code></pre>
+<p>💡 <strong>Tip: </strong><code>task_description</code> reduces ambiguity (e.g., classify by <strong>reason for contact</strong> rather than <strong>tone</strong>).</p>
+<h2 is-upgraded>Step 3: Quick Classification (With Descriptions)</h2>
+<p><strong>Key addition:</strong> Add <strong>descriptions for each label</strong> so the model understands boundaries between categories.</p>
+<pre><code language="language-sql" class="language-sql">SELECT
+    CALL_ID,
+    TRANSCRIPT,
+    AI_CLASSIFY
+    (
+        TRANSCRIPT,
+        [
+            {
+                &#39;label&#39;: &#39;Complaint&#39;,
+                &#39;description&#39;: &#39;Caller reports a problem or dissatisfaction&#39;
+            },
+            {
+                &#39;label&#39;: &#39;Query&#39;,
+                &#39;description&#39;: &#39;Caller asks for information or clarification&#39;
+            },
+            {
+                &#39;label&#39;: &#39;Support Request&#39;,
+                &#39;description&#39;: &#39;Caller needs help to resolve something&#39;
+            },
+            {
+                &#39;label&#39;: &#39;Sales&#39;,
+                &#39;description&#39;: &#39;Caller wants to buy or upgrade&#39;
+            },
+            {
+                &#39;label&#39;: &#39;Cancellation&#39;,
+                &#39;description&#39;: &#39;Caller wants to cancel a service&#39;
+            }
+        ]
+    ) AS CALL_TYPE_JSON,      
+    CALL_TYPE_JSON:labels[0]::TEXT AS CALL_TYPE
+FROM
+    CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES;
+</code></pre>
+<p>💡 <strong>Tip: </strong><code>description</code> acts like mini‑guidelines for each class, improving separation where transcripts might fit multiple labels.</p>
+<h2 is-upgraded>Step 4: Extended Classification (With Examples)</h2>
+<p><strong>Key additions:</strong> Combine a <strong>task_description</strong>, set <strong><code>output_mode: 'single'</code></strong>, and include <strong>few‑shot examples</strong> to steer edge cases.</p>
+<pre><code language="language-sql" class="language-sql">    SELECT
+        CALL_ID,
+        TRANSCRIPT,
+        AI_CLASSIFY
+        (
+            TRANSCRIPT,
+            [
+                {
+                    &#39;label&#39;: &#39;Complaint&#39;,
+                    &#39;description&#39;: &#39;Caller reports a problem or dissatisfaction&#39;
+                },
+                {
+                    &#39;label&#39;: &#39;Query&#39;,
+                    &#39;description&#39;: &#39;Caller asks for information or clarification&#39;
+                },
+                {
+                    &#39;label&#39;: &#39;Support Request&#39;,
+                    &#39;description&#39;: &#39;Caller needs help to resolve something&#39;
+                },
+                {
+                    &#39;label&#39;: &#39;Sales&#39;,
+                    &#39;description&#39;: &#39;Caller wants to buy or upgrade&#39;
+                },
+                {
+                    &#39;label&#39;: &#39;Cancellation&#39;,
+                    &#39;description&#39;: &#39;Caller wants to cancel a service&#39;
+                }
+            ],
+            {
+                &#39;task_description&#39;: &#39;Classify the type of customer service call&#39;,
+                &#39;output_mode&#39;: &#39;single&#39;,
+                &#39;examples&#39;:  
+                [
+                    {
+                      &#39;input&#39;: &#39;My internet has been down all morning and I am very frustrated&#39;,
+                      &#39;labels&#39;: [&#39;Complaint&#39;],
+                      &#39;explanation&#39;: &#39;The caller expresses dissatisfaction and reports a recurring problem&#39;
+                    },
+                    {
+                      &#39;input&#39;: &#39;Can you explain how to change my billing address?&#39;,
+                      &#39;labels&#39;: [&#39;Query&#39;],
+                      &#39;explanation&#39;: &#39;The caller is asking for information&#39;
+                    },
+                    {
+                      &#39;input&#39;: &#39;I cannot log into my account, can you help me reset my password?&#39;,
+                      &#39;labels&#39;: [&#39;Support Request&#39;],
+                      &#39;explanation&#39;: &#39;The caller is explicitly asking for help to resolve a problem&#39;
+                    },
+                    {
+                      &#39;input&#39;: &#39;I am interested in upgrading to the premium plan, what will it cost?&#39;,
+                      &#39;labels&#39;: [&#39;Sales&#39;],
+                      &#39;explanation&#39;: &#39;The caller is showing intent to purchase/upgrade&#39;
+                    },
+                    {
+                      &#39;input&#39;: &#39;I want to cancel my subscription and end my service&#39;,
+                      &#39;labels&#39;: [&#39;Cancellation&#39;],
+                      &#39;explanation&#39;: &#39;The caller explicitly wants to cancel their subscription&#39;
+                    }
+                ]
+            }
+        ) AS CALL_TYPE_JSON,
+        IFNULL(CALL_TYPE_JSON:labels[0]::TEXT,&#39;Other&#39;) AS CALL_TYPE
+    FROM
+        CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES;
+</code></pre>
+<p>💡 <strong>Tip: </strong><code>examples</code> provide real patterns the model can mirror, reducing borderline misclassifications.</p>
+<h2 is-upgraded>Step 5: Persist Classification Results</h2>
+<p><strong>Key addition:</strong> Persist results with the same enriched configuration (including examples) to create a reliable, one‑row‑per‑call table for downstream joins.</p>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES_CLASSIFY
+AS
+  
+    WITH CTE_CLASSIFY
+    AS
+    (
+    SELECT
+        CALL_ID,
+        AI_CLASSIFY
+        (
+            TRANSCRIPT,
+            [
+                {
+                    &#39;label&#39;: &#39;Complaint&#39;,
+                    &#39;description&#39;: &#39;Caller reports a problem or dissatisfaction&#39;
+                },
+                {
+                    &#39;label&#39;: &#39;Query&#39;,
+                    &#39;description&#39;: &#39;Caller asks for information or clarification&#39;
+                },
+                {
+                    &#39;label&#39;: &#39;Support Request&#39;,
+                    &#39;description&#39;: &#39;Caller needs help to resolve something&#39;
+                },
+                {
+                    &#39;label&#39;: &#39;Sales&#39;,
+                    &#39;description&#39;: &#39;Caller wants to buy or upgrade&#39;
+                },
+                {
+                    &#39;label&#39;: &#39;Cancellation&#39;,
+                    &#39;description&#39;: &#39;Caller wants to cancel a service&#39;
+                }
+            ],
+            {
+                &#39;task_description&#39;: &#39;Classify the type of customer service call&#39;,
+                &#39;output_mode&#39;: &#39;single&#39;,
+                &#39;examples&#39;:  
+                [
+                    {
+                      &#39;input&#39;: &#39;My internet has been down all morning and I am very frustrated&#39;,
+                      &#39;labels&#39;: [&#39;Complaint&#39;],
+                      &#39;explanation&#39;: &#39;The caller expresses dissatisfaction and reports a recurring problem&#39;
+                    },
+                    {
+                      &#39;input&#39;: &#39;Can you explain how to change my billing address?&#39;,
+                      &#39;labels&#39;: [&#39;Query&#39;],
+                      &#39;explanation&#39;: &#39;The caller is asking for information&#39;
+                    },
+                    {
+                      &#39;input&#39;: &#39;I cannot log into my account, can you help me reset my password?&#39;,
+                      &#39;labels&#39;: [&#39;Support Request&#39;],
+                      &#39;explanation&#39;: &#39;The caller is explicitly asking for help to resolve a problem&#39;
+                    },
+                    {
+                      &#39;input&#39;: &#39;I am interested in upgrading to the premium plan, what will it cost?&#39;,
+                      &#39;labels&#39;: [&#39;Sales&#39;],
+                      &#39;explanation&#39;: &#39;The caller is showing intent to purchase/upgrade&#39;
+                    },
+                    {
+                      &#39;input&#39;: &#39;I want to cancel my subscription and end my service&#39;,
+                      &#39;labels&#39;: [&#39;Cancellation&#39;],
+                      &#39;explanation&#39;: &#39;The caller explicitly wants to cancel their subscription&#39;
+                    }
+                ]
+            }
+        ) AS CALL_TYPE_JSON,
+        IFNULL(CALL_TYPE_JSON:labels[0]::TEXT,&#39;Other&#39;) AS CALL_TYPE
+    FROM
+        CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES AS SRC
+    )
+
+    SELECT
+        CALL_ID,
+        CALL_TYPE
+    FROM
+        CTE_CLASSIFY;
+</code></pre>
+<h2 is-upgraded>Step 6: Preview Saved Results</h2>
+<p>Confirm that the table contains expected values.</p>
+<pre><code language="language-sql" class="language-sql">SELECT * FROM CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES_CLASSIFY LIMIT 10;
+</code></pre>
+<h2 is-upgraded>Notes &amp; Troubleshooting</h2>
+<ul>
+<li><strong>Borderline calls:</strong> Expand label descriptions or examples for tighter guidance.</li>
+<li><strong>Multi‑label needs:</strong> Switch <code>output_mode</code> to <code>'multi'</code> (then parse arrays accordingly).</li>
+<li><strong>Fallback label:</strong> Keep <code>IFNULL(...,'Other')</code> to avoid nulls when the model is uncertain.</li>
+<li><strong>Determinism:</strong> For more stable runs at scale, consider lowering temperature via model‑specific parameters where supported by your environment.</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="SENTIMENT" duration="5">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Compute an overall sentiment score for each call transcript using <code>SNOWFLAKE.CORTEX.SENTIMENT()</code>, then persist the results for reuse in later steps and BI queries.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-snowflake-intelligence-callcenter-lab/scripts/05-AI-LAB-CORTEX-SENTIMENT.sql" target="_blank">here</a>.</p>
+<h2 is-upgraded>Description</h2>
+<p><code>SENTIMENT()</code> analyzes free‑text and returns a single sentiment score per input. In this module, you will:</p>
+<ul>
+<li>Score each transcript and quickly <strong>rank by sentiment</strong> to spot strongly positive or negative calls.</li>
+<li><strong>Persist</strong> the results to a dedicated table to simplify downstream joins and visualizations.</li>
+</ul>
+<p>💡 <strong>Tip:</strong> Higher scores indicate more positive sentiment. Very short or noisy transcripts may yield weak or null scores—filter or quality‑check as needed.</p>
+<h2 is-upgraded>Step 1: Set Snowflake Context</h2>
+<p>Sets the current database, schema, and warehouse so subsequent operations run in the correct environment.</p>
+<pre><code language="language-sql" class="language-sql">USE DATABASE CALL_CENTER_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+</code></pre>
+<h2 is-upgraded>Step 2: Overall Sentiment Score</h2>
+<p>Computes overall sentiment for each transcript and orders by score (most positive first).</p>
+<pre><code language="language-sql" class="language-sql">SELECT
+    CALL_ID,
+    TRANSCRIPT,
+    SNOWFLAKE.CORTEX.SENTIMENT(TRANSCRIPT) AS OVERALL_SENTIMENT
+FROM
+    CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES
+ORDER BY
+    OVERALL_SENTIMENT DESC;
+</code></pre>
+<h2 is-upgraded>Step 3: Persist Overall Sentiment</h2>
+<p>Saves one sentiment score per call into a table for reuse downstream.</p>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES_OVERALL_SENTIMENT
+AS
+    SELECT
+        CALL_ID,
+        TRANSCRIPT,
+        SNOWFLAKE.CORTEX.SENTIMENT(TRANSCRIPT) AS OVERALL_SENTIMENT
+    FROM
+        CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES
+    ORDER BY
+        OVERALL_SENTIMENT DESC;
+</code></pre>
+<h2 is-upgraded>Step 4: View Sentiment Scores</h2>
+<p>Preview a sample of saved sentiment scores for verification.</p>
+<pre><code language="language-sql" class="language-sql">SELECT * FROM CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES_OVERALL_SENTIMENT LIMIT 10;
+</code></pre>
+<h2 is-upgraded>Notes &amp; Troubleshooting</h2>
+<ul>
+<li><strong>Short transcripts:</strong> Consider excluding transcripts under a character/word threshold to avoid weak signals.</li>
+<li><strong>Language considerations:</strong> Mixed‑language calls can affect accuracy; segment by language if possible.</li>
+<li><strong>Join for insights:</strong> Join this table with classification and entity sentiment in later steps to understand <strong>why</strong> a call is positive/negative.</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="AI_SENTIMENT" duration="6">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Use <code>SNOWFLAKE.CORTEX.AI_SENTIMENT()</code> to measure <strong>category-level sentiment</strong> (e.g., Brand, Cost, Product) for each transcript, then reshape and persist the results for downstream analysis and BI.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-snowflake-intelligence-callcenter-lab/scripts/06-AI-LAB-CORTEX-AI_SENTIMENT.sql" target="_blank">here</a>.</p>
+<h2 is-upgraded>Description</h2>
+<p><code>AI_SENTIMENT()</code> scores sentiment for <strong>specific categories</strong> you define (as an array), returning JSON with a <code>categories</code> list. Each list item contains at least:</p>
+<ul>
+<li><code>name</code> — the category string you provided (e.g., <code>Brand</code>, <code>Cost</code>, <code>Product</code>).</li>
+<li><code>sentiment</code> — the model&#39;s sentiment result for that category (cast to <code>TEXT</code> in this lab for simplicity).</li>
+</ul>
+<p>💡 <strong>Tip:</strong> Add or rename categories (e.g., <em>Agent, Billing, Delivery</em>) by extending <code>ARRAY_CONSTRUCT(...)</code>.</p>
+<h2 is-upgraded>Step 1: Set Snowflake Context</h2>
+<p>Run each statement in order so queries execute in the correct environment.</p>
+<pre><code language="language-sql" class="language-sql">USE DATABASE CALL_CENTER_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+</code></pre>
+<h2 is-upgraded>Step 2: Category Sentiment Score</h2>
+<p>Uses <code>SNOWFLAKE.CORTEX.AI_SENTIMENT</code> to score the specified categories for each transcript.</p>
+<pre><code language="language-sql" class="language-sql">SELECT
+    CALL_ID,
+    TRANSCRIPT,
+    SNOWFLAKE.CORTEX.AI_SENTIMENT
+    (
+        TRANSCRIPT,
+        ARRAY_CONSTRUCT(&#39;Brand&#39;, &#39;Cost&#39;, &#39;Product&#39;)
+    ) AS ENTITY_SENTIMENT
+FROM
+    CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES;
+</code></pre>
+<p>💡 <strong>Tip:</strong> Start with a few categories; expand only after you&#39;ve validated results on a sample of calls.</p>
+<h2 is-upgraded>Step 3: Transpose Category Sentiment (with <code>ARRAY_CONSTRUCT</code> explained)</h2>
+<p><strong>About </strong></p>
+<p><strong><code>ARRAY_CONSTRUCT</code></strong></p>
+<p><strong>:</strong></p>
+<ul>
+<li><code>ARRAY_CONSTRUCT('Brand','Cost','Product')</code> builds a Snowflake <strong>VARIANT array</strong> of strings. We pass this array into <code>AI_SENTIMENT()</code> so the model scores <strong>exactly those categories</strong> for each transcript in a single call.</li>
+<li>This approach is clear, repeatable, and easy to extend—just add another string to the array to score a new category.</li>
+</ul>
+<p><strong>About the returned structure:</strong></p>
+<ul>
+<li><code>ENTITY_SENTIMENT</code> contains a JSON object with a <code>categories</code> <strong>array</strong>.</li>
+<li>Each element in <code>categories</code> is a JSON object exposing:<ul>
+<li><code>name</code> (the category label you requested)</li>
+<li><code>sentiment</code> (the model&#39;s sentiment for that category)</li>
+</ul>
+</li>
+</ul>
+<p>We <strong>flatten</strong> the <code>categories</code> array to get one row per <code>(CALL_ID, category)</code> pair for quick inspection.</p>
+<pre><code language="language-sql" class="language-sql">WITH CTE_ENTITY_SENTIMENT
+AS
+(
+    SELECT
+        CALL_ID,
+        TRANSCRIPT,
+        SNOWFLAKE.CORTEX.AI_SENTIMENT
+        (
+            TRANSCRIPT,
+            ARRAY_CONSTRUCT(&#39;Brand&#39;, &#39;Cost&#39;, &#39;Product&#39;)
+        ) AS ENTITY_SENTIMENT
+    FROM
+        CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES AS SRC
+)
+
+SELECT
+    CALL_ID,
+    TRANSCRIPT,
+    CAT.value:name::TEXT      AS &#34;CATEGORY&#34;,
+    CAT.value:sentiment::TEXT AS &#34;SENTIMENT&#34;
+FROM
+    CTE_ENTITY_SENTIMENT AS SRC,
+LATERAL FLATTEN(INPUT =&gt; SRC.ENTITY_SENTIMENT:&#34;categories&#34;) AS CAT;
+</code></pre>
+<p>💡 <strong>Tip: </strong><code>LATERAL FLATTEN</code> expands the <code>categories</code> array into rows, making it easier to read, debug, and validate category-level results.</p>
+<h2 is-upgraded>Step 4: Persist Category Sentiment (Pivoted)</h2>
+<p>Create a table with one row per call and separate columns for each category.</p>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES_ENTITY_SENTIMENT
+AS
+
+    WITH CTE_ENTITY_SENTIMENT
+    AS
+    (
+        SELECT
+            CALL_ID,
+            TRANSCRIPT,
+            SNOWFLAKE.CORTEX.AI_SENTIMENT
+            (
+                TRANSCRIPT,
+                ARRAY_CONSTRUCT(&#39;Brand&#39;, &#39;Cost&#39;, &#39;Product&#39;)
+            ) AS ENTITY_SENTIMENT
+        FROM
+            CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES AS SRC
+    )
+
+    SELECT
+        CALL_ID,
+        MAX(CASE WHEN CAT.value:name::TEXT = &#39;Brand&#39;   THEN CAT.value:sentiment::TEXT   END) AS BRAND_SENTIMENT,
+        MAX(CASE WHEN CAT.value:name::STRING = &#39;Cost&#39;  THEN CAT.value:sentiment::STRING END) AS COST_SENTIMENT,
+        MAX(CASE WHEN CAT.value:name::STRING = &#39;Product&#39; THEN CAT.value:sentiment::STRING END) AS PRODUCT_SENTIMENT
+    FROM
+        CTE_ENTITY_SENTIMENT AS SRC,
+    LATERAL FLATTEN(INPUT =&gt; SRC.ENTITY_SENTIMENT:&#34;categories&#34;) AS CAT
+    GROUP BY
+        CALL_ID,
+        TRANSCRIPT;
+</code></pre>
+<p>💡 <strong>Tip:</strong> Pivoting simplifies joins with overall sentiment and classification and works well for side‑by‑side BI charts.</p>
+<h2 is-upgraded>Step 5: Preview Persisted Results</h2>
+<p>Quickly verify saved category sentiment.</p>
+<pre><code language="language-sql" class="language-sql">SELECT * FROM CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES_ENTITY_SENTIMENT LIMIT 10;
+</code></pre>
+<h2 is-upgraded>Notes &amp; Troubleshooting</h2>
+<ul>
+<li><strong>Category naming:</strong> Keep category names consistent (including capitalization) across steps.</li>
+<li><strong>Language:</strong> Mixed‑language transcripts can affect accuracy; segment/translate if needed.</li>
+<li><strong>Extend:</strong> Add more categories based on your domain (e.g., <em>Pricing</em>, <em>Delivery</em>, <em>Agent Professionalism</em>).</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="SUMMARIZE" duration="5">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Generate concise summaries for each call transcript using <code>SNOWFLAKE.CORTEX.SUMMARIZE()</code>, and persist those summaries for downstream analysis and BI.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-snowflake-intelligence-callcenter-lab/scripts/07-AI-LAB-CORTEX-SUMMARISE.sql" target="_blank">here</a>.</p>
+<h2 is-upgraded>Description</h2>
+<p><code>SUMMARIZE()</code> produces a short natural‑language summary of a transcript. You can keep the default behavior for a quick overview or pair it with prompt guidance (e.g., &#34;3 bullets,&#34; &#34;focus on resolution&#34;) to tailor the output to your use case.</p>
+<p>💡 <strong>Tip:</strong> Summaries help triage long calls quickly and are great inputs for ticket notes or BI cards.</p>
+<h2 is-upgraded>Step 1: Set Snowflake Context</h2>
+<p>Sets the current database, schema, and warehouse for summarization.</p>
+<pre><code language="language-sql" class="language-sql">USE DATABASE CALL_CENTER_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+</code></pre>
+<h2 is-upgraded>Step 2: Summarize Transcripts</h2>
+<p>Summarizes each transcript using <code>SNOWFLAKE.CORTEX.SUMMARIZE</code>. Adjust prompt/parameters as needed for your use case.</p>
+<pre><code language="language-sql" class="language-sql">SELECT
+    CALL_ID,
+    TRANSCRIPT,
+    SNOWFLAKE.CORTEX.SUMMARIZE
+    (
+        TRANSCRIPT
+    ) AS TRANSCRIPT_SUMMARY
+FROM
+    CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES;
+</code></pre>
+<p>💡 <strong>Tip:</strong> For structured bullet points, prepend guidance like &#34;Summarize in 3 short bullets:&#34; to the transcript text.</p>
+<h2 is-upgraded>Step 3: Persist Summaries</h2>
+<p>Saves summaries into a table for reuse.</p>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES_SUMMARY
+AS
+    SELECT
+        CALL_ID,
+        SNOWFLAKE.CORTEX.SUMMARIZE
+        (
+            TRANSCRIPT
+        ) AS TRANSCRIPT_SUMMARY
+    FROM
+        CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES;
+</code></pre>
+<p>💡 <strong>Tip:</strong> Persisted summaries make it easy to surface in dashboards and to join with classification and sentiment.</p>
+<h2 is-upgraded>Step 4: Preview Summaries</h2>
+<p>Displays a sample of saved summaries for verification.</p>
+<pre><code language="language-sql" class="language-sql">SELECT * FROM CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES_SUMMARY LIMIT 10;
+</code></pre>
+<h2 is-upgraded>Notes &amp; Troubleshooting</h2>
+<ul>
+<li><strong>Very short transcripts:</strong> Consider filtering very short calls; they often yield minimal summaries.</li>
+<li><strong>Privacy:</strong> If transcripts contain PII, clarify redaction requirements in your prompting or preprocess accordingly.</li>
+<li><strong>Localization:</strong> If transcripts span multiple languages, summarize per language or translate first for consistent tone.</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="AI_COMPLETE (1)" duration="7">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Harness <code>AI_COMPLETE()</code> for both free‑text and <strong>structured</strong> completions over call transcripts. Progressively add <strong>PROMPT()</strong>, <strong>named arguments</strong>, <strong>model_parameters</strong>, <strong>response_format</strong> (JSON schema), and <strong>show_details</strong> to control output quality, determinism, structure, and observability.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-snowflake-intelligence-callcenter-lab/scripts/08-AI-LAB-CORTEX-AI_COMPLETE-01.sql" target="_blank">here</a>.</p>
+<h2 is-upgraded>Description</h2>
+<p>We&#39;ll <strong>build the final query step‑by‑step</strong>, starting from a minimal prompt and adding controls for safer prompts, deterministic behavior, structured JSON, and runtime metadata.</p>
+<p>💡 <strong>Tip:</strong> Validate each step on a single <code>CALL_ID</code> before scaling to the full dataset.</p>
+<h2 is-upgraded>Step 1: Set Snowflake Context</h2>
+<p>Sets the current database, schema, and warehouse for summarization.</p>
+<pre><code language="language-sql" class="language-sql">USE DATABASE CALL_CENTER_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+</code></pre>
+<h2 is-upgraded>Step 2: Basic AI_COMPLETE</h2>
+<p>Use the simplest form to smoke‑test completion quality:</p>
+<ul>
+<li><strong>Signature: </strong><code>AI_COMPLETE('<model>', '<string prompt>')</code></li>
+<li><strong>Prompt:</strong> single string (<code>'Summarize the call transcript. ' || TRANSCRIPT</code>)</li>
+<li><strong>Parameters:</strong> defaults (no controls)</li>
+<li><strong>Output:</strong> free text only (no structure, no metadata)</li>
+</ul>
+<pre><code language="language-sql" class="language-sql">SELECT
+    CALL_ID,
+    AI_COMPLETE
+    (
+        &#39;snowflake-arctic&#39;,
+        &#39;Summarize the call transcript. &#39; || TRANSCRIPT
+    )::VARCHAR AS CALL_SUMMARY
+FROM
+    CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES
+WHERE   
+    CALL_ID = &#39;CALL_20250728_10050&#39;;
+</code></pre>
+<p>💡 <strong>Tip:</strong> Minimal usage is great for smoke tests but offers little control over style, length, or safety.</p>
+<h2 is-upgraded>Step 3: Use PROMPT() Function</h2>
+<p>Improve readability of code without changing output type:</p>
+<ul>
+<li><strong>Use </strong><strong><code>PROMPT()</code></strong> function with placeholders for clean variable insertion</li>
+</ul>
+<pre><code language="language-sql" class="language-sql">SELECT
+    CALL_ID,
+    AI_COMPLETE
+    (
+        &#39;snowflake-arctic&#39;,
+        PROMPT(&#39;Summarize the call transcript. {0}&#39;, TRANSCRIPT)
+    )::VARCHAR AS CALL_SUMMARY
+FROM
+    CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES
+WHERE   
+    CALL_ID = &#39;CALL_20250728_10050&#39;;
+</code></pre>
+<p>💡 <strong>Tip:</strong> Prefer <code>PROMPT()</code> when combining literals + variables to avoid quoting/escaping bugs.</p>
+<h2 is-upgraded>Step 4: Use Named Arguments and Model Parameters</h2>
+<p>Be more specic by using paramter assignments, particularly when working with more complex longer scripts. Take more control of the LLM by using the model_parameters:</p>
+<ul>
+<li><strong>Named Arguments: </strong><code>model =></code>, <code>prompt =></code> for clarity</li>
+<li><strong>Model Parameter:</strong> set <code>temperature</code>, <code>top_p</code>, <code>max_tokens</code>, <code>guardrails</code></li>
+</ul>
+<pre><code language="language-sql" class="language-sql">SELECT
+    CALL_ID,
+    AI_COMPLETE
+    (
+        model  =&gt; &#39;snowflake-arctic&#39;,
+        prompt =&gt; PROMPT(&#39;Summarize the call transcript. {0}&#39;, TRANSCRIPT),
+        model_parameters =&gt; {&#39;temperature&#39;: 0.2, &#39;top_p&#39;: 0.9, &#39;max_tokens&#39;: 120, &#39;guardrails&#39;: TRUE}
+    ) AS CALL_SUMMARY
+FROM
+    CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES
+WHERE   
+    CALL_ID = &#39;CALL_20250728_10050&#39;;
+</code></pre>
+<p>💡 <strong>Tip:</strong> Lower <code>temperature</code> raises consistency. Use <code>max_tokens</code> to cap verbosity.</p>
+<h2 is-upgraded>Step 5: Use Structured Output with Response Format (JSON schema)</h2>
+<p>Return machine‑readable JSON and extract fields as columns:</p>
+<ul>
+<li><strong>Response Format:</strong> provide minimal JSON Schema for required fields</li>
+<li><strong>Parsing:</strong> use JSON paths (e.g., <code>:summary</code>) to extract individual fields</li>
+</ul>
+<p>💡 <strong>Tip (Warning):</strong> You <strong>CANNOT</strong> combine <code>PROMPT()</code> with structured JSON output—whether using <code>response_format</code> or <code>show_details</code>. For these cases, build the prompt via <strong>string concatenation</strong> (e.g., <code>'... ' || TRANSCRIPT</code>).</p>
+<pre><code language="language-sql" class="language-sql">WITH CTE_RESULT
+AS
+(
+    SELECT
+        CALL_ID,
+        AI_COMPLETE
+        (
+            model  =&gt; &#39;snowflake-arctic&#39;,
+            prompt =&gt; &#39;Summarize the call transcript. &#39; || TRANSCRIPT,
+            model_parameters =&gt; {&#39;temperature&#39;: 0.2, &#39;top_p&#39;: 0.9, &#39;max_tokens&#39;: 120, &#39;guardrails&#39;: TRUE},
+            response_format =&gt; {
+                &#39;type&#39;: &#39;json&#39;,
+                &#39;schema&#39;: {
+                    &#39;type&#39;: &#39;object&#39;,
+                    &#39;properties&#39;: {
+                        &#39;summary&#39;: {&#39;type&#39;: &#39;string&#39;}
+                    },
+                    &#39;required&#39;: [&#39;summary&#39;]
+                }
+            }
+        ) AS CALL_SUMMARY_JSON
+    FROM
+        CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES
+    WHERE
+        CALL_ID = &#39;CALL_20250728_10050&#39;
+)
+
+SELECT
+    CALL_ID,
+    CALL_SUMMARY_JSON:summary::string AS &#34;CALL_SUMMARY&#34;
+FROM
+    CTE_RESULT;
+</code></pre>
+<h2 is-upgraded>Step 6: Enable Show Details for Modela and Token Useage</h2>
+<p>Add observability to each completion call:</p>
+<ul>
+<li><strong>Show Details:</strong> prompt/completion/total tokens</li>
+</ul>
+<pre><code language="language-sql" class="language-sql">WITH CTE_RESULT
+AS
+(
+    SELECT
+        CALL_ID,
+        AI_COMPLETE
+        (
+            model  =&gt; &#39;snowflake-arctic&#39;,
+            prompt =&gt; &#39;Summarize the call transcript. &#39; || TRANSCRIPT,
+            model_parameters =&gt; {&#39;temperature&#39;: 0.2, &#39;top_p&#39;: 0.9, &#39;max_tokens&#39;: 120, &#39;guardrails&#39;: TRUE},
+            show_details =&gt; TRUE
+        ) AS CALL_SUMMARY_JSON
+    FROM
+        CALL_CENTER_DB.STAGE/TRANSCRIBE_AUDIO_FILES
+    WHERE
+        CALL_ID = &#39;CALL_20250728_10050&#39;
+)
+
+SELECT
+    CALL_ID,
+    CALL_SUMMARY_JSON:choices[0]:messages::string AS &#34;CALL_SUMMARY&#34;,
+    CALL_SUMMARY_JSON:model::string AS &#34;MODEL_USED&#34;,
+    TO_TIMESTAMP_NTZ(CALL_SUMMARY_JSON:created) AS &#34;CREATED_TS&#34;,
+    CALL_SUMMARY_JSON:usage:completion_tokens::int AS &#34;COMPLETION_TOKENS&#34;,
+    CALL_SUMMARY_JSON:usage:guardrails_tokens::int AS &#34;GUARDRAILS_TOKENS&#34;,
+    CALL_SUMMARY_JSON:usage:prompt_tokens::int AS &#34;PROMPT_TOKENS&#34;,
+    CALL_SUMMARY_JSON:usage:total_tokens::int AS &#34;TOTAL_TOKENS&#34;
+FROM
+    CTE_RESULT;
+</code></pre>
+<p>💡 <strong>Tip:</strong> Track token usage by step to understand cost drivers and tune prompts/length limits.</p>
+<h2 is-upgraded>Step 7: Structured Output + Show Details together</h2>
+<p>Combine structure and observability for robust executions:</p>
+<ul>
+<li><strong>Structured output:</strong> validate with a JSON Schema and parse reliably</li>
+<li><strong>Metadata:</strong> capture model and token usage for audits/costs</li>
+</ul>
+<pre><code language="language-sql" class="language-sql">WITH CTE_RESULT
+AS
+(
+    SELECT
+        CALL_ID,
+        AI_COMPLETE
+        (
+            model  =&gt; &#39;snowflake-arctic&#39;,
+            prompt =&gt; &#39;Summarize the call transcript. &#39; || TRANSCRIPT,
+            model_parameters =&gt; {&#39;temperature&#39;: 0.2, &#39;top_p&#39;: 0.9, &#39;max_tokens&#39;: 120, &#39;guardrails&#39;: TRUE},
+            response_format =&gt; {
+                &#39;type&#39;: &#39;json&#39;,
+                &#39;schema&#39;: {
+                    &#39;type&#39;: &#39;object&#39;,
+                    &#39;properties&#39;: {
+                        &#39;summary&#39;: {&#39;type&#39;: &#39;string&#39;}
+                    },
+                    &#39;required&#39;: [&#39;summary&#39;]
+                }
+            },
+            show_details =&gt; TRUE
+        ) AS CALL_SUMMARY_JSON
+    FROM
+        CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES
+    WHERE
+        CALL_ID = &#39;CALL_20250728_10050&#39;
+)
+
+SELECT
+    CALL_ID,
+    CALL_SUMMARY_JSON:structured_output[0]:raw_message:summary::string AS &#34;CALL_SUMMARY&#34;,
+    TO_TIMESTAMP_NTZ(CALL_SUMMARY_JSON:created) AS &#34;CREATED_TS&#34;,
+    CALL_SUMMARY_JSON:model::string AS &#34;MODEL_USED&#34;,
+    CALL_SUMMARY_JSON:usage:completion_tokens::int AS &#34;COMPLETION_TOKENS&#34;,
+    CALL_SUMMARY_JSON:usage:guardrails_tokens::int AS &#34;GUARDRAILS_TOKENS&#34;,
+    CALL_SUMMARY_JSON:usage:prompt_tokens::int AS &#34;PROMPT_TOKENS&#34;,
+    CALL_SUMMARY_JSON:usage:total_tokens::int AS &#34;TOTAL_TOKENS&#34;
+FROM
+    CTE_RESULT;
+</code></pre>
+<h2 is-upgraded>Output behavior: <code>response_format</code> and <code>show_details</code></h2>
+<p>For detailed definitions of return types, see the Snowflake docs: <a href="https://docs.snowflake.com/en/sql-reference/functions/ai_complete-single-string#returns" target="_blank">https://docs.snowflake.com/en/sql-reference/functions/ai_complete-single-string#returns</a></p>
+<table>
+<tr><td colspan="1" rowspan="1"><p><code>show_details</code></p>
+</td><td colspan="1" rowspan="1"><p><code>response_format</code></p>
+</td><td colspan="1" rowspan="1"><p>Return type</p>
+</td><td colspan="1" rowspan="1"><p>Key fields returned</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>not specified / <code>FALSE</code></p>
+</td><td colspan="1" rowspan="1"><p>not specified / <code>NULL</code></p>
+</td><td colspan="1" rowspan="1"><p><strong>String</strong></p>
+</td><td colspan="1" rowspan="1"><p>The model&#39;s free‑text response only.</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>not specified / <code>FALSE</code></p>
+</td><td colspan="1" rowspan="1"><p><strong>specified</strong></p>
+</td><td colspan="1" rowspan="1"><p><strong>Object following your schema</strong></p>
+</td><td colspan="1" rowspan="1"><p>Whatever fields your JSON Schema defines.</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>TRUE</strong></p>
+</td><td colspan="1" rowspan="1"><p>not specified / <code>NULL</code></p>
+</td><td colspan="1" rowspan="1"><p><strong>JSON object</strong></p>
+</td><td colspan="1" rowspan="1"><p><code>choices</code>, <code>created</code>, <code>model</code>, <code>usage</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>TRUE</strong></p>
+</td><td colspan="1" rowspan="1"><p><strong>specified</strong></p>
+</td><td colspan="1" rowspan="1"><p><strong>JSON object</strong></p>
+</td><td colspan="1" rowspan="1"><p><code>structured_output</code>, <code>created</code>, <code>model</code>, <code>usage</code></p>
+</td></tr>
+</table>
+<h2 is-upgraded>Notes &amp; Troubleshooting</h2>
+<ul>
+<li><strong>Schema mismatches:</strong> If the model returns text that doesn&#39;t match your JSON schema, relax constraints or tighten the prompt.</li>
+<li><strong>Determinism:</strong> Lower <code>temperature</code> and add explicit format instructions when you need repeatable outputs.</li>
+<li><strong>Token limits:</strong> Keep prompts succinct (e.g., summarize key points) to avoid truncation.</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="AI_COMPLETE (2)" duration="8">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>By the end of this step you will be able to:</p>
+<ul>
+<li>Design <strong>different types of AI_COMPLETE requests</strong> (structured JSON, free‑text bullets, mixed queries) for call‑center analytics.</li>
+<li><strong>Choose models per task</strong> (e.g., structured extraction vs. summarization) and understand the trade‑offs.</li>
+<li><strong>Combine multiple AI_COMPLETE calls</strong> in a single SELECT (Step 5) to leverage <strong>specialized LLMs</strong>—and recognize the <strong>cost implications</strong> of multiple calls.</li>
+<li><strong>Consolidate</strong> those requests into <strong>one structured payload</strong> (Step 6) using JSON Schema (<code>type</code>, <code>enum</code>, <code>items</code>, <code>description</code>) to guide the model—similar to how <code>AI_CLASSIFY</code> benefits from label descriptions.</li>
+</ul>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-snowflake-intelligence-callcenter-lab/scripts/09-AI-LAB-CORTEX-AI_COMPLETE-02.sql" target="_blank">here</a>.</p>
+<h2 is-upgraded>Description</h2>
+<p>In earlier labs you constructed complete <code>AI_COMPLETE</code> function calls. Here, we explore <strong>what kinds of requests</strong> you can make and <strong>when to pick different models</strong>:</p>
+<ul>
+<li><strong>Task‑specific models:</strong> We use different models for different outcomes (e.g., <em>structured classification</em>, <em>human‑readable bullets</em>, <em>action items</em>). This aligns model strengths with the job to be done.</li>
+<li><strong>One SELECT, many calls (Step 5):</strong> Combine multiple <code>AI_COMPLETE</code> requests—each with its <strong>own model</strong>—in the same query for maximum flexibility. <strong>Trade‑off:</strong> more LLM calls → <strong>higher cost/latency</strong>.</li>
+<li><strong>One call, unified payload (Step 6):</strong> Merge all fields into a <strong>single JSON Schema</strong> with <code>type</code>, <code>enum</code>, <code>items</code>, and <code>description</code>. This both documents your intent and reduces the number of calls.</li>
+</ul>
+<p>💡 <strong>Tip:</strong> For structured outputs (<code>response_format</code>) build prompts via <strong>string concatenation</strong> (e.g., <code>CONCAT(...)</code>). Avoid <code>PROMPT()</code> when requesting structured JSON.</p>
+<h2 is-upgraded>Step 1: Set Snowflake Context</h2>
+<p>Sets the current database, schema, and warehouse for summarization.</p>
+<pre><code language="language-sql" class="language-sql">USE DATABASE CALL_CENTER_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+</code></pre>
+<h2 is-upgraded>Step 2: Structured Output: Multiple Fields</h2>
+<p><strong>Details:</strong></p>
+<ul>
+<li><strong>Intent:</strong> Normalize key fields (<code>call_type</code>, <code>primary_intent</code>, <code>urgency_level</code>) for analytics.</li>
+<li><strong>Model choice: </strong><code>snowflake-arctic</code> for <strong>structured extraction</strong> with enums for consistency.</li>
+<li><strong>Outcome:</strong> Machine‑parseable JSON, easier to store and join.</li>
+</ul>
+<pre><code language="language-sql" class="language-sql">SELECT
+    CALL_ID,
+    AI_COMPLETE
+    (
+        model =&gt; &#39;snowflake-arctic&#39;,
+        prompt =&gt; CONCAT(&#39;Extract structured data from this call center transcript. &lt;Transcript&gt;&#39;, TRANSCRIPT, &#39;&lt;/Transcript&gt;&#39;),
+        response_format =&gt; {
+            &#39;type&#39;:&#39;json&#39;,
+            &#39;schema&#39;:{
+                &#39;type&#39;:&#39;object&#39;,
+                &#39;properties&#39;:{
+                    &#39;call_type&#39;:{&#39;type&#39;:&#39;string&#39;,&#39;enum&#39;:[&#39;inbound&#39;,&#39;outbound&#39;,&#39;transfer&#39;]},
+                    &#39;primary_intent&#39;:{&#39;type&#39;:&#39;string&#39;,&#39;enum&#39;:[&#39;billing&#39;,&#39;technical_support&#39;,&#39;complaint&#39;,&#39;information&#39;,&#39;sales&#39;,&#39;cancellation&#39;,&#39;other&#39;]},
+                    &#39;urgency_level&#39;:{&#39;type&#39;:&#39;string&#39;,&#39;enum&#39;:[&#39;low&#39;,&#39;medium&#39;,&#39;high&#39;,&#39;critical&#39;]}
+                },
+                &#39;required&#39;:[&#39;call_type&#39;,&#39;primary_intent&#39;,&#39;urgency_level&#39;]
+            }
+        }
+    ) AS CLASSIFICATION_JSON
+FROM
+    CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES
+WHERE
+    CALL_ID = &#39;CALL_20250728_10050&#39;;
+</code></pre>
+<p>💡 <strong>Tip:</strong> Enums reduce downstream cleaning and improve dashboard filters.</p>
+<h2 is-upgraded>Step 3: Summary</h2>
+<p><strong>Details:</strong></p>
+<ul>
+<li><strong>Intent:</strong> Give analysts a fast human synopsis.</li>
+<li><strong>Model choice: </strong><code>mistral-large</code> for <strong>concise bullets/summarization</strong>.</li>
+<li><strong>Outcome:</strong> Readable text for tickets/triage.</li>
+</ul>
+<pre><code language="language-sql" class="language-sql">SELECT
+    CALL_ID,
+    AI_COMPLETE
+    (
+        model =&gt; &#39;mistral-large&#39;,
+        prompt =&gt; CONCAT(&#39;Summarize this call in 3 concise bullet points. &lt;Transcript&gt;&#39;, TRANSCRIPT, &#39;&lt;/Transcript&gt;&#39;)
+    ) AS CALL_SUMMARY
+FROM
+    CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES
+WHERE
+    CALL_ID = &#39;CALL_20250728_10050&#39;;
+</code></pre>
+<p>💡 <strong>Tip:</strong> Keep bullets short—ideal for dashboards.</p>
+<h2 is-upgraded>Step 4: Structured Output: Array</h2>
+<p><strong>Details:</strong></p>
+<ul>
+<li><strong>Intent:</strong> Capture <strong>follow‑ups</strong> that can drive workflows.</li>
+<li><strong>Model choice: </strong><code>claude-4-sonnet</code> for <strong>explicit action extraction</strong>.</li>
+<li><strong>Outcome: </strong><code>action_items</code> array that&#39;s simple to persist and query.</li>
+</ul>
+<pre><code language="language-sql" class="language-sql">SELECT
+    CALL_ID,
+    AI_COMPLETE
+    (
+        model =&gt; &#39;claude-4-sonnet&#39;,
+        prompt =&gt; CONCAT(
+          &#39;Extract concrete action items for the agent and customer. &#39;,
+          &#39;Return JSON with key &#34;action_items&#34; as an array of strings. &#39;,
+          &#39;&lt;Transcript&gt;&#39;, TRANSCRIPT, &#39;&lt;/Transcript&gt;&#39;
+        ),
+        response_format =&gt; {
+            &#39;type&#39;:&#39;json&#39;,
+            &#39;schema&#39;:{
+                &#39;type&#39;:&#39;object&#39;,
+                &#39;properties&#39;:{
+                &#39;action_items&#39;:{&#39;type&#39;:&#39;array&#39;,&#39;items&#39;:{&#39;type&#39;:&#39;string&#39;}}
+                },
+                &#39;required&#39;:[&#39;action_items&#39;]
+            }
+        }
+    ) AS ACTION_ITEMS_JSON
+FROM
+    CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES
+WHERE
+    CALL_ID = &#39;CALL_20250728_10050&#39;;
+</code></pre>
+<p>💡 <strong>Tip:</strong> Persist to a task table for SLA tracking.</p>
+<h2 is-upgraded>Step 5: Combined Outputs — Three Prompts in One SELECT</h2>
+<p><strong>Details:</strong></p>
+<ul>
+<li><strong>Flexibility:</strong> Use <strong>different models</strong> for <strong>different sub‑tasks</strong> (classification, bullets, action items) <strong>in one query</strong>.</li>
+<li><strong>Trade‑off:</strong> More <strong>LLM calls</strong> → potential <strong>higher cost/latency</strong>; monitor usage.</li>
+<li><strong>Benefit:</strong> Side‑by‑side outputs simplify comparisons and validation.</li>
+</ul>
+<pre><code language="language-sql" class="language-sql">SELECT
+    CALL_ID,
+    
+    ---------------------------------------------------------------------
+    -- 1) Classification (JSON)
+    ---------------------------------------------------------------------
+    AI_COMPLETE
+    (
+        model =&gt; &#39;snowflake-arctic&#39;,
+        prompt =&gt; CONCAT(&#39;Extract structured data from this call center transcript. &lt;Transcript&gt;&#39;, TRANSCRIPT, &#39;&lt;/Transcript&gt;&#39;),
+        response_format =&gt; {
+            &#39;type&#39;:&#39;json&#39;,
+            &#39;schema&#39;:{
+                &#39;type&#39;:&#39;object&#39;,
+                &#39;properties&#39;:{
+                    &#39;call_type&#39;:{&#39;type&#39;:&#39;string&#39;,&#39;enum&#39;:[&#39;inbound&#39;,&#39;outbound&#39;,&#39;transfer&#39;]},
+                    &#39;primary_intent&#39;:{&#39;type&#39;:&#39;string&#39;,&#39;enum&#39;:[&#39;billing&#39;,&#39;technical_support&#39;,&#39;complaint&#39;,&#39;information&#39;,&#39;sales&#39;,&#39;cancellation&#39;,&#39;other&#39;]},
+                    &#39;urgency_level&#39;:{&#39;type&#39;:&#39;string&#39;,&#39;enum&#39;:[&#39;low&#39;,&#39;medium&#39;,&#39;high&#39;,&#39;critical&#39;]}
+                },
+                &#39;required&#39;:[&#39;call_type&#39;,&#39;primary_intent&#39;,&#39;urgency_level&#39;]
+            }
+        }
+    ) AS CLASSIFICATION_JSON,
+    ---------------------------------------------------------------------
+    -- 2) Summary (text)
+    ---------------------------------------------------------------------
+    AI_COMPLETE
+    (
+        model =&gt; &#39;mistral-large&#39;,
+        prompt =&gt; CONCAT(&#39;Summarize this call in 3 concise bullet points. &lt;Transcript&gt;&#39;, TRANSCRIPT, &#39;&lt;/Transcript&gt;&#39;)
+    ) AS CALL_SUMMARY,
+    ---------------------------------------------------------------------
+    -- 3) Action items (JSON)
+    ---------------------------------------------------------------------
+    AI_COMPLETE
+    (
+        model =&gt; &#39;claude-4-sonnet&#39;,
+        prompt =&gt; CONCAT(
+          &#39;Extract concrete action items for the agent and customer. &#39;,
+          &#39;Return JSON with key &#34;action_items&#34; as an array of strings. &#39;,
+          &#39;&lt;Transcript&gt;&#39;, TRANSCRIPT, &#39;&lt;/Transcript&gt;&#39;
+        ),
+        response_format =&gt; {
+            &#39;type&#39;:&#39;json&#39;,
+            &#39;schema&#39;:{
+                &#39;type&#39;:&#39;object&#39;,
+                &#39;properties&#39;:{
+                &#39;action_items&#39;:{&#39;type&#39;:&#39;array&#39;,&#39;items&#39;:{&#39;type&#39;:&#39;string&#39;}}
+                },
+                &#39;required&#39;:[&#39;action_items&#39;]
+            }
+        }
+    ) AS ACTION_ITEMS_JSON
+FROM
+    CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES
+WHERE
+    CALL_ID = &#39;CALL_20250728_10050&#39;;
+</code></pre>
+<p>💡 <strong>Tip:</strong> Consider caching or persisting intermediate outputs to control cost.</p>
+<h2 is-upgraded>Step 6: Unified JSON Payload — One call for multiple outputs</h2>
+<p><strong>Details:</strong></p>
+<ul>
+<li><strong>Intent:</strong> Reduce total calls by <strong>combining</strong> fields into one <strong>schema‑driven</strong> response.</li>
+<li><strong>Design:</strong> Use <code>type</code>, <code>enum</code>, <code>items</code>, and <code>description</code> in your schema—this <strong>documents intent</strong> and <strong>guides</strong> the model (akin to adding label descriptions in <code>AI_CLASSIFY</code>).</li>
+<li><strong>Trade‑off:</strong> One larger call; tune <code>max_tokens</code> accordingly.</li>
+</ul>
+<pre><code language="language-sql" class="language-sql">SELECT
+    CALL_ID,
+    AI_COMPLETE
+    (
+        model =&gt; &#39;snowflake-arctic&#39;,
+        prompt =&gt; CONCAT(&#39;Extract structured data from this call center transcript. &lt;Transcript&gt;&#39;, TRANSCRIPT, &#39;&lt;/Transcript&gt;&#39;),
+        response_format =&gt; {
+          &#39;type&#39;: &#39;json&#39;,
+          &#39;schema&#39;: {
+            &#39;type&#39;: &#39;object&#39;,
+            &#39;properties&#39;: {
+              &#39;call_type&#39;: { &#39;type&#39;: &#39;string&#39;, &#39;enum&#39;: [&#39;inbound&#39;,&#39;outbound&#39;,&#39;transfer&#39;], &#39;description&#39;: &#39;Overall direction of the call.&#39; },
+              &#39;primary_intent&#39;: { &#39;type&#39;: &#39;string&#39;, &#39;enum&#39;: [&#39;billing&#39;,&#39;technical_support&#39;,&#39;complaint&#39;,&#39;information&#39;,&#39;sales&#39;,&#39;cancellation&#39;,&#39;other&#39;], &#39;description&#39;: &#39;Main reason for contact.&#39; },
+              &#39;urgency_level&#39;: { &#39;type&#39;: &#39;string&#39;, &#39;enum&#39;: [&#39;low&#39;,&#39;medium&#39;,&#39;high&#39;,&#39;critical&#39;], &#39;description&#39;: &#39;Urgency inferred from the conversation.&#39; },
+              &#39;summary_bullets&#39;: { &#39;type&#39;: &#39;array&#39;, &#39;items&#39;: { &#39;type&#39;: &#39;string&#39; }, &#39;description&#39;: &#39;Three concise bullets.&#39; },
+              &#39;action_items&#39;: { &#39;type&#39;: &#39;array&#39;, &#39;items&#39;: { &#39;type&#39;: &#39;string&#39; }, &#39;description&#39;: &#39;Concrete next steps.&#39; }
+            },
+            &#39;required&#39;: [&#39;call_type&#39;,&#39;primary_intent&#39;,&#39;urgency_level&#39;,&#39;summary_bullets&#39;,&#39;action_items&#39;]
+          }
+        }
+    )::VARIANT AS PAYLOAD
+FROM
+    CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES
+WHERE
+    CALL_ID = &#39;CALL_20250728_10050&#39;;
+</code></pre>
+<h2 is-upgraded>Notes &amp; Troubleshooting</h2>
+<ul>
+<li><strong>Prompt hygiene:</strong> Use XML‑style tags (e.g., <code><Transcript>...</Transcript></code>) to scope context.</li>
+<li><strong>Schema drift:</strong> Keep enums aligned with your taxonomy for stable joins.</li>
+<li><strong>Cost tuning:</strong> Step 5 maximizes flexibility but can cost more; Step 6 reduces calls but increases token size per call.</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="AI_COMPLETE (3)" duration="8">
+        <h2 is-upgraded>Learning Outcome</h2>
+<ul>
+<li>Extract <strong>structured JSON</strong> with <code>AI_COMPLETE</code>, <strong>flatten</strong> arrays with <code>LATERAL FLATTEN</code>, and <strong>aggregate</strong> rows with <code>AI_AGG</code>.</li>
+<li>Apply a guardrails-aware filter using <code>OBJECT_KEYS</code> + <code>ARRAY_CONTAINS</code> when persisting results.</li>
+</ul>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-snowflake-intelligence-callcenter-lab/scripts/10-AI-LAB-CORTEX-AI_COMPLETE-03.sql" target="_blank">here</a>.</p>
+<h2 is-upgraded>Additional Functions</h2>
+<p><strong><code>LATERAL FLATTEN</code></strong></p>
+<ul>
+<li><strong>What it does:</strong> Converts each element of a JSON array (or member of an object) in a <code>VARIANT</code> column into its <strong>own row</strong>, exposing helper fields like <code>VALUE</code>, <code>INDEX</code>, and <code>KEY</code>.</li>
+<li><strong>Why use it:</strong> Treat model outputs (e.g., <code>summary_bullets</code>, <code>action_items</code>) as <strong>relational rows</strong> so you can join, filter, and aggregate—often a prerequisite before applying <code>AI_AGG</code>.</li>
+<li><strong>Common pattern:</strong><pre><code language="language-sql" class="language-sql">SELECT t.CALL_ID, f.value::string AS ITEM
+FROM my_table t,
+     LATERAL FLATTEN(input =&gt; t.json_col:array_field) f;
+</code></pre>
+</li>
+</ul>
+<p><strong><code>AI_AGG(text_expr, instruction)</code></strong></p>
+<ul>
+<li><strong>What it does:</strong> Uses an LLM to <strong>reduce many text rows into a single output</strong> per group, guided by your instruction (e.g., tone, length, format).</li>
+<li><strong>Why use it:</strong> Ideal for <strong>summarizing bullets</strong>, <strong>merging action items</strong>, or creating <strong>executive digests</strong> after you&#39;ve expanded arrays with <code>FLATTEN</code>.</li>
+<li><strong>Guidance:</strong> Add constraints like <em>&#34;≤40 words, one sentence&#34;</em> or <em>&#34;preserve dates verbatim&#34;</em> for predictable results.</li>
+</ul>
+<p><strong><code>OBJECT_KEYS(variant)</code></strong></p>
+<ul>
+<li><strong>What it does:</strong> Returns an <strong>array of top‑level keys</strong> from a JSON object stored in a <code>VARIANT</code> (e.g., keys present in <code>SUMMARY_JSON</code>).</li>
+<li><strong>Why use it:</strong> Helpful for <strong>introspection/validation</strong> of model responses (e.g., detect special keys such as <code>guardrails</code> to handle refusals/redactions).</li>
+<li><strong>Example:</strong><pre><code language="language-sql" class="language-sql">SELECT OBJECT_KEYS(response_variant) AS top_keys FROM my_table;
+</code></pre>
+</li>
+</ul>
+<p><strong><code>ARRAY_CONTAINS(element, array)</code></strong></p>
+<ul>
+<li><strong>What it does:</strong> Returns <strong>TRUE</strong> if <code>element</code> exists in <code>array</code>. With <code>VARIANT</code>, ensure types match (e.g., cast <code>'guardrails'::VARIANT</code>).</li>
+<li><strong>Why use it:</strong> Enables concise <strong>membership tests</strong>—great for filtering rows based on keys discovered by <code>OBJECT_KEYS</code>.</li>
+<li><strong>Example:</strong><pre><code language="language-sql" class="language-sql">WHERE ARRAY_CONTAINS(&#39;guardrails&#39;::VARIANT, OBJECT_KEYS(SUMMARY_JSON)) = FALSE
+</code></pre>
+</li>
+</ul>
+<p><strong>Combined usage (guardrails filter):</strong></p>
+<pre><code language="language-sql" class="language-sql">WHERE ARRAY_CONTAINS(&#39;guardrails&#39;::VARIANT, OBJECT_KEYS(SUMMARY_JSON)) = FALSE
+</code></pre>
+<h2 is-upgraded>Step 1: Set Context</h2>
+<p>Sets the current database, schema, and warehouse for analysis.</p>
+<pre><code language="language-sql" class="language-sql">USE DATABASE CALL_CENTER_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+</code></pre>
+<h2 is-upgraded>Step 2: Preview aggregated results for a single call</h2>
+<p><strong>Highlights</strong></p>
+<ul>
+<li><code>AI_COMPLETE</code> with <strong><code>response_format</code></strong><strong> (JSON Schema)</strong> extracts fields + arrays.</li>
+<li><code>LATERAL FLATTEN</code> expands <code>summary_bullets</code> / <code>action_items</code> into rows.</li>
+<li><code>AI_AGG</code> combines rows into concise outputs for inspection.</li>
+</ul>
+<pre><code language="language-sql" class="language-sql">WITH CTE_RESULTS
+AS
+(
+    SELECT
+        CALL_ID,
+        AI_COMPLETE
+        (
+            model =&gt; &#39;claude-4-sonnet&#39;,
+            prompt =&gt; CONCAT(&#39;Extract structured data from this call center transcript. &lt;Transcript&gt;&#39;, TRANSCRIPT, &#39;&lt;/Transcript&gt;&#39;),
+            model_parameters =&gt; {&#39;temperature&#39;: 0.1, &#39;max_tokens&#39;: 4096, &#39;guardrails&#39;: FALSE},
+            response_format =&gt;
+            {
+                &#39;type&#39;: &#39;json&#39;,
+                &#39;schema&#39;:
+                {
+                    &#39;type&#39;: &#39;object&#39;,
+                    &#39;properties&#39;: {
+                        &#39;call_type&#39;: { &#39;type&#39;: &#39;string&#39;, &#39;enum&#39;: [&#39;inbound&#39;,&#39;outbound&#39;,&#39;transfer&#39;], &#39;description&#39;: &#39;Overall direction of the call.&#39; },
+                        &#39;primary_intent&#39;: { &#39;type&#39;: &#39;string&#39;, &#39;enum&#39;: [&#39;billing&#39;,&#39;technical_support&#39;,&#39;complaint&#39;,&#39;information&#39;,&#39;sales&#39;,&#39;cancellation&#39;,&#39;other&#39;], &#39;description&#39;: &#39;Main reason for contact.&#39; },
+                        &#39;urgency_level&#39;: { &#39;type&#39;: &#39;string&#39;, &#39;enum&#39;: [&#39;low&#39;,&#39;medium&#39;,&#39;high&#39;,&#39;critical&#39;], &#39;description&#39;: &#39;Urgency inferred from the conversation.&#39; },
+                        &#39;issue_resolved&#39;: {&#39;type&#39;: &#39;string&#39;, &#39;enum&#39;: [&#39;yes&#39;, &#39;no&#39;, &#39;partial&#39;]},
+                        &#39;summary_bullets&#39;: { &#39;type&#39;: &#39;array&#39;, &#39;items&#39;: { &#39;type&#39;: &#39;string&#39; }, &#39;description&#39;: &#39;Three concise bullets.&#39; },
+                        &#39;action_items&#39;: { &#39;type&#39;: &#39;array&#39;, &#39;items&#39;: { &#39;type&#39;: &#39;string&#39; }, &#39;description&#39;: &#39;Concrete next steps.&#39; }
+                    },
+                    &#39;required&#39;: [&#39;call_type&#39;,&#39;primary_intent&#39;,&#39;urgency_level&#39;,&#39;summary_bullets&#39;,&#39;action_items&#39;]
+                }
+            }
+        )::VARIANT AS SUMMARY_JSON
+    FROM
+        CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES
+    WHERE
+        CALL_ID = &#39;CALL_20250728_10050&#39;
+),
+
+CTE_ACTION_ITEMS
+AS
+(
+    SELECT
+        SRC.CALL_ID,
+        AI.value::string AS ACTION_ITEM
+    FROM
+        CTE_RESULTS SRC,
+    LATERAL FLATTEN(input =&gt; SRC.SUMMARY_JSON:action_items) AI
+),
+
+CTE_SUMMARY_ITEMS
+AS
+(
+    SELECT
+        SRC.CALL_ID,
+        SI.value::string AS SUMMARY_ITEM
+    FROM
+        CTE_RESULTS SRC,
+    LATERAL FLATTEN(input =&gt; SRC.SUMMARY_JSON:summary_bullets) SI
+),
+
+CTE_ROLLUPS
+AS
+(
+    SELECT
+        SRC.CALL_ID,
+        SRC.SUMMARY_JSON:call_type::string AS CALL_TYPE,
+        SRC.SUMMARY_JSON:primary_intent::string AS PRIMARY_INTENT,
+        SRC.SUMMARY_JSON:urgency_level::string AS URGENCY_LEVEL,
+        SRC.SUMMARY_JSON:issue_resolved::string AS ISSUE_RESOLVED,
+        AI_AGG(SI.SUMMARY_ITEM, &#39;Combine these bullets into one concise sentence (&lt;=40 words), keep key facts.&#39;) AS SUMMARY_ITEMS,
+        AI_AGG(AI.ACTION_ITEM, &#39;Combine these into one sentence of action items; retain dates/time windows precisely.&#39;) AS ACTION_ITEMS
+    FROM
+        CTE_RESULTS SRC
+    LEFT JOIN CTE_SUMMARY_ITEMS SI
+        ON SI.CALL_ID = SRC.CALL_ID
+    LEFT JOIN CTE_ACTION_ITEMS AI  
+        ON AI.CALL_ID = SRC.CALL_ID
+    GROUP BY 1,2,3,4,5
+)
+
+SELECT * FROM CTE_ROLLUPS;
+</code></pre>
+<p>💡 <strong>Tip:</strong> Validate on one <code>CALL_ID</code> first; then scale.</p>
+<h2 is-upgraded>Step 3: Persist aggregated results across the dataset</h2>
+<p><strong>Highlights</strong></p>
+<ul>
+<li>Process <strong>all calls</strong> and persist rollups.</li>
+<li>Includes a <strong>guardrails</strong> filter to exclude refused/redacted responses.</li>
+</ul>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE TABLE CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES_ANALYSIS
+AS
+
+    WITH CTE_RESULTS
+    AS
+    (
+        SELECT
+            CALL_ID,
+            AI_COMPLETE
+            (
+                model =&gt; &#39;claude-4-sonnet&#39;,
+                prompt =&gt; CONCAT(&#39;Extract structured data from this call center transcript. &lt;Transcript&gt;&#39;, TRANSCRIPT, &#39;&lt;/Transcript&gt;&#39;),
+                model_parameters =&gt; {&#39;temperature&#39;: 0.1, &#39;max_tokens&#39;: 4096, &#39;guardrails&#39;: FALSE},
+                response_format =&gt;
+                {
+                    &#39;type&#39;: &#39;json&#39;,
+                    &#39;schema&#39;:
+                    {
+                        &#39;type&#39;: &#39;object&#39;,
+                        &#39;properties&#39;: {
+                            &#39;call_type&#39;: { &#39;type&#39;: &#39;string&#39;, &#39;enum&#39;: [&#39;inbound&#39;,&#39;outbound&#39;,&#39;transfer&#39;], &#39;description&#39;: &#39;Overall direction of the call.&#39; },
+                            &#39;primary_intent&#39;: { &#39;type&#39;: &#39;string&#39;, &#39;enum&#39;: [&#39;billing&#39;,&#39;technical_support&#39;,&#39;complaint&#39;,&#39;information&#39;,&#39;sales&#39;,&#39;cancellation&#39;,&#39;other&#39;], &#39;description&#39;: &#39;Main reason for contact.&#39; },
+                            &#39;urgency_level&#39;: { &#39;type&#39;: &#39;string&#39;, &#39;enum&#39;: [&#39;low&#39;,&#39;medium&#39;,&#39;high&#39;,&#39;critical&#39;], &#39;description&#39;: &#39;Urgency inferred from the conversation.&#39; },
+                            &#39;issue_resolved&#39;: {&#39;type&#39;: &#39;string&#39;, &#39;enum&#39;: [&#39;yes&#39;, &#39;no&#39;, &#39;partial&#39;]},
+                            &#39;summary_bullets&#39;: { &#39;type&#39;: &#39;array&#39;, &#39;items&#39;: { &#39;type&#39;: &#39;string&#39; }, &#39;description&#39;: &#39;Three concise bullets.&#39; },
+                            &#39;action_items&#39;: { &#39;type&#39;: &#39;array&#39;, &#39;items&#39;: { &#39;type&#39;: &#39;string&#39; }, &#39;description&#39;: &#39;Concrete next steps.&#39; }
+                        },
+                        &#39;required&#39;: [&#39;call_type&#39;,&#39;primary_intent&#39;,&#39;urgency_level&#39;,&#39;summary_bullets&#39;,&#39;action_items&#39;]
+                    }
+                }
+            )::VARIANT AS SUMMARY_JSON
+        FROM
+            CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES
+        WHERE
+            ARRAY_CONTAINS(&#39;guardrails&#39;::VARIANT,OBJECT_KEYS(SUMMARY_JSON)) = FALSE
+    ),
+    
+    CTE_ACTION_ITEMS
+    AS
+    (
+        SELECT
+            SRC.CALL_ID,
+            AI.value::string AS ACTION_ITEM
+        FROM
+            CTE_RESULTS SRC,
+        LATERAL FLATTEN(input =&gt; SRC.SUMMARY_JSON:action_items) AI
+    ),
+    
+    CTE_SUMMARY_ITEMS
+    AS
+    (
+        SELECT
+            SRC.CALL_ID,
+            SI.value::string AS SUMMARY_ITEM
+        FROM
+            CTE_RESULTS SRC,
+        LATERAL FLATTEN(input =&gt; SRC.SUMMARY_JSON:summary_bullets) SI
+    ),
+    
+    CTE_ROLLUPS
+    AS
+    (
+        SELECT
+            SRC.CALL_ID,
+            SRC.SUMMARY_JSON:call_type::string AS CALL_TYPE,
+            SRC.SUMMARY_JSON:primary_intent::string AS PRIMARY_INTENT,
+            SRC.SUMMARY_JSON:urgency_level::string AS URGENCY_LEVEL,
+            SRC.SUMMARY_JSON:issue_resolved::string AS ISSUE_RESOLVED,
+            AI_AGG(SI.SUMMARY_ITEM, &#39;Combine these items into single bullet list&#39;) AS SUMMARY_ITEMS,
+            AI_AGG(AI.ACTION_ITEM, &#39;Combine these items into single bullet list&#39;) AS ACTION_ITEMS
+        FROM
+            CTE_RESULTS SRC
+        LEFT JOIN CTE_SUMMARY_ITEMS SI
+            ON SI.CALL_ID = SRC.CALL_ID
+        LEFT JOIN CTE_ACTION_ITEMS AI  
+            ON AI.CALL_ID = SRC.CALL_ID
+        GROUP BY 1,2,3,4,5
+    )
+    
+    SELECT
+        CALL_ID,
+        CALL_TYPE,
+        PRIMARY_INTENT,
+        URGENCY_LEVEL,
+        ISSUE_RESOLVED,
+        SUMMARY_ITEMS,
+        ACTION_ITEMS
+    FROM
+        CTE_ROLLUPS;
+</code></pre>
+<p>💡 <strong>Tip (guardrails filter): </strong><code>OBJECT_KEYS(SUMMARY_JSON)</code> lists top‑level JSON keys; <code>ARRAY_CONTAINS('guardrails'::VARIANT, ...)</code> tests for a guardrails key. Rows with model refusals/redactions are <strong>excluded</strong>.</p>
+<h2 is-upgraded>Step 4: Preview persisted analysis</h2>
+<p>Display a sample of saved rollups for verification.</p>
+<pre><code language="language-sql" class="language-sql">SELECT * FROM CALL_CENTER_DB.STAGE.TRANSCRIBE_AUDIO_FILES_ANALYSIS LIMIT 10;
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="SEMANTIC VIEW (1)" duration="4">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Create a <strong>single analysis view</strong> that stitches together all outputs from prior steps (<code>AI_TRANSCRIBE</code>, <code>EXTRACT_ANSWER</code>, <code>AI_CLASSIFY</code>, <code>SENTIMENT</code>/<code>AI_SENTIMENT</code>, <code>SUMMARIZE</code>, <code>AI_COMPLETE</code> + <code>AI_AGG</code>). This unified view powers the Cortex Analyst Semantic View in the next page.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-snowflake-intelligence-callcenter-lab/scripts/11-AI-LAB-ANALYST-SEMANTIC-VIEW-01.sql" target="_blank">here</a>.</p>
+<h2 is-upgraded>Description</h2>
+<p>We&#39;ll:</p>
+<ul>
+<li><strong>Create </strong><code>CALL_CENTER_DB.ANALYTICS.CALL_CENTER_ANALYSIS</code> by <strong>LEFT JOIN</strong>‑ing the outputs from earlier steps on <code>CALL_ID</code>.</li>
+</ul>
+<h2 is-upgraded>Step 1: Set Context</h2>
+<p>Sets the current database, schema, and warehouse for analysis.</p>
+<pre><code language="language-sql" class="language-sql">USE DATABASE CALL_CENTER_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+</code></pre>
+<h2 is-upgraded>Step 2: Create a view over the aggregated AI outputs</h2>
+<p>Combine results from our previous analysis steps into a unified view.</p>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE VIEW CALL_CENTER_DB.ANALYTICS.CALL_CENTER_ANALYSIS
+AS
+    SELECT
+        TO_DATE(REGEXP_SUBSTR(&#39;CALL_20250728_10050&#39;, &#39;\\d{8}&#39;), &#39;YYYYMMDD&#39;) AS CALL_DATE,
+        TRANSCRIBE_AUDIO_FILES.CALL_ID,
+        TRANSCRIBE_AUDIO_FILES.AUDIO_FILE_URL,
+        TRANSCRIBE_AUDIO_FILES.DURATION,      
+        TRANSCRIBE_AUDIO_FILES_AGENT.CALL_CENTER_AGENT,
+        TRANSCRIBE_AUDIO_FILES_CLASSIFY.CALL_TYPE,
+        TRANSCRIBE_AUDIO_FILES_ENTITY_SENTIMENT.BRAND_SENTIMENT,
+        TRANSCRIBE_AUDIO_FILES_ENTITY_SENTIMENT.COST_SENTIMENT,
+        TRANSCRIBE_AUDIO_FILES_ENTITY_SENTIMENT.PRODUCT_SENTIMENT,
+        TRANSCRIBE_AUDIO_FILES_OVERALL_SENTIMENT.OVERALL_SENTIMENT,
+        TRANSCRIBE_AUDIO_FILES_ANALYSIS.PRIMARY_INTENT,
+        TRANSCRIBE_AUDIO_FILES_ANALYSIS.URGENCY_LEVEL,
+        TRANSCRIBE_AUDIO_FILES_ANALYSIS.ISSUE_RESOLVED,
+        TRANSCRIBE_AUDIO_FILES_ANALYSIS.SUMMARY_ITEMS,
+        TRANSCRIBE_AUDIO_FILES_ANALYSIS.ACTION_ITEMS,
+        TRANSCRIBE_AUDIO_FILES_SUMMARY.TRANSCRIPT_SUMMARY,
+        TRANSCRIBE_AUDIO_FILES.TRANSCRIPT
+    FROM
+        STAGE.TRANSCRIBE_AUDIO_FILES
+    LEFT JOIN STAGE.TRANSCRIBE_AUDIO_FILES_AGENT
+        ON TRANSCRIBE_AUDIO_FILES_AGENT.CALL_ID = TRANSCRIBE_AUDIO_FILES.CALL_ID
+    LEFT JOIN STAGE.TRANSCRIBE_AUDIO_FILES_CLASSIFY
+        ON TRANSCRIBE_AUDIO_FILES_CLASSIFY.CALL_ID = TRANSCRIBE_AUDIO_FILES.CALL_ID
+    LEFT JOIN STAGE.TRANSCRIBE_AUDIO_FILES_ENTITY_SENTIMENT
+        ON TRANSCRIBE_AUDIO_FILES_ENTITY_SENTIMENT.CALL_ID = TRANSCRIBE_AUDIO_FILES.CALL_ID
+    LEFT JOIN STAGE.TRANSCRIBE_AUDIO_FILES_OVERALL_SENTIMENT
+        ON TRANSCRIBE_AUDIO_FILES_OVERALL_SENTIMENT.CALL_ID = TRANSCRIBE_AUDIO_FILES.CALL_ID
+    LEFT JOIN STAGE.TRANSCRIBE_AUDIO_FILES_ANALYSIS
+        ON TRANSCRIBE_AUDIO_FILES_ANALYSIS.CALL_ID = TRANSCRIBE_AUDIO_FILES.CALL_ID
+    LEFT JOIN STAGE.TRANSCRIBE_AUDIO_FILES_SUMMARY
+        ON TRANSCRIBE_AUDIO_FILES_SUMMARY.CALL_ID = TRANSCRIBE_AUDIO_FILES.CALL_ID;
+</code></pre>
+<p>💡 <strong>Tip:</strong> If your <code>CALL_ID</code> embeds a date (e.g., <code>CALL_YYYYMMDD_...</code>), you can derive <code>CALL_DATE</code> using the <strong>column</strong> instead of a literal, e.g.: <code>TO_DATE(REGEXP_SUBSTR(TRANSCRIBE_AUDIO_FILES.CALL_ID, '\\d{8}'), 'YYYYMMDD')</code>. Keep the regex escaped as shown when used inside a string.</p>
+<h2 is-upgraded>Step 3: Preview the view</h2>
+<p>Quick sanity check to confirm the joins and row counts look right.</p>
+<pre><code language="language-sql" class="language-sql">SELECT * FROM CALL_CENTER_DB.ANALYTICS.CALL_CENTER_ANALYSIS LIMIT 10;
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="SEMANTIC VIEW (2)" duration="7">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Create a <strong>Cortex Analyst Semantic View</strong> over your curated call‑center dataset, then enrich it with keys, enums, filters, metrics, and verified queries so analysts (and agents) can ask guided questions in natural language.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-snowflake-intelligence-callcenter-lab/scripts/11-AI-LAB-ANALYST-SEMANTIC-VIEW-01.sql" target="_blank">here</a>.</p>
+<p>If you want to jump ahead the complete semantic view code is <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-snowflake-intelligence-callcenter-lab/scripts/12-AI-LAB-ANALYST-SEMANTIC-VIEW-02.sql" target="_blank">here</a>.</p>
+<p>This step is completed using the Snowflake UI. You will create a Semantic View called <code>CALL_CENTER_MODEL</code> in <code>CALL_CENTER_DB.ANALYTICS</code>, linking it to your analysis view. The process includes marking keys and enums, adding named filters, defining metrics, and registering verified queries to enable guided analytics and natural language Q&amp;A.</p>
+<h2 is-upgraded>Create the Semantic View (UI)</h2>
+<h3 is-upgraded>Step 1: Open Cortex Analyst</h3>
+<ol type="1">
+<li>In the main navigation, select <strong>AI &amp; ML</strong>.</li>
+<li>Click <strong>Cortex Analyst</strong>.</li>
+</ol>
+<h3 is-upgraded>Step 2: Start a new Semantic View</h3>
+<ol type="1">
+<li>In the top‑left, choose <strong>Semantic Views</strong>.</li>
+<li>In the top‑right, click <strong>Create new</strong> → <strong>Create new Semantic View</strong>.</li>
+</ol>
+<h3 is-upgraded>Step 3: Wizard - Getting started</h3>
+<p>Fill these fields:</p>
+<ul>
+<li><strong>Location to store: </strong><code>CALL_CENTER_DB.ANALYTICS</code></li>
+<li><strong>Name: </strong><code>CALL_CENTER_MODEL</code></li>
+<li><strong>Description: </strong><code>Call Center Analytics Semantic Model</code></li>
+</ul>
+<h3 is-upgraded>Step 4: Wizard — Select tables</h3>
+<ul>
+<li>Navigate to the view <strong><code>CALL_CENTER_DB</code></strong><strong> → </strong><strong><code>ANALYTICS</code></strong><strong> → </strong><strong><code>CALL_CENTER_ANALYSIS</code></strong>.</li>
+<li>Select this object as the <strong>source</strong>.</li>
+</ul>
+<h3 is-upgraded>Step 5: Wizard - Select columns</h3>
+<ul>
+<li><strong>Select all columns</strong> from <code>CALL_CENTER_ANALYSIS</code>.</li>
+<li>Click <strong>Create &amp; Save</strong>.</li>
+</ul>
+<h3 is-upgraded>Step 6: Wizard - Connect Cortex Search</h3>
+<ul>
+<li><strong>Leave this blank</strong> don;y select anay columns.</li>
+<li>Click <strong>Create &amp; Save</strong>.</li>
+</ul>
+<h2 is-upgraded>Enrich the Model</h2>
+<h3 is-upgraded>Step 1: Logical Table &amp; Primary Key</h3>
+<ul>
+<li>In the Semantic View, under <strong>Logical Table</strong>, click <strong>+</strong>.</li>
+<li>Click <strong>+ Primary Key</strong> → choose <strong><code>CALL_ID</code></strong> → <strong>Save</strong>.</li>
+</ul>
+<h3 is-upgraded>Step 2: Dimensions</h3>
+<p>Open <strong>Dimensions</strong> and for each of the following field select Edit, and then use the following settings.</p>
+<p><strong>Unique column</strong></p>
+<ul>
+<li><code>CALL_ID</code> → enable <strong>Contains unique values</strong>.</li>
+</ul>
+<p><strong>Set the following as enums</strong> (Is Enum = TRUE):</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Dimension</p>
+</td><td colspan="1" rowspan="1"><p>Set &#34;Is Enum&#34;</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>CALL_TYPE</code></p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>BRAND_SENTIMENT</code></p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>COST_SENTIMENT</code></p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>PRIMARY_INTENT</code></p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>URGENCY_LEVEL</code></p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+</table>
+<p>💡 <strong>Tip:</strong> Enums constrain possible values and improve classification, filters, and autosuggest.</p>
+<h3 is-upgraded>Step 3: Named Filters</h3>
+<p>Use the table below to add multiple <strong>Named Filters</strong>. In the Semantic View editor, open <strong>Named Filters</strong> → <strong>Add filter</strong> and populate the fields exactly.</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Filter name</p>
+</td><td colspan="1" rowspan="1"><p>Expression</p>
+</td><td colspan="1" rowspan="1"><p>Description</p>
+</td><td colspan="1" rowspan="1"><p>Synonyms</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>RESOLVED_CALLS</p>
+</td><td colspan="1" rowspan="1"><p>ISSUE_RESOLVED = ‘yes&#39;</p>
+</td><td colspan="1" rowspan="1"><p>Filter for calls where issues were resolved</p>
+</td><td colspan="1" rowspan="1"><p>successful calls, resolved issues</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>UNRESOLVED_CALLS</p>
+</td><td colspan="1" rowspan="1"><p>ISSUE_RESOLVED &lt;&gt; ‘yes&#39;</p>
+</td><td colspan="1" rowspan="1"><p>Calls still open or partially resolved</p>
+</td><td colspan="1" rowspan="1"><p>open issues, unresolved, pending</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>HIGH_URGENCY</p>
+</td><td colspan="1" rowspan="1"><p>URGENCY_LEVEL = ‘high&#39;</p>
+</td><td colspan="1" rowspan="1"><p>Calls marked as high urgency</p>
+</td><td colspan="1" rowspan="1"><p>critical, urgent</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>POSITIVE_PRODUCT_SENTIMENT</p>
+</td><td colspan="1" rowspan="1"><p>PRODUCT_SENTIMENT = ‘positive&#39;</p>
+</td><td colspan="1" rowspan="1"><p>Calls with positive product feedback</p>
+</td><td colspan="1" rowspan="1"><p>happy product, positive product</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>NEGATIVE_BRAND_SENTIMENT</p>
+</td><td colspan="1" rowspan="1"><p>brand_sentiment = ‘negative&#39;</p>
+</td><td colspan="1" rowspan="1"><p>Calls with negative brand sentiment</p>
+</td><td colspan="1" rowspan="1"><p>brand complaints, unhappy brand</p>
+</td></tr>
+</table>
+<h3 is-upgraded>Step 4: Metrics</h3>
+<p>Add these metrics to the model. Use the <strong>Expression</strong>, <strong>Name</strong>, <strong>Description</strong>, and <strong>Synonyms</strong> as listed.</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Expression</p>
+</td><td colspan="1" rowspan="1"><p>Metric name</p>
+</td><td colspan="1" rowspan="1"><p>Description</p>
+</td><td colspan="1" rowspan="1"><p>Synonyms</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>AVG(OVERALL_SENTIMENT)</p>
+</td><td colspan="1" rowspan="1"><p>AVG_SENTIMENT_SCORE</p>
+</td><td colspan="1" rowspan="1"><p>Average sentiment score across calls</p>
+</td><td colspan="1" rowspan="1"><p>average sentiment; mean sentiment; sentiment average</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>COUNT(*)</p>
+</td><td colspan="1" rowspan="1"><p>CALL_COUNT</p>
+</td><td colspan="1" rowspan="1"><p>Number of calls</p>
+</td><td colspan="1" rowspan="1"><p>Call Count; Calls</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>SUM(CASE WHEN PRODUCT_SENTIMENT = ‘positive&#39; THEN 1 ELSE 0 END) / COUNT(*) * 100</p>
+</td><td colspan="1" rowspan="1"><p>POSITIVE_PRODUCT_SENTIMENT_RATE</p>
+</td><td colspan="1" rowspan="1"><p>Percentage of calls with positive product sentiment</p>
+</td><td colspan="1" rowspan="1"><p>positive product sentiment percentage; positive product sentiment</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>SUM(CASE WHEN ISSUE_RESOLVED = ‘yes&#39; THEN 1 ELSE 0 END) / COUNT(*) * 100</p>
+</td><td colspan="1" rowspan="1"><p>RESOLUTION_RATE</p>
+</td><td colspan="1" rowspan="1"><p>Percentage of calls with issues resolved successfully</p>
+</td><td colspan="1" rowspan="1"><p>resolution percentage; success rate; issue resolution rate</p>
+</td></tr>
+</table>
+<h3 is-upgraded>Step 5: Verified Queries</h3>
+<p>Add each <strong>Question</strong> and its <strong>SQL</strong> under Verified Queries (click <strong>Run</strong> to validate). Use the table for copy‑paste.</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Question</p>
+</td><td colspan="1" rowspan="1"><p>SQL</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>What is the average sentiment score by agent?</p>
+</td><td colspan="1" rowspan="1"><p>SELECT CALL_CENTER_AGENT, AVG(OVERALL_SENTIMENT) AS AVG_OVERALL_SENTIMENT FROM CALL_CENTER_DB.ANALYTICS.CALL_CENTER_ANALYSIS GROUP BY CALL_CENTER_AGENT ORDER BY CALL_CENTER_AGENT DESC;</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>What is the resolution rate by call intent?</p>
+</td><td colspan="1" rowspan="1"><p>SELECT PRIMARY_INTENT, SUM(CASE WHEN ISSUE_RESOLVED = ‘yes&#39; THEN 1 ELSE 0 END) / COUNT(*) * 100 AS RESOLUTION_RATE FROM CALL_CENTER_ANALYSIS GROUP BY PRIMARY_INTENT ORDER BY RESOLUTION_RATE DESC;</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Which call types are most frequent and how do they score on average sentiment?</p>
+</td><td colspan="1" rowspan="1"><p>SELECT CALL_TYPE, COUNT(*) AS CALL_COUNT, AVG(OVERALL_SENTIMENT) AS AVG_OVERALL_SENTIMENT FROM CALL_CENTER_ANALYSIS GROUP BY CALL_TYPE ORDER BY CALL_COUNT DESC;</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Which agents have the highest issue‑resolution rate?</p>
+</td><td colspan="1" rowspan="1"><p>SELECT CALL_CENTER_AGENT, SUM(CASE WHEN ISSUE_RESOLVED = ‘yes&#39; THEN 1 ELSE 0 END) / COUNT(*) * 100 AS RESOLUTION_RATE FROM CALL_CENTER_ANALYSIS GROUP BY CALL_CENTER_AGENT ORDER BY RESOLUTION_RATE DESC LIMIT 10;</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Which primary intents are most likely to be high urgency?</p>
+</td><td colspan="1" rowspan="1"><p>SELECT PRIMARY_INTENT, SUM(CASE WHEN URGENCY_LEVEL = ‘high&#39; THEN 1 ELSE 0 END) / COUNT(*) * 100 AS HIGH_URGENCY_RATE FROM CALL_CENTER_ANALYSIS GROUP BY PRIMARY_INTENT ORDER BY HIGH_URGENCY_RATE DESC;</p>
+</td></tr>
+</table>
+<p>💡 <strong>Tip:</strong> Mark verified queries as <strong>onboarding</strong> examples to guide first‑time users.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="CORTEX SEARCH SERVICE" duration="7">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>In this step, you will create a Cortex Search Service on your call center analysis view, enabling fast, contextual search across transcripts and key attributes. You&#39;ll validate the service using <code>SEARCH_PREVIEW</code>, parse results into rows, and support both free-text and filtered queries for advanced analytics.</p>
+<h2 is-upgraded>Download Script</h2>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-snowflake-intelligence-callcenter-lab/scripts/12-AI-LAB-SEARCH-SEARCH-SERVICE.sql" target="_blank">here</a>.</p>
+<h2 is-upgraded>Description</h2>
+<p>In this step, you will set up a Cortex Search Service to enable fast, contextual search across your call center transcripts and key attributes. The service will index the <code>TRANSCRIPT</code> field as the main searchable text and expose important attributes such as <code>CALL_ID</code>, <code>PRIMARY_INTENT</code>, <code>URGENCY_LEVEL</code>, and <code>CALL_CENTER_AGENT</code> for filtering and retrieval. You will validate the search service using the <code>SEARCH_PREVIEW</code> function, which allows you to run queries against the indexed data, request specific columns in the results, and apply JSON-based filters to narrow down search results based on attribute values.</p>
+<p>💡 <strong>Tips</strong></p>
+<ul>
+<li>Only columns selected inside the service&#39;s <code>AS (SELECT ...)</code> clause can be returned by <code>SEARCH_PREVIEW(columns=[...])</code> or used in filters.</li>
+<li>Use <code>TARGET_LAG</code> to control index refresh cadence (e.g., <code>'1 Day'</code>).</li>
+</ul>
+<h2 is-upgraded>Step 1: Set Context</h2>
+<p>Sets the current database, schema, and warehouse for analysis.</p>
+<pre><code language="language-sql" class="language-sql">USE DATABASE CALL_CENTER_DB;
+USE SCHEMA ANALYTICS;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+</code></pre>
+<h2 is-upgraded>Step 2: Create a search service</h2>
+<p>Include additional fields that can be used for filtering.</p>
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE CORTEX SEARCH SERVICE CALL_CENTER_DB.ANALYTICS.CALL_CENTER_SEARCH_SERVICE
+ON TRANSCRIPT
+ATTRIBUTES CALL_ID,PRIMARY_INTENT,URGENCY_LEVEL,CALL_CENTER_AGENT
+WAREHOUSE = USER_STD_XSMALL_WH
+TARGET_LAG = &#39;1 Day&#39;
+AS
+(
+    SELECT
+        ----------------------------------------------------
+        -- Transcript (primary searchable text)
+        ----------------------------------------------------
+        TRANSCRIPT,
+
+        ----------------------------------------------------
+        -- Indexed Fields
+        ----------------------------------------------------
+        AUDIO_FILE_URL,
+
+        ----------------------------------------------------
+        -- Filters (available as filterable fields in queries)
+        ----------------------------------------------------
+        CALL_ID,
+        CALL_CENTER_AGENT,
+        PRIMARY_INTENT,
+        URGENCY_LEVEL,
+        ISSUE_RESOLVED
+    FROM
+        CALL_CENTER_DB.ANALYTICS.CALL_CENTER_ANALYSIS
+    WHERE
+        TRANSCRIPT IS NOT NULL
+    AND LENGTH(TRANSCRIPT) &gt; 50
+);
+</code></pre>
+<p>💡 <strong>Tip:</strong> Keep the <code>AS (SELECT ...)</code> list lean—only include fields you plan to return or filter on to keep the index light.</p>
+<h2 is-upgraded>Step 3: SEARCH_PREVIEW (basic)</h2>
+<ul>
+<li><code>SEARCH_PREVIEW</code> runs the search service and does not persist results.</li>
+<li>The <code>query</code> parameter searches the <code>TRANSCRIPT</code> text.</li>
+<li>The <code>limit</code> parameter controls the maximum number of returned rows.</li>
+</ul>
+<pre><code language="language-sql" class="language-sql">SELECT
+    SNOWFLAKE.CORTEX.SEARCH_PREVIEW
+    (
+        &#39;CALL_CENTER_DB.ANALYTICS.CALL_CENTER_SEARCH_SERVICE&#39;,
+        &#39;{
+            &#34;query&#34;: &#34;billing complaint&#34;,
+            &#34;limit&#34;: 5
+        }&#39;
+    ) AS SEARCH_RESULTS;
+</code></pre>
+<h2 is-upgraded>Step 4: SEARCH_PREVIEW (with columns)</h2>
+<ul>
+<li>You can request additional indexed or selected fields to be returned alongside each search hit.</li>
+<li>Use the <code>columns</code> parameter in your search query to specify which fields to include in the results.</li>
+</ul>
+<pre><code language="language-sql" class="language-sql">SELECT
+    SNOWFLAKE.CORTEX.SEARCH_PREVIEW
+    (
+        &#39;CALL_CENTER_DB.ANALYTICS.CALL_CENTER_SEARCH_SERVICE&#39;,
+        &#39;{
+            &#34;query&#34;: &#34;billing complaint&#34;,
+            &#34;columns&#34;: [&#34;CALL_ID&#34;, &#34;CALL_CENTER_AGENT&#34;,&#34;AUDIO_FILE_URL&#34;],
+            &#34;limit&#34;: 5
+        }&#39;
+    ) AS SEARCH_RESULTS;
+</code></pre>
+<p>💡 <strong>Tip:</strong> Column names here must appear in the service&#39;s <code>AS (SELECT ...)</code> clause.</p>
+<h2 is-upgraded>Step 5: SEARCH_PREVIEW (parse JSON to rows)</h2>
+<ul>
+<li>Use <code>PARSE_JSON</code> to convert the JSON response from <code>SEARCH_PREVIEW</code> into a Snowflake VARIANT object.</li>
+<li>Apply <code>LATERAL FLATTEN</code> to the <code>"results"</code> array in the parsed JSON to expand each search result into its own row.</li>
+<li>Select and cast desired fields (e.g., <code>"CALL_ID"</code>, <code>"CALL_CENTER_AGENT"</code>, <code>"URGENCY_LEVEL"</code>) from each flattened result for analysis or display.</li>
+<li>Example pattern:<pre><code language="language-sql" class="language-sql">WITH CTE_SEARCH_PREVIEW AS (
+        SELECT
+                PARSE_JSON(
+                        SNOWFLAKE.CORTEX.SEARCH_PREVIEW(
+                                &#39;CALL_CENTER_DB.ANALYTICS.CALL_CENTER_SEARCH_SERVICE&#39;,
+                                &#39;{ &#34;query&#34;: &#34;billing complaint&#34;, &#34;columns&#34;: [&#34;CALL_ID&#34;, &#34;CALL_CENTER_AGENT&#34;,&#34;URGENCY_LEVEL&#34;], &#34;limit&#34;: 5 }&#39;
+                        )
+                ) AS SEARCH_RESULTS
+)
+SELECT
+        SEARCH_RESULTS:&#34;request_id&#34;::string AS REQUEST_ID,
+        REC.value:&#34;CALL_ID&#34;::string AS CALL_ID,
+        REC.value:&#34;CALL_CENTER_AGENT&#34;::string AS CALL_CENTER_AGENT,
+        REC.value:&#34;URGENCY_LEVEL&#34;::string AS URGENCY_LEVEL
+FROM
+        CTE_SEARCH_PREVIEW,
+        LATERAL FLATTEN(input =&gt; SEARCH_RESULTS:&#34;results&#34;) REC;
+</code></pre>
+</li>
+</ul>
+<h2 is-upgraded>Step 6: SEARCH_PREVIEW (with filter)</h2>
+<ul>
+<li>Add a JSON <code>filter</code> block to constrain results, such as: <ul>
+<li>Use <code>@eq</code> to filter by a specific value (e.g., <code>URGENCY_LEVEL</code>).</li>
+<li>This limits returned results to only those matching the filter condition.</li>
+</ul>
+</li>
+</ul>
+<pre><code language="language-sql" class="language-sql">WITH CTE_SEARCH_PREVIEW AS
+(
+    SELECT
+        PARSE_JSON
+        (
+            SNOWFLAKE.CORTEX.SEARCH_PREVIEW
+            (
+                &#39;CALL_CENTER_DB.ANALYTICS.CALL_CENTER_SEARCH_SERVICE&#39;,
+                &#39;{
+                    &#34;query&#34;: &#34;billing complaint&#34;,
+                    &#34;filter&#34;: { &#34;@eq&#34;: { &#34;URGENCY_LEVEL&#34;: &#34;high&#34; } },
+                    &#34;columns&#34;: [&#34;CALL_ID&#34;, &#34;CALL_CENTER_AGENT&#34;,&#34;URGENCY_LEVEL&#34;],
+                    &#34;limit&#34;: 5
+                }&#39;
+            )
+        ) AS SEARCH_RESULTS
+)
+
+SELECT
+    SEARCH_RESULTS:&#34;request_id&#34;::string AS REQUEST_ID,
+    REC.value:&#34;CALL_ID&#34;::string AS CALL_ID,
+    REC.value:&#34;CALL_CENTER_AGENT&#34;::string AS CALL_CENTER_AGENT,
+    REC.value:&#34;URGENCY_LEVEL&#34;::string AS URGENCY_LEVEL
+FROM
+    CTE_SEARCH_PREVIEW,
+    LATERAL FLATTEN(input =&gt; SEARCH_RESULTS:&#34;results&#34;) REC;
+</code></pre>
+<h2 is-upgraded>Notes &amp; Troubleshooting</h2>
+<ul>
+<li><strong>Attributes vs. filters:</strong> Attributes listed in the service and selected in <code>AS (SELECT ...)</code> are available both as returned columns and <strong>filter fields</strong>.</li>
+<li><strong>Index freshness:</strong> Adjust <code>TARGET_LAG</code> to control how often the service scans for changes.</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="CORTEX AGENTS" duration="8">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>In this step, you&#39;ll configure a Cortex Agent that can intelligently route queries between structured metrics (using Cortex Analyst and your semantic view) and unstructured transcript search (using Cortex Search Service). You&#39;ll provide clear instructions to guide the agent&#39;s tool selection, link both the semantic view and search service, manage orchestration and access, and validate the agent with test prompts covering both types of data.</p>
+<h2 is-upgraded>Description</h2>
+<p>In this step, you&#39;ll create a call‑center agent in Snowsight that can:</p>
+<p>This agent can answer questions about call center metrics by querying structured data through Cortex Analyst and your semantic view. It also retrieves relevant passages from call transcripts using Cortex Search, and combines both sources to provide concise, cited responses for multi-part queries.</p>
+<p>💡 <strong>Tip:</strong> Ensure the objects from previous steps exist and are populated:</p>
+<ul>
+<li>Semantic View: <code>CALL_CENTER_DB.ANALYTICS.CALL_CENTER_MODEL</code></li>
+<li>Search Service: <code>CALL_CENTER_DB.ANALYTICS.CALL_CENTER_SEARCH_SERVICE</code></li>
+</ul>
+<h2 is-upgraded>Step 1: Open Agents in Snowsight</h2>
+<ul>
+<li>In Snowsight, go to <strong>AI &amp; ML → Agents</strong>.</li>
+<li>Click <strong>Create Agent</strong>.</li>
+</ul>
+<h2 is-upgraded>Step 2: About — Name &amp; Location</h2>
+<p>Fill the agent&#39;s basic details:</p>
+<ul>
+<li><strong>Location (database.schema): </strong><code>SNOWFLAKE_INTELLIGENCE.AGENTS</code></li>
+<li><strong>Name: </strong><code>CALL_CENTER_AGENT</code></li>
+<li><strong>Display Name: </strong><code>Call Center Agent</code></li>
+<li><strong>Description :</strong> This agent analyzes call‑center conversations and metrics. It uses Cortex Search over call transcripts and Cortex Analyst over a governed semantic view to answer questions with concise, cited responses.</li>
+</ul>
+<p>💡 <strong>Tip:</strong> Keep the description focused on scope and data sources. It improves planning and tool‑selection quality.</p>
+<h2 is-upgraded>Step 3: Instructions</h2>
+<p>Paste the following <strong>instructions</strong>:</p>
+<pre><code>You are a call‑center analytics assistant. When a question involves:
+- Structured KPIs/metrics (rates, counts, averages), use Cortex Analyst with the semantic view `CALL_CENTER_DB.ANALYTICS.CALL_CENTER_MODEL`. Return concise numeric answers with clear groupings and time context.
+- Unstructured transcripts (who said what, reasons, quotes, summaries), use Cortex Search service `CALL_CENTER_DB.ANALYTICS.CALL_CENTER_SEARCH_SERVICE` and cite the matching call IDs.
+- Both: combine results. Clearly label which parts come from Analyst vs Search. Prefer bullet points, 3–5 max. Avoid speculation.
+Formatting:
+- Keep responses ≤ 4 sentences where possible.
+- Include inline call IDs for references (e.g., CALL_20250728_10050).
+- Use tables for grouped numeric results.
+</code></pre>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Sample Questions</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Which primary_intent has the highest resolution rate? Show % and call count?</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Find calls with high urgency discussing billing and summarize key issues?</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>By agent, what&#39;s the average overall sentiment and positive product sentiment rate?</p>
+</td></tr>
+</table>
+<h2 is-upgraded>Step 4: Tools — Add Cortex Analyst</h2>
+<p>Add your governed model for structured queries:</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Field</p>
+</td><td colspan="1" rowspan="1"><p>Value</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Name</strong></p>
+</td><td colspan="1" rowspan="1"><p><code>CALL_CENTER_ANALYST</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Tool Type</strong></p>
+</td><td colspan="1" rowspan="1"><p>Cortex Analyst</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Source</strong></p>
+</td><td colspan="1" rowspan="1"><p><strong>Semantic View</strong></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Schema</strong></p>
+</td><td colspan="1" rowspan="1"><p><code>CALL_CENTER_DB.ANALYTICS</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Semantic View</strong></p>
+</td><td colspan="1" rowspan="1"><p><code>CALL_CENTER_DB.ANALYTICS.CALL_CENTER_ANALYST</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Warehouse</strong></p>
+</td><td colspan="1" rowspan="1"><p><code>USER_STD_XSMALL_WH</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Query timeout (sec)</strong></p>
+</td><td colspan="1" rowspan="1"><p><code>60</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Description</strong></p>
+</td><td colspan="1" rowspan="1"><p><em>Comprehensive call‑center analytics (transcripts, sentiment, resolution, action items).</em></p>
+</td></tr>
+</table>
+<h2 is-upgraded>Step 5: Tools — Add Cortex Search Service</h2>
+<p>Wire the agent to your transcript search index:</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Field</p>
+</td><td colspan="1" rowspan="1"><p>Value</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Name</strong></p>
+</td><td colspan="1" rowspan="1"><p><code>CORTEX_SEARCH_SERVICE</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Tool Type</strong></p>
+</td><td colspan="1" rowspan="1"><p>Cortex Search Service</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Database</strong></p>
+</td><td colspan="1" rowspan="1"><p><code>CALL_CENTER_DB</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Service</strong></p>
+</td><td colspan="1" rowspan="1"><p><code>CALL_CENTER_DB.ANALYTICS.CALL_CENTER_SEARCH_SERVICE</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>ID Column</strong></p>
+</td><td colspan="1" rowspan="1"><p><code>AUDIO_FILE_URL</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Title Column</strong></p>
+</td><td colspan="1" rowspan="1"><p><code>CALL_ID</code></p>
+</td></tr>
+<tr><td colspan="2" rowspan="1"><p><strong>Description</strong></p>
+</td><td colspan="1" rowspan="1"></td></tr>
+</table>
+<p>💡 <strong>Tip:</strong> Only columns included in the service&#39;s <code>AS (SELECT ...)</code> clause are available for return and filtering.</p>
+<h2 is-upgraded>Step 6: Orchestration</h2>
+<ul>
+<li>In <strong>Orchestration</strong>, leave mode as <strong>Auto</strong>.</li>
+<li><strong>Planning instructions (optional):</strong>If a query spans both structured and unstructured data, state which tool(s) you will use first. Prefer Analyst for numeric comparisons; use Search to retrieve supporting context. If unsure, ask a brief clarifying question.</li>
+</ul>
+<h2 is-upgraded>Step 7: Access</h2>
+<ul>
+<li>In <strong>Access</strong>, grant a role that should run the agent we using ACCOUNTADMIN for now.</li>
+<li>Click <strong>Save</strong>.</li>
+</ul>
+<h2 is-upgraded>Step 8: Test the Agent</h2>
+<p>Try a few prompts:</p>
+<ul>
+<li><em>&#34;Which </em><strong><em>primary_intent</em></strong><em> has the highest </em><strong><em>resolution rate</em></strong><em>? Show % and call count.&#34;</em></li>
+<li><em>&#34;Find calls with </em><strong><em>high</em></strong><em> urgency discussing </em><strong><em>billing</em></strong><em> and summarize key issues.&#34;</em></li>
+<li><em>&#34;By agent, what&#39;s the </em><strong><em>average overall sentiment</em></strong><em> and </em><strong><em>positive product sentiment rate</em></strong><em>?&#34;</em></li>
+</ul>
+<p>💡 <strong>Tip:</strong> If search results look sparse, confirm the search service is refreshed and that transcripts exceed the length threshold used in your index query.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="SNOWFLAKE INTELLIGENCE" duration="4">
+        <h2 is-upgraded>Learning Outcome</h2>
+<ul>
+<li>Open <strong>Snowflake Intelligence</strong> in Snowsight and launch a chat powered by your <strong>Cortex Agent</strong>.</li>
+<li>Choose the correct <strong>agent</strong>, <strong>location</strong>, and <strong>warehouse</strong>.</li>
+<li>Run a few starter prompts that exercise both <strong>Cortex Analyst</strong> and <strong>Cortex Search</strong>.</li>
+</ul>
+<h2 is-upgraded>Prerequisites</h2>
+<ul>
+<li>Agent created and saved: <code>CALL_CENTER_AGENT</code></li>
+<li>Semantic View published: <code>CALL_CENTER_DB.ANALYTICS.CALL_CENTER_MODEL</code></li>
+<li>Search Service created: <code>CALL_CENTER_DB.ANALYTICS.CALL_CENTER_SEARCH_SERVICE</code></li>
+<li>Warehouse available: <code>USER_STD_XSMALL_WH</code></li>
+</ul>
+<h2 is-upgraded>Step 1: Open Snowflake Intelligence (Snowsight)</h2>
+<ol type="1">
+<li>In the left navigation, click <strong>AI &amp; ML → Snowflake Intelligence</strong>.</li>
+<li>Click <strong>Create Intelligence</strong>.</li>
+</ol>
+<p>💡 <strong>Tip:</strong> If you don&#39;t see Intelligence, ensure your role has access to Cortex features and the relevant database/schema.</p>
+<h2 is-upgraded>Step 2: Basics</h2>
+<p>Fill in the core settings for your chat experience.</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Field</p>
+</td><td colspan="1" rowspan="1"><p>Example Value</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Name</strong></p>
+</td><td colspan="1" rowspan="1"><p><code>CALL_CENTER_INTELLIGENCE</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Location (database.schema)</strong></p>
+</td><td colspan="1" rowspan="1"><p><code>CALL_CENTER_DB.ANALYTICS</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Agent</strong></p>
+</td><td colspan="1" rowspan="1"><p><code>CALL_CENTER_AGENT</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Warehouse</strong></p>
+</td><td colspan="1" rowspan="1"><p><code>USER_STD_XSMALL_WH</code></p>
+</td></tr>
+</table>
+<p>Click <strong>Create</strong> (or <strong>Save</strong>).</p>
+<h2 is-upgraded>Step 3: Optional Settings</h2>
+<ul>
+<li><strong>Welcome message</strong> (example):<em>&#34;Ask about call volumes, sentiment trends, and specific conversations. I can search transcripts and run metrics.&#34;</em></li>
+<li><strong>Access</strong>: grant your lab role.</li>
+<li>Leave other defaults as‑is for this lab.</li>
+</ul>
+<h2 is-upgraded>Step 4: Try These Prompts</h2>
+<p>Use a mix that routes across Analyst and Search via your agent.</p>
+<ul>
+<li><strong>Analyst‑leaning: </strong><em>&#34;What is the average overall sentiment by </em><strong><em>primary_intent</em></strong><em>? Show top 5.&#34;</em></li>
+<li><strong>Search‑leaning: </strong><em>&#34;Find calls that mention </em><strong><em>cancellation</em></strong><em> with </em><strong><em>high</em></strong><em> urgency and summarize the customer&#39;s reasons.&#34;</em></li>
+<li><strong>Hybrid: </strong><em>&#34;Which agents have the </em><strong><em>highest average sentiment</em></strong><em> on calls that mention </em><strong><em>refunds</em></strong><em>? Include 3 supporting </em><em><code>CALL_ID</code></em><em>s.&#34;</em></li>
+</ul>
+<p>💡 <strong>Tip:</strong> If you don&#39;t see call IDs or context snippets, confirm the <strong>search service</strong> is attached to the agent and includes <code>CALL_ID</code> (and any other attributes you want back) in its <code>AS (SELECT ...)</code> list.</p>
+<h2 is-upgraded>Troubleshooting</h2>
+<ul>
+<li><strong>No/empty results:</strong> Confirm your semantic view and search service are in <code>CALL_CENTER_DB.ANALYTICS</code> and populated.</li>
+<li><strong>Permission errors:</strong> Ensure your role has <code>USAGE</code> on the database/schema and warehouse, plus <code>SELECT</code> on the underlying objects.</li>
+<li><strong>Compute:</strong> If responses time out, bump the warehouse size temporarily and retry.</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Conclusion" duration="0">
+        <p>Congratulations on completing the <strong>Snowflake Cortex AI — Call Center Analytics with AI Agents</strong> lab!</p>
+<h2 is-upgraded>What You Learned</h2>
+<p>You worked end‑to‑end across Snowflake Aisql, Cortex Analyst, Cortex Search Services, and Agentic features:</p>
+<ul>
+<li><code>AI_TRANSCRIBE()</code> – Convert staged audio (MP3/WAV) into text transcripts for downstream analytics.</li>
+<li><code>EXTRACT_ANSWER()</code> – Pull precise fields (e.g., agent name) from transcripts using natural language.</li>
+<li><code>SUMMARIZE()</code> – Generate concise overviews of long conversations.</li>
+<li><code>SENTIMENT()</code> and <code>AI_SENTIMENT()</code> – Score overall tone and per‑category sentiment (e.g., Brand, Cost, Product).</li>
+<li><code>AI_CLASSIFY()</code> – Categorize calls into business‑relevant labels with task descriptions, enums, and few‑shot examples.</li>
+<li><code>AI_COMPLETE()</code> + <code>PROMPT()</code> – Produce both free‑text and <strong>structured JSON</strong> outputs.</li>
+<li><strong>Semantic View (Cortex Analyst)</strong> – Model dimensions, metrics, and named filters and verified queries.</li>
+<li><strong>Cortex Search Service</strong> – Create a semantic search index over <code>TRANSCRIPT</code> with filterable attributes.</li>
+<li><strong>Cortex Agents &amp; Snowflake Intelligence</strong> – Orchestrate tools (Analyst + Search) and expose a governed chat experience.</li>
+</ul>
+<h2 is-upgraded>Alternate Use Cases</h2>
+<p>These techniques extend far beyond call centers:</p>
+<ul>
+<li>Legal brief and case‑file summarization</li>
+<li>Customer support email triage and routing</li>
+<li>Interview/meeting transcription analysis</li>
+<li>Insurance claims intake &amp; validation</li>
+<li>Product review classification and scoring</li>
+</ul>
+<h2 is-upgraded>Further Exploration</h2>
+<p>Dive deeper with these docs and ideas:</p>
+<ul>
+<li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/aisql" target="_blank"><strong>AISQL</strong></a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/views-semantic/overview" target="_blank"><strong>Semantic Views</strong></a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst" target="_blank"><strong>Cortex Analyst</strong></a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-search/cortex-search-overview" target="_blank"><strong>Cortex Search Service</strong></a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents" target="_blank"><strong>Cortex Agents</strong></a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/snowflake-intelligence" target="_blank"><strong>Snowflake Intelligence</strong></a></li>
+</ul>
+<p>🎓 If you joined this lab as part of a AI Lab training session, you&#39;ll receive a certified badge of attendance.</p>
+<p>Thank you for spending time with us!</p>
+<p>Visit <strong>datalab</strong> at <a href="https://www.datalab.co.za" target="_blank"><strong>www.datalab.co.za</strong></a> to learn more about our AI training and analytics solutions.</p>
+<p>Follow us on <a href="https://www.linkedin.com/company/datalabsolutions" target="_blank"><strong>LinkedIn</strong></a> for new labs and updates.</p>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+</html>

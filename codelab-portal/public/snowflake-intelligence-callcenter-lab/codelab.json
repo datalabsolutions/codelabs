@@ -1,0 +1,37 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-08-21T10:11:22+02:00",
+  "id": "snowflake-intelligence-callcenter-lab",
+  "duration": 94,
+  "title": "Snowflake Intelligence: Call Centre Analytics with AI Agents",
+  "summary": "A self-paced hands-on lab that teaches how to use Snowflake Cortex AI to ingest, extract, structure, translate, analyze, summarize, and answer questions from audio recording of call center transcripts.",
+  "source": "C:\\Users\\Douglas\\Git\\codelabs\\codelab-orginal\\snowflake-intelligence-callcenter-lab.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "[“ai”",
+    "“cortex”",
+    "“callcenter”",
+    "“cortexanalyst”",
+    "“cortexsearch”",
+    "“agenticai”",
+    "“snowflakeintelligence”]"
+  ],
+  "tags": [
+    "[“snowflake”",
+    "web",
+    "“agentic-ai”",
+    "“cortex-ai”",
+    "“cortex-analyst”",
+    "“cortex-search”",
+    "“snowflake-intelligence”]"
+  ],
+  "feedback": "https://github.com/datalab-solutions/snowflake-codelabs/issues",
+  "ga": "UA-XXXXXXXXX-X",
+  "url": "snowflake-intelligence-callcenter-lab"
+}
