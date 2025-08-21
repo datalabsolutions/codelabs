@@ -34,7 +34,7 @@
     "link": "/snowflake-introduction-to-dbt-lab/",
     "duration": 90,
     "difficulty": "Intermediate",
-    "featured": true,
+    "featured": false,
     "author": "De Wet Conradie",
     "authorLinkedIn": "https://www.linkedin.com/in/de-wet-conradie-21b02b42"
   },
@@ -47,7 +47,7 @@
     "link": "",
     "duration": 60,
     "difficulty": "Beginner",
-    "featured": true,
+    "featured": false,
     "author": "Douglas Day",
     "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/"
   },
@@ -73,6 +73,20 @@
     "link": "",
     "duration": 60,
     "difficulty": "Beginner",
+    "featured": false,
+    "author": "Douglas Day",
+    "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/"
+  },
+  
+  {
+    "id": "8",
+    "title": "Snowflake Intelligence: Call Centre Analytics with AI Agents",
+    "description": "End-to-end call center analytics using AISQL, Cortex Analyst, Cortex Search, Cortex Agents and Snowflake Intelligence",
+    "tags": ["Snowflake", "AISQL", "Cortex Analyst", "Cortex Search", "Cortex Agents", "Snowflake Intelligence"],
+    "category": "Snowflake",
+    "link": "/snowflake-intelligence-callcenter-lab/index.html",
+    "duration": 90,
+    "difficulty": "Advanced",
     "featured": true,
     "author": "Douglas Day",
     "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/"
