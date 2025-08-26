@@ -1,0 +1,33 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-08-26T11:34:36+02:00",
+  "id": "matillion-maia-call-center-lab",
+  "duration": 4,
+  "title": "Matillion Maia: Call Center AI Agents",
+  "summary": "A hands-on lab to learn how to use Matillion Maia for call center analytics and data integration.",
+  "source": "C:\\Users\\Douglas\\Git\\codelabs\\codelab-orginal\\matillion-maia-call-center-lab.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "[“etl”",
+    "“matillion”",
+    "“callcenter”",
+    "“dataintegration”]"
+  ],
+  "tags": [
+    "[“matillion”",
+    "web",
+    "“call-center”",
+    "“data-integration”]",
+    "“etl”",
+    "“maia”"
+  ],
+  "feedback": "https://github.com/datalab-solutions/matillion-codelabs/issues",
+  "ga": "UA-XXXXXXXXX-X",
+  "url": "matillion-maia-call-center-lab"
+}
