@@ -1,0 +1,250 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Snowflake Cortex Search: Earnings Call Q&amp;A</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+  <google-codelab codelab-gaid="UA-XXXXXXXXX-X"
+                  id="snowflake-cortex-search-earnings-calls"
+                  title="Snowflake Cortex Search: Earnings Call Q&amp;A"
+                  environment="web"
+                  feedback-link="https://github.com/datalab-solutions/snowflake-codelabs/issues">
+    
+      <google-codelab-step label="Overview" duration="3">
+        <h2 is-upgraded>Introduction</h2>
+<p>In this lab, you&#39;ll use Snowflake Cortex Search to create a semantic search experience over a corpus of earnings call transcripts. You&#39;ll prepare data (including chunking and metadata), build a Cortex Search index, run queries with filters, and wire a simple grounded Q&amp;A pattern.</p>
+<h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+<ul class="checklist">
+<li>How to prepare and chunk unstructured transcripts for search</li>
+<li>How to include rich metadata for precise filtering</li>
+<li>How to create and validate a Cortex Search index in Snowsight</li>
+<li>How to run semantic queries and apply filters</li>
+<li>How to ground an LLM answer on top search results (RAG-style)</li>
+</ul>
+<h2 is-upgraded>Prerequisites</h2>
+<ul>
+<li>A Snowflake account in a region where Cortex Search is supported</li>
+<li>Role with privileges to create databases, stages, and Cortex Search indexes</li>
+<li>Prior completion of the PARSE_DOCUMENT step (optional but recommended) from the Call Center lab, or any table with transcript text</li>
+</ul>
+<p>4a1 Tip: If you completed the Call Center lab, you already have <code>LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT (FILE_NAME, TRANSCRIPT)</code> to use as your source.</p>
+<h2 is-upgraded>Download Code</h2>
+<p>All SQL blocks are embedded below. Optionally, reuse assets from your previous labs.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Environment Configuration" duration="4">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Ensure a consistent Snowflake environment and identify the source transcripts table.</p>
+<h2 is-upgraded>Description</h2>
+<p>We&#39;ll reuse the <code>LLM_CORTEX_DEMO_DB</code> database and <code>STAGE</code> schema for convenience.</p>
+<pre><code language="language-sql" class="language-sql">-- Set context (adjust role as needed)
+USE DATABASE LLM_CORTEX_DEMO_DB;
+USE SCHEMA STAGE;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+</code></pre>
+<p>4dd If you don&#39;t have transcripts yet, see the PARSE_DOCUMENT section in the Call Center lab to build <code>STAGE.TRANSCRIPT</code> from PDFs.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Prepare the Corpus: Chunking and Metadata" duration="12">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Create compact, searchable text chunks and attach useful metadata for filtering (e.g., date, speaker, company).</p>
+<h2 is-upgraded>Description</h2>
+<p>Shorter chunks improve retrieval quality. We&#39;ll split each transcript into paragraph-like segments, remove empty lines, and keep a simple word count to inspect chunk sizes. Then we&#39;ll optionally enrich with extracted fields if available.</p>
+<h2 is-upgraded>Step 1: Create Chunk Table</h2>
+<pre><code language="language-sql" class="language-sql">-- Create a chunked view of each transcript by splitting on double newlines
+CREATE OR REPLACE TABLE LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CHUNKS AS
+SELECT
+	t.FILE_NAME,
+	ROW_NUMBER() OVER (PARTITION BY t.FILE_NAME ORDER BY f.index) AS CHUNK_ID,
+	TRIM(f.value::string) AS TEXT,
+	REGEXP_COUNT(f.value::string, &#39;\\S+&#39;) AS WORD_COUNT
+FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT t,
+		 LATERAL FLATTEN(input =&gt; SPLIT(t.TRANSCRIPT, &#39;\n\n&#39;)) f
+WHERE TRIM(f.value::string) &lt;&gt; &#39;&#39;;
+
+-- Quick sanity check
+SELECT FILE_NAME, COUNT(*) AS CHUNKS, AVG(WORD_COUNT) AS AVG_WORDS
+FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CHUNKS
+GROUP BY FILE_NAME
+ORDER BY CHUNKS DESC;
+</code></pre>
+<h2 is-upgraded>Step 2: Optional – Enrich with Extracted Metadata</h2>
+<p>If you completed the EXTRACT_ANSWER step in the Call Center lab, join metadata like caller name and call date.</p>
+<pre><code language="language-sql" class="language-sql">-- This step is optional and depends on the presence of TRANSCRIPT_CALLER
+CREATE OR REPLACE VIEW LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CHUNKS_ENRICHED AS
+SELECT
+	c.FILE_NAME,
+	c.CHUNK_ID,
+	c.TEXT,
+	c.WORD_COUNT,
+	tc.CALLER_NAME,
+	tc.CALL_DATE,
+	tc.CALL_DURATION
+FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CHUNKS c
+LEFT JOIN LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CALLER tc
+	USING (FILE_NAME);
+
+-- If you don&#39;t have TRANSCRIPT_CALLER, you can use TRANSCRIPT_CHUNKS directly
+</code></pre>
+<p>4a1 Tip: You can add any structured fields (ticker, quarter, language, etc.) if available. More metadata enables better filtered search.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Create a Cortex Search Index (Snowsight UI)" duration="8">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Build a semantic search index over your chunked corpus using the Snowflake UI.</p>
+<h2 is-upgraded>Description</h2>
+<p>We&#39;ll use Snowsight to create and populate a Cortex Search index over the <code>TRANSCRIPT_CHUNKS_ENRICHED</code> (or <code>TRANSCRIPT_CHUNKS</code>) table.</p>
+<h2 is-upgraded>Steps</h2>
+<ol type="1">
+<li>In Snowsight, open the left navigation.</li>
+<li>Go to AI &amp; ML &gt; Cortex Search (name may appear under &#34;AI &amp; ML&#34; or &#34;Cortex&#34; depending on region).</li>
+<li>Click &#34;Create Search Index&#34;.</li>
+<li>Configure the index: <ul>
+<li>Source: <code>LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CHUNKS_ENRICHED</code> (or <code>TRANSCRIPT_CHUNKS</code>)</li>
+<li>Text column: <code>TEXT</code></li>
+<li>Metadata columns: <code>FILE_NAME</code>, <code>CHUNK_ID</code>, and any of <code>CALLER_NAME</code>, <code>CALL_DATE</code>, <code>CALL_DURATION</code></li>
+<li>Warehouse: <code>USER_STD_XSMALL_WH</code></li>
+<li>Index name: <code>EARNINGS_SEARCH</code></li>
+</ul>
+</li>
+<li>Create the index and wait for indexing to complete.</li>
+</ol>
+<p>6a7 If the UI differs in your region/edition, follow the Cortex Search docs for equivalent steps.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Run Semantic Queries and Apply Filters" duration="10">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Use Cortex Search to retrieve the most relevant transcript chunks and refine results with metadata filters.</p>
+<h2 is-upgraded>Description</h2>
+<p>Use the Search UI (or SQL API, per docs) to test queries and apply filters.</p>
+<h2 is-upgraded>Try these queries in the Search UI</h2>
+<ul>
+<li>What did Apple say about guidance in Q1 2025?</li>
+<li>Summarize customer churn drivers discussed in the last quarter.</li>
+<li>Did management mention AI investment or hiring plans?</li>
+</ul>
+<h2 is-upgraded>Add filters</h2>
+<ul>
+<li>Filter by <code>CALL_DATE</code> range (e.g., last 365 days)</li>
+<li>Filter by <code>FILE_NAME</code> (specific company/meeting)</li>
+</ul>
+<p>4a1 Tip: Inspect returned <code>FILE_NAME</code> and <code>CHUNK_ID</code> to jump back to source context quickly.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Grounded Q&amp;A (RAG-style) with COMPLETE()" duration="15">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Compose a grounded answer by passing top search snippets into an LLM prompt.</p>
+<h2 is-upgraded>Description</h2>
+<p>This pattern retrieves top-N relevant chunks and feeds them to <code>SNOWFLAKE.CORTEX.COMPLETE</code> with instructions to answer concisely and cite sources.</p>
+<p>4d6 Note: The SQL API for querying a Cortex Search index can vary by release. Use the official docs to obtain top-N results into a common table expression named <code>HITS</code> with columns <code>(FILE_NAME, CHUNK_ID, TEXT)</code>.</p>
+<pre><code language="language-sql" class="language-sql">-- PSEUDO-CODE for search; replace with the documented SQL API for your region
+-- with HITS as (
+--   SELECT FILE_NAME, CHUNK_ID, TEXT
+--   FROM TABLE( SNOWFLAKE.CORTEX.SEARCH(&#39;EARNINGS_SEARCH&#39;, :query, OBJECT_CONSTRUCT(&#39;k&#39;, 5)) )
+-- )
+-- SELECT * FROM HITS;
+</code></pre>
+<p>Once you have a <code>HITS</code> CTE, you can ground an answer:</p>
+<pre><code language="language-sql" class="language-sql">-- Example: build a single context block from top results and generate an answer
+WITH HITS AS (
+	-- Replace this SELECT with your actual Cortex Search query
+	SELECT FILE_NAME, CHUNK_ID, TEXT
+	FROM LLM_CORTEX_DEMO_DB.STAGE.TRANSCRIPT_CHUNKS
+	WHERE FILE_NAME = &#39;example.pdf&#39;
+	QUALIFY ROW_NUMBER() OVER (ORDER BY CHUNK_ID) &lt;= 3
+),
+CONTEXT AS (
+	SELECT STRING_AGG(
+					 &#39;Source: &#39; || FILE_NAME || &#39; #&#39; || CHUNK_ID || &#39;\n&#39; || TEXT,
+					 &#39;\n\n---\n\n&#39;
+				 ) AS CONTEXT_TEXT
+	FROM HITS
+)
+SELECT SNOWFLAKE.CORTEX.COMPLETE(
+	&#39;snowflake-arctic&#39;,
+	&#39;You are an expert earnings call analyst. Using only the CONTEXT below, answer the QUESTION concisely. &#39;
+	|| &#39;If the answer is not in the context, say you do not know. Cite sources by file name and chunk id.&#39;
+	|| &#39;\n\nQUESTION: &#39; || :question
+	|| &#39;\n\nCONTEXT:\n&#39; || (SELECT CONTEXT_TEXT FROM CONTEXT)
+) AS ANSWER;
+</code></pre>
+<p>4a1 Tip: Keep CONTEXT under model token limits. Use <code>LIMIT</code>/<code>TOP N</code> and chunk sizes of 100–300 words for good results.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Evaluate and Tune" duration="6">
+        <h2 is-upgraded>Learning Outcome</h2>
+<p>Measure retrieval quality and iterate on chunking, metadata, and filters.</p>
+<h2 is-upgraded>Description</h2>
+<p>Try these adjustments:</p>
+<ul>
+<li>Chunking: test sentence-based vs paragraph-based splits</li>
+<li>Metadata: add quarter, ticker, or language; filter more precisely</li>
+<li>k: vary top-N results (e.g., 3 vs 8) and compare answer quality</li>
+<li>Formatting: instruct the model to output citations consistently</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Conclusion and Next Steps" duration="2">
+        <h2 is-upgraded>What You&#39;ve Accomplished</h2>
+<ul>
+<li>Prepared and chunked transcripts with metadata</li>
+<li>Built a Cortex Search index and ran semantic queries</li>
+<li>Implemented a grounded Q&amp;A flow with COMPLETE()</li>
+</ul>
+<h2 is-upgraded>Next Steps</h2>
+<ol type="1">
+<li>Automate chunking/index refresh via tasks or dynamic tables</li>
+<li>Add UI (e.g., Streamlit) to expose search + Q&amp;A to users</li>
+<li>Extend corpus to more documents and add richer metadata</li>
+</ol>
+<h2 is-upgraded>Additional Resources</h2>
+<ul>
+<li>Snowflake Cortex Search documentation (region-specific)</li>
+<li>Snowflake Cortex LLM functions reference</li>
+<li>RAG best practices for retrieval and prompt construction</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+</html>

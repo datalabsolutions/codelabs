@@ -14,9 +14,7 @@ feedback link: https://github.com/datalab-solutions/snowflake-codelabs/issues
 level: intermediate
 products: ["Snowflake Cortex Analyst"]
 
-# Snowflake Cortex Analyst: Querying NASDAQ Trading Data
 
-## Overview
 
 Duration: 0:05:00
 

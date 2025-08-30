@@ -14,6 +14,8 @@ import { createRoot } from 'react-dom/client';
  * @property {string} difficulty // Added difficulty (e.g., "Beginner", "Intermediate", "Advanced")
  * @property {boolean} featured // Added featured flag
  * @property {string} author // Added author field
+ * @property {string} [authorLinkedIn] // Optional: author's LinkedIn URL
+ * @property {string} [authorAvatar] // Optional: path (from public) or full URL to avatar image, e.g. "/img/avatars/jane.jpg"
  */
 
 // Define category color mapping for modern accents using provided CSS HEX values
@@ -21,10 +23,20 @@ const categoryColors = {
   // Main brand color for the header and general primary elements: --penn-blue #0b2254
   // Main overall background: --antiflash-white #f6f8fc
 
-  "Snowflake": { main: "#265D84", light: "#F6F8FC" }, // Lapis Lazuli for main, Antiflash White for light tag background
-  "dbt": { main: "#18406C", light: "#F6F8FC" },     // Indigo Dye for main, Antiflash White for light tag background
-  "Power BI": { main: "#E98932", light: "#F6F8FC" }, // Tangerine for main, Antiflash White for light tag background
+  "Snowflake": { main: "#249EDC", light: "#F6F8FC" }, // Updated Snowflake brand color
+  "dbt": { main: "#FE6703", light: "#F6F8FC" },     // Updated dbt color
+  "Power BI": { main: "#EBC411", light: "#F6F8FC" }, // Updated Power BI color
+  "Matillion": { main: "#19E57F", light: "#F6F8FC" }, // New Matillion category color
   "Default": { main: "#969696", light: "#F6F8FC" }  // Battleship Gray for default, Antiflash White for light tag background
+};
+
+// Map categories/partners to their logo images in public/img/partners
+const partnerLogos = {
+  "Snowflake": "/img/partners/Snowflake.png",
+  "dbt": "/img/partners/dbt.png",
+  "Power BI": "/img/partners/Power BI.png",
+  "Matillion": "/img/partners/Matillion.png",
+  "Sigma": "/img/partners/Sigma.png",
 };
 
 // Difficulty bar colors - 'empty' remains, 'filled' will now come from categoryColors.main
@@ -34,10 +46,10 @@ const difficultyBarColors = {
 
 // Header Component
 const Header = ({ siteTitle, logoSrc, navLinks }) => (
-  <header className="bg-gradient-to-r from-[#0B2254] to-[#18406C] text-white py-4 shadow-lg rounded-b-xl">
+  <header className="bg-gradient-to-r from-[#0B2254] to-[#18406C] text-white py-6 shadow-lg rounded-b-xl">{/* Extra vertical padding for breathing room */}
     <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
       <div className="flex items-center space-x-3">
-        {logoSrc && <img src={logoSrc} alt="Logo" className="h-9 w-auto filter drop-shadow-md" />}
+        {logoSrc && <img src={logoSrc} alt="Site logo" className="h-8 w-auto filter drop-shadow-md" />}{/* Slightly reduced logo size */}
         {siteTitle && <h1 className="text-3xl font-extrabold tracking-tight text-white">{siteTitle}</h1>}
       </div>
       <nav className="space-x-6 text-sm font-medium">
@@ -81,6 +93,12 @@ const SearchBar = ({ value, onChange, onClear, placeholder }) => (
   </div>
 );
 
+// Helper to get author initials for avatar
+const getInitials = (name = "") => {
+  const parts = name.trim().split(/\s+/);
+  return (parts[0]?.[0] || "").toUpperCase() + (parts[1]?.[0] || "").toUpperCase();
+};
+
 // LabCard Component with dynamic colors and duration and featured styling
 const LabCard = ({ lab, isFeatured = false }) => { // Added isFeatured prop
   const colors = categoryColors[lab.category] || categoryColors["Default"];
@@ -99,8 +117,8 @@ const LabCard = ({ lab, isFeatured = false }) => { // Added isFeatured prop
 
   return (
     <div
-      className={`bg-white rounded-xl border-t-4 shadow-lg hover:shadow-xl transition-all duration-300 p-6 flex flex-col justify-between relative overflow-hidden`} // Removed isFeatured specific styling
-      style={{ borderTopColor: colors.main }}
+  className={`bg-white rounded-xl border-t-4 shadow-lg hover:shadow-xl transition-all duration-300 p-6 flex flex-col justify-between relative overflow-hidden h-full`} // Keep padding and make card square
+  style={{ borderTopColor: colors.main }}
     >
       {/* Time bubble */}
       {lab.duration && (
@@ -117,11 +135,35 @@ const LabCard = ({ lab, isFeatured = false }) => { // Added isFeatured prop
       )}
       <div className="mb-4">
         <h3 className="text-xl font-bold leading-snug mb-2" style={{ color: colors.main }}>{lab.title}</h3>
-        <p className="text-sm text-gray-600 font-medium italic mb-2">{lab.category}</p>
+  <p className="text-sm text-gray-600 mb-4 flex items-center gap-2">
+          {/* Partner/Category logo if available */}
+          {partnerLogos[lab.category] ? (
+            <img
+              src={process.env.PUBLIC_URL + partnerLogos[lab.category]}
+              alt={`${lab.category} logo`}
+              className="h-8 w-auto object-contain"
+            />
+          ) : (
+            <span className="inline-block h-4 w-4 rounded-sm" style={{ backgroundColor: colors.main }} aria-hidden="true"></span>
+          )}
+        </p>
         
         {/* Author information */}
         {lab.author && (
-          <p className="text-sm text-gray-500 mb-2 flex items-center">
+          <div className="text-sm text-gray-500 mb-2 flex items-center gap-2">
+            {/* Avatar image (if provided), otherwise initials */}
+            {lab.authorAvatar ? (
+              <img
+                src={lab.authorAvatar.startsWith('http') ? lab.authorAvatar : (process.env.PUBLIC_URL + lab.authorAvatar)}
+                alt={`${lab.author} avatar`}
+                className="rounded-full"
+                style={{ width: 24, height: 24, objectFit: 'cover', border: `1px solid ${colors.main}`, backgroundColor: '#fff' }}
+              />
+            ) : (
+              <div className="flex items-center justify-center rounded-full" style={{ width: 24, height: 24, backgroundColor: colors.light, color: colors.main, border: `1px solid ${colors.main}` }} aria-hidden="true">
+                <span className="text-[10px] font-bold leading-none">{getInitials(lab.author)}</span>
+              </div>
+            )}
             <a
               href={lab.authorLinkedIn}
               target="_blank"
@@ -130,12 +172,12 @@ const LabCard = ({ lab, isFeatured = false }) => { // Added isFeatured prop
               title={`View ${lab.author}'s LinkedIn profile`}
             >
               {/* LinkedIn SVG Icon */}
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="currentColor">
+              <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11 19h-3v-10h3v10zm-1.5-11.268c-.966 0-1.75-.784-1.75-1.75s.784-1.75 1.75-1.75 1.75.784 1.75 1.75-.784 1.75-1.75 1.75zm15.5 11.268h-3v-5.604c0-1.337-.025-3.063-1.868-3.063-1.868 0-2.154 1.459-2.154 2.967v5.7h-3v-10h2.881v1.367h.041c.401-.761 1.379-1.563 2.841-1.563 3.04 0 3.601 2.002 3.601 4.604v5.592z"/>
               </svg>
-              By {lab.author}
+              <span className="sr-only">Author: </span>By {lab.author}
             </a>
-          </p>
+          </div>
         )}
         
         {/* Difficulty indicator */}
@@ -158,10 +200,10 @@ const LabCard = ({ lab, isFeatured = false }) => { // Added isFeatured prop
         {lab.tags.map((tag) => (
           <span
             key={tag}
-            className="text-xs font-semibold px-3 py-1 rounded-full shadow-sm"
+            className="inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full shadow-sm"
             style={{ backgroundColor: colors.light, color: colors.main }}
           >
-            {tag}
+            <span>{tag}</span>
           </span>
         ))}
       </div>
@@ -173,7 +215,14 @@ const LabCard = ({ lab, isFeatured = false }) => { // Added isFeatured prop
           ${isComingSoon ? 'bg-gray-400 cursor-not-allowed' : 'hover:brightness-90 transition-all duration-200 hover:shadow-lg'}`}
         style={{ backgroundColor: isComingSoon ? null : colors.main }} // Apply main color only if not coming soon
       >
-        {isComingSoon ? "Coming Soon" : "Launch Lab"}
+        {isComingSoon ? (
+          "Coming Soon"
+        ) : (
+          <span className="inline-flex items-center justify-center gap-2">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <span>Launch Lab</span>
+          </span>
+        )}
       </a>
     </div>
   );
@@ -259,6 +308,15 @@ export default function App() {
       });
   }, []);
 
+  // Preserve original order to keep stable sorting within groups
+  const originalIndexById = useMemo(() => {
+    const map = {};
+    labs.forEach((lab, index) => {
+      map[lab.id] = index;
+    });
+    return map;
+  }, [labs]);
+
   // Scroll event listener for "Back to Top" button
   useEffect(() => {
     const handleScroll = () => {
@@ -287,6 +345,7 @@ export default function App() {
     categories.add("Snowflake");
     categories.add("dbt");
     categories.add("Power BI");
+    categories.add("Matillion");
 
     labs.forEach(lab => {
       if (lab.category) {
@@ -298,7 +357,7 @@ export default function App() {
 
   // Filtered labs based on search, category, difficulty, and duration
   const filteredAndSearchedLabs = useMemo(() => {
-    return labs.filter(
+    const filtered = labs.filter(
       (lab) => {
         const matchesSearch =
           lab.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -324,7 +383,23 @@ export default function App() {
         return matchesSearch && matchesCategory && matchesDifficulty && matchesDuration;
       }
     );
-  }, [labs, search, selectedCategory, selectedDuration, selectedDifficulty]); // Depend on selectedDifficulty
+
+    // Sort order: featured first, then active (has link), then coming soon (no link)
+    const groupWeight = (lab) => {
+      const isComingSoon = !lab.link || lab.link.trim() === "";
+      if (lab.featured) return 0; // featured first
+      if (!isComingSoon) return 1; // active next
+      return 2; // coming soon last
+    };
+
+    return filtered.slice().sort((a, b) => {
+      const ga = groupWeight(a);
+      const gb = groupWeight(b);
+      if (ga !== gb) return ga - gb;
+      // Stable within group using original index
+      return (originalIndexById[a.id] ?? 0) - (originalIndexById[b.id] ?? 0);
+    });
+  }, [labs, search, selectedCategory, selectedDuration, selectedDifficulty, originalIndexById]); // Depend on originalIndexById
 
   // Separate featured labs - now limited to first 3
   const featuredLabs = useMemo(() => {
@@ -351,14 +426,14 @@ export default function App() {
         ]}
       />
       
-        <section className="bg-white py-16 px-6 rounded-xl shadow-lg mx-auto max-w-7xl mt-8">
+        <section className="bg-white py-16 px-8 rounded-xl shadow-lg mx-auto max-w-7xl mt-8">{/* Slightly more horizontal padding */}
           <div className="text-center">
             <img
           src={process.env.PUBLIC_URL + "/logo-blue.png"}
-          alt="datalab logo"
-          className="h-24 w-auto mx-auto mb-6 drop-shadow-lg"
+          alt="Datalab Solutions logo"
+          className="h-20 w-auto mx-auto mb-8 drop-shadow-lg"
             />
-            <h2 className="text-4xl font-bold tracking-tight text-[#0B2254] mb-4">Where Data Mastery Begins!</h2>
+            <h2 className="text-4xl font-extrabold tracking-tight text-[#0B2254] mb-4">Where Data <span className="text-[#249EDC]">Mastery</span> Begins!</h2>{/* Emphasize keyword with accent color */}
             <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
           Dive into practical, hands-on labs designed to help you master various data technologies.
           Whether you're exploring Snowflake, building with dbt, or visualizing data with Power BI,
@@ -370,7 +445,7 @@ export default function App() {
         <main className="max-w-7xl mx-auto px-6 py-16">
           {/* Featured Labs Section */}
         {featuredLabs.length > 0 && (
-          <div className="mb-16 bg-blue-50 p-8 rounded-xl shadow-lg"> {/* Background remains bg-blue-50 */}
+          <div className="mb-16 bg-gray-100 p-8 rounded-xl shadow-lg"> {/* Slightly darker grey background */}
             <h2 className="text-3xl font-bold tracking-tight text-[#0B2254] mb-8 text-center">Featured Labs</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredLabs.map((lab) => (
@@ -491,9 +566,11 @@ export default function App() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
               {currentLabs.map((lab) => (
-                <LabCard key={lab.id} lab={lab} />
+                <div key={lab.id} className="h-full">
+                  <LabCard lab={lab} />
+                </div>
               ))}
             </div>
 
