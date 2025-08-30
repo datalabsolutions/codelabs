@@ -1,0 +1,33 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-08-20T22:06:54+02:00",
+  "id": "snowflake-cortex-search-earnings-calls",
+  "duration": 60,
+  "title": "Snowflake Cortex Search: Earnings Call Q\u0026A",
+  "summary": "Build a semantic search experience over earnings call transcripts using Snowflake Cortex Search with chunking, metadata, filters, and grounded Q\u0026A.",
+  "source": "C:\\Users\\Douglas\\Git\\codelabs\\codelab-orginal\\snowflake-cortex-search-earnings-calls.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "[“ai”",
+    "“cortex”",
+    "“search”",
+    "“rag”]"
+  ],
+  "tags": [
+    "[“snowflake”",
+    "web",
+    "“cortex-search”",
+    "“earnings-calls”",
+    "“rag”]",
+    "“semantic-search”"
+  ],
+  "feedback": "https://github.com/datalab-solutions/snowflake-codelabs/issues",
+  "ga": "UA-XXXXXXXXX-X",
+  "url": "snowflake-cortex-search-earnings-calls"
+}

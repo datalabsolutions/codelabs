@@ -9,9 +9,9 @@
     "duration": 60,
     "difficulty": "Beginner",
     "featured": true,
-  "author": "Douglas Day",
-  "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/",
-  "authorAvatar": "/img/avatars/Douglas-Day.png"
+    "author": "Douglas Day",
+    "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/",
+    "authorAvatar": "/img/avatars/Douglas-Day.png"
   },
   {
     "id": "2",
@@ -23,9 +23,9 @@
     "duration": 60,
     "difficulty": "Beginner",
     "featured": false,
-  "author": "Douglas Day",
-  "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/",
-  "authorAvatar": "/img/avatars/Douglas-Day.png"
+    "author": "Douglas Day",
+    "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/",
+    "authorAvatar": "/img/avatars/Douglas-Day.png"
   },
   {
     "id": "3",
@@ -37,9 +37,9 @@
     "duration": 90,
     "difficulty": "Intermediate",
     "featured": false,
-  "author": "De Wet Conradie",
-  "authorLinkedIn": "https://www.linkedin.com/in/de-wet-conradie-21b02b42",
-  "authorAvatar": "/img/avatars/DeWet-Conradie.png"
+    "author": "De Wet Conradie",
+    "authorLinkedIn": "https://www.linkedin.com/in/de-wet-conradie-21b02b42",
+    "authorAvatar": "/img/avatars/DeWet-Conradie.png"
   },
   {
     "id": "4",
@@ -51,9 +51,9 @@
     "duration": 60,
     "difficulty": "Beginner",
     "featured": false,
-  "author": "Douglas Day",
-  "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/",
-  "authorAvatar": "/img/avatars/Douglas-Day.png"
+    "author": "Douglas Day",
+    "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/",
+    "authorAvatar": "/img/avatars/Douglas-Day.png"
   },
   {
     "id": "5",
@@ -65,9 +65,9 @@
     "duration": 75,
     "difficulty": "Intermediate",
     "featured": false,
-  "author": "Douglas Day",
-  "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/",
-  "authorAvatar": "/img/avatars/Douglas-Day.png"
+    "author": "Douglas Day",
+    "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/",
+    "authorAvatar": "/img/avatars/Douglas-Day.png"
   },
   {
     "id": "6",
@@ -79,11 +79,10 @@
     "duration": 60,
     "difficulty": "Beginner",
     "featured": false,
-  "author": "Douglas Day",
-  "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/",
-  "authorAvatar": "/img/avatars/Douglas-Day.png"
+    "author": "Douglas Day",
+    "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/",
+    "authorAvatar": "/img/avatars/Douglas-Day.png"
   },
-  
   {
     "id": "8",
     "title": "Snowflake Intelligence: Call Centre Analytics with AI Agents",
@@ -94,9 +93,9 @@
     "duration": 90,
     "difficulty": "Advanced",
     "featured": true,
-  "author": "Douglas Day",
-  "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/",
-  "authorAvatar": "/img/avatars/Douglas-Day.png"
+    "author": "Douglas Day",
+    "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/",
+    "authorAvatar": "/img/avatars/Douglas-Day.png"
   },
   {
     "id": "9",
@@ -104,12 +103,12 @@
     "description": "Explore call center analytics using Matillion Maia, integrating data transformation and AI-powered insights.",
     "tags": ["Matillion", "Maia", "Call Center", "Analytics", "AI", "Data Transformation"],
     "category": "Matillion",
-  "link": "/matillion-maia-call-center-lab/",
+    "link": "/matillion-maia-call-center-lab/",
     "duration": 90,
     "difficulty": "Intermediate",
     "featured": true,
-  "author": "Douglas Day",
-  "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/",
-  "authorAvatar": "/img/avatars/Douglas-Day.png"
+    "author": "Douglas Day",
+    "authorLinkedIn": "https://www.linkedin.com/in/douglasday1/",
+    "authorAvatar": "/img/avatars/Douglas-Day.png"
   }
 ]

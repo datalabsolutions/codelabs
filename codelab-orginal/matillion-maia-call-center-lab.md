@@ -16,9 +16,70 @@ products: ["Matillion Maia"]
 
 # Matillion Maia: Call Center AI Agents
 
-## Introduction
+## Overview
+
+Duration: 0:03:00
+
+### Introduction
 
 In this quickstart, you’ll sign up for Matillion’s Data Productivity Cloud and prepare your environment for call center analytics with Maia. You’ll create an account, choose your region and experience, and (optionally) connect a Snowflake trial warehouse so you can start building pipelines in minutes.
+
+This hands-on lab demonstrates how to use **Matillion Maia** to transform call center data from raw audio transcripts using Snowflake Cortex AI functions. You’ll learn to ingest, transcribe, enrich, and structure audio recordings (`.wav`, `.mp3`) and transcript documents (`.txt`, `.pdf`) directly in Snowflake. With functions like `AI_TRANSCRIBE`, `SUMMARIZE`, `SENTIMENT`, `AI_SENTIMENT`, `AI_CLASSIFY`, `AI_COMPLETE`, and `EXTRACT_ANSWER`, you’ll unlock actionable insights from unstructured conversations and build advanced analytics pipelines.
+
+* Convert call recordings into searchable transcripts.
+* Summarize long conversations into concise overviews.
+* Measure overall and entity-specific sentiment.
+* Classify call types by intent (complaint, query, sales, cancellation, etc.).
+* Extract key answers like customer name, call reason, or resolution.
+* Generate structured insights, action items, and follow-ups using completions.
+
+In addition, you will:
+
+* Deploy a **Cortex Search Service** to perform contextual, vector-based retrieval across transcripts.
+* Use **Cortex Analyst** to enable guided, natural language Q&A on call data.
+
+By the end of this lab, you will have transformed **raw call recordings** into **actionable business intelligence**, equipping analysts and support managers with the ability to identify trends, improve service quality, and uncover insights faster.
+
+### What You'll Learn
+
+#### Maia
+
+* Understand the capabilities of Matillion Maia for AI-powered data transformation.
+* Learn how Maia integrates with Snowflake to process unstructured call center data.
+* Explore Maia's features for orchestrating ETL workflows and leveraging AI functions.
+* Discover how Maia simplifies building, scheduling, and monitoring data pipelines.
+
+
+#### AI SQL
+
+* Upload and manage unstructured call center data in Snowflake
+* Transcribe audio with [`AI_TRANSCRIBE`](https://docs.snowflake.com/en/sql-reference/functions/ai_transcribe)
+* Summarize transcripts with [`SUMMARIZE`](https://docs.snowflake.com/en/sql-reference/functions/summarize-snowflake-cortex)
+* Analyze sentiment using [`SENTIMENT`](https://docs.snowflake.com/en/sql-reference/functions/sentiment-snowflake-cortex) and [`AI_SENTIMENT`](https://docs.snowflake.com/en/sql-reference/functions/ai_sentiment)
+* Classify call intent with [`AI_CLASSIFY`](https://docs.snowflake.com/en/sql-reference/functions/ai_classify)
+* Extract structured details with [`EXTRACT_ANSWER`](https://docs.snowflake.com/en/sql-reference/functions/extract_answer-snowflake-cortex)
+* Perform advanced completions with [`AI_COMPLETE`](https://docs.snowflake.com/en/sql-reference/functions/ai_complete)
+* Explore prompt building with [`PROMPT`](https://docs.snowflake.com/en/sql-reference/functions/prompt) to simplify and structure code
+* Aggregate textual data and generate concise summaries with [`AI_AGG`](https://docs.snowflake.com/en/sql-reference/functions/ai_agg)
+
+
+### Download Source Files
+
+Download all source SQL files for this lab [here](https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2Fdatalabsolutions%2FAI-Labs%2Ftree%2Fmain%2Fsnowflake-snowflake-intelligence-callcenter-lab%2Fscripts)
+
+### Prerequisites
+
+Duration: 0:01:00
+
+* A [Snowflake account](https://trial.snowflake.com/?owner=SPN-PID-452710) in a region where **Snowflake Cortex LLM functions** are supported
+* Basic familiarity with SQL and the Snowflake UI
+* Access all the scripts for this Lab [on GitHub](https://github.com/datalabsolutions/AI-Labs/tree/main/snowflake-snowflake-intelligence-callcenter-lab)
+* [Download all the audio files](https://github.com/datalabsolutions/AI-Labs/blob/a27daf7c5d6f72949cc73c820351348d755bbd9c/snowflake-snowflake-intelligence-callcenter-lab/assets/audio_files/audio-files.zip?raw=1)
+
+> 💡 **Tip:** Explore this interactive walkthrough to learn how to sign up for a [Snowflake account](https://app.supademo.com/demo/cmbw9nmxe0606xw0izxyku479).
+
+> 💡 **Tip:** Use the [LLM Function Availability](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#availability) page to check which cloud regions are supported.
+
 
 ## Configure Snowflake
 Duration: 0:04:00
@@ -62,6 +123,14 @@ WITH
     AUTO_SUSPEND = 60
     AUTO_RESUME = TRUE
     INITIALLY_SUSPENDED = TRUE;
+
+CREATE OR REPLACE WAREHOUSE APP_STD_XSMALL_WH
+WITH
+    WAREHOUSE_SIZE = 'XSMALL'
+    WAREHOUSE_TYPE = 'STANDARD'
+    AUTO_SUSPEND = 60
+    AUTO_RESUME = TRUE
+    INITIALLY_SUSPENDED = TRUE;
 ```
 
 > 💡 **Tip:** Auto-suspend after 60 seconds prevents unnecessary credit usage. Auto-resume ensures queries always run when needed.
@@ -93,7 +162,54 @@ CREATE OR REPLACE STAGE CALL_CENTER_DB.RAW.INT_STAGE_DOC_RAW
 ```
 > 🔒 **Note:** Files uploaded here are secured with Snowflake’s Server-Side Encryption (SSE).
 
-### Step 5: Upload Files to the Stage
+
+
+### Step 4: Create Matillion User and Role
+
+The internal stage is where you will upload audio files. 
+
+```sql
+CREATE ROLE IF NOT EXISTS APP_MATILLION_ROLE;
+
+-- Assign application role to SYSADMIN (best practice)
+GRANT ROLE APP_MATILLION_ROLE TO ROLE SYSADMIN;
+
+-- Create user
+CREATE USER IF NOT EXISTS APP_MATILLION_SVC
+  TYPE = LEGACY_SERVICE                           -- Explicitly mark as service account
+  PASSWORD = 'M@tillion!1.'
+  DEFAULT_ROLE = APP_MATILLION_ROLE
+  DEFAULT_WAREHOUSE = APP_STD_XSMALL_WH
+  MUST_CHANGE_PASSWORD = FALSE             -- Not required for service users
+  COMMENT = 'Service account for Matillion ETL operations';
+
+-- Assign role to user
+GRANT ROLE APP_MATILLION_ROLE TO USER APP_MATILLION_SVC;
+
+-- Database & schema usage
+GRANT USAGE ON DATABASE CALL_CENTER_DB TO ROLE APP_MATILLION_ROLE;
+GRANT USAGE ON ALL SCHEMAS IN DATABASE CALL_CENTER_DB TO ROLE APP_MATILLION_ROLE;
+
+-- Warehouse usage
+GRANT USAGE ON WAREHOUSE APP_STD_XSMALL_WH TO ROLE APP_MATILLION_ROLE;
+
+-- Stage usage
+GRANT READ ON STAGE CALL_CENTER_DB.RAW.INT_STAGE_DOC_RAW TO ROLE APP_MATILLION_ROLE;
+GRANT WRITE ON STAGE CALL_CENTER_DB.RAW.INT_STAGE_DOC_RAW TO ROLE APP_MATILLION_ROLE;
+
+-- Table privileges (all current + future tables)
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA CALL_CENTER_DB.RAW TO ROLE APP_MATILLION_ROLE;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA CALL_CENTER_DB.STAGE TO ROLE APP_MATILLION_ROLE;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA CALL_CENTER_DB.ANALYTICS TO ROLE APP_MATILLION_ROLE;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON FUTURE TABLES IN SCHEMA CALL_CENTER_DB.RAW TO ROLE APP_MATILLION_ROLE;
+GRANT SELECT, INSERT, UPDATE, DELETE ON FUTURE TABLES IN SCHEMA CALL_CENTER_DB.STAGE TO ROLE APP_MATILLION_ROLE;
+GRANT SELECT, INSERT, UPDATE, DELETE ON FUTURE TABLES IN SCHEMA CALL_CENTER_DB.ANALYTICS TO ROLE APP_MATILLION_ROLE;
+
+
+```
+
+### Step 6: Upload Files to the Stage
 
 Your internal stage `CALL_CENTER_DB.RAW.INT_STAGE_DOC_RAW` is now set up.
 
@@ -124,6 +240,8 @@ The trial is free and includes 500 usage credits, allowing you to explore Matill
 - Choose a password and verify your email address
 
 ![Matillion sign up - Create account](img/matillion-maia-call-center-lab/lab02/Matillion-Signup-01.01.png)
+
+![Matillion sign up - Create account](img/matillion-maia-call-center-lab/lab01/test.gif)
 
 ### Step 2: Create your profile
 - Enter basic details like name, job title, and contact information
