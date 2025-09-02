@@ -20,6 +20,13 @@ products: ["Matillion Maia"]
 
 Duration: 0:03:00
 
+### Watch the Lab Overview
+
+For a quick intro into Maia, llick on the image below to watch a short video:
+
+[![Matillion Maia Call Center Lab Overview](img/matillion-maia-call-center-lab/lab01/Maia.png)](https://www.youtube.com/watch?v=ihIRmJirWno)
+
+
 ### Introduction
 
 In this quickstart, you’ll sign up for Matillion’s Data Productivity Cloud and prepare your environment for call center analytics with Maia. You’ll create an account, choose your region and experience, and connect a Snowflake trial account so you can start building pipelines in minutes.
@@ -217,7 +224,8 @@ Your internal stage `CALL_CENTER_DB.RAW.INT_STAGE_DOC_RAW` is now set up.
 1. In Snowsight, go to **Databases**.
 2. Select `CALL_CENTER_ANALYTICS_DW` → `EXTRACT` → **Stages**.
 3. Click on `INT_STAGE_DOC`.
-4. Click **+ Files** and upload one or more audio recordings (MP3/WAV).
+4. Click **+ Files** and upload one or more audio recordings (.mp3), there are 50 files in total.
+4. Click **+ Files** and upload the LOOKUP.json file (.json).
 
 > 🔒 **Note:** The zip file that you [downloaded](https://github.com/datalabsolutions/AI-Labs/blob/a27daf7c5d6f72949cc73c820351348d755bbd9c/snowflake-snowflake-intelligence-callcenter-lab/assets/audio_files/audio-files.zip?raw=1) will need to be unzipped.  You need to upload the individual files.
 
@@ -244,7 +252,7 @@ The trial is free and includes 500 usage credits, allowing you to explore Matill
 ![Matillion sign up - Create account](img/matillion-maia-call-center-lab/lab03/Matillion-Signup-03-01.png)
 
 
-### Step 2: Set up your account (Region)
+### Step 2: Choose Region
 Select your preferred region carefully—this cannot be changed later.
 
 > 💡 **Tip:** If your Snowflake account is in AWS Oregon, choose "US" as your region, the option on the left.
@@ -280,7 +288,7 @@ Use the following values (unless you changed the password)
 
 ![Matillion sign up - Warehouse credentials](img/matillion-maia-call-center-lab/lab03/Matillion-Signup-03-05.png)
 
-### Step 6: Select warehouse defaults
+### Step 6: Specify database defaults
 Set role, warehouse, database, and schema defaults for pipelines
 
 
@@ -296,3 +304,557 @@ Set role, warehouse, database, and schema defaults for pipelines
 You’re now ready to begin building pipelines with Matillion and Maia.
 
 ## Configure Project & Deploy Schema
+
+
+### Learning Outcomes
+
+### Prerequisites
+
+### Description
+
+
+## Extract ETL
+
+### Learning Outcomes
+
+By completing this section, you will:
+
+- Understand how to load and store binary data into snowflake table.
+- Understand how to load and flatten JSON data.
+- Prepare raw call center data for downstream AI enrichment and analytics.
+
+### Prerequisites
+
+- Completion of Snowflake environment setup, including creation of stages and file formats.
+- Access to Matillion Data Productivity Cloud with a connected Snowflake account.
+- Audio files and lookup JSON uploaded to the Snowflake stage.
+
+### Description
+
+In this section, you will create two Matillion Maia extract pipelines. The first pipeline loads new or updated audio files (`.mp3`) from a Snowflake stage into the `EXTRACT.AUDIO_FILES` table, ensuring incremental extraction and proper filtering. The second pipeline extracts lookup data from a JSON file, loading it into the `EXTRACT.LOOKUP` table for use in later transformation and enrichment steps. These pipelines form the foundation for processing and analyzing call center data.
+
+### Step 1: Create EXTRACT_AUDIO_TRANSCRIPT
+
+#### Pipeline
+![Matillion Extract - EXTRACT_AUDIO_TRANSCRIPT](img/matillion-maia-call-center-lab/lab05/Matillion-Extract-05-01.png)
+
+#### Prompt
+
+```plaintext
+Task: Create a pipeline to do incremental extract of audio files (.MP3) stored in a snowflake stage.
+
+Job Name: EXTRACT_AUDIO_TRANSCRIPT
+Folder: 01 - EXTRACT
+
+Source: @EXTRACT.INT_STAGE_DOC
+Target: EXTRACT.AUDIO_FILES (existing table)
+Unique Identifier: CALL_TRANSCRIPT_ID
+Load Type: Incremental - exclude existing records
+
+Guidelines: 
+Filter: RELATIVE_PATH LIKE .mp3
+
+Output Fields:
+CALL_TRANSCRIPT_ID
+FILE_PATH
+AUDIO_FILE
+AUDIO_FILE_URL
+LAST_MODIFIED 
+FILE_SIZE
+LAST_MODIFIED
+FILE_EXTENSION
+```
+
+### Step 2: Create EXTRACT_LOOKUP
+
+#### Pipeline
+![Matillion Extract - EXTRACT_LOOKUP](img/matillion-maia-call-center-lab/lab05/Matillion-Extract-05-02.png)
+
+#### Prompt
+```plaintext
+Task: Create a pipeline to do incremental extract of json file stored in a snowflake stage.
+
+Job Name: EXTRACT_LOOKUP
+Folder: 01 - EXTRACT
+
+Source: @EXTRACT.INT_STAGE_DOC
+Target: EXTRACT.LOOKUP (existing table)
+File: LOOKUP.json
+File Format: EXTRACT.JSON_FORMAT
+Unique Identifier: LOOKUP_FILTER, LOOKUP_ID  
+Load Type: Incremental - exclude existing records
+```
+
+## Stage ETL
+
+### Learning Outcomes
+
+By completing this section, you will:
+
+- Build a step-by-step transformation pipeline in Matillion Maia to analyze call center audio data using Snowflake Cortex AI functions.
+- Use the following Snowflake Cortex AI functions in your pipeline:
+  - `AI_TRANSCRIBE`: Convert raw audio files into searchable transcripts and extract metadata.
+  - `EXTRACT_ANSWER`: Extract the agent name from transcripts.
+  - `SUMMARISE`: Generate concise call summaries.
+  - `AI_SENTIMENT`: Classify overall call sentiment.
+  - `COMPLETE`: Extract multiple attributes such as call type, resolution status, priority, and sentiment score.
+- Use the `REGEX` function to derive agent initals from agent names.
+- Use CALCULATOR components to extract values from JSON AI responses.
+- Implement incremental load logic to process only new or updated records, maintaining an efficient and up-to-date data warehouse.
+- Understand how each AI function enriches your call center analytics for actionable business insights.
+
+### Prerequisites
+
+- Completion of Snowflake configuration steps in this lab.
+- Access to Matillion Data Productivity Cloud with a connected Snowflake account.
+- Sufficient roles and privileges to create and manage schemas and projects.
+- Extracted `.mp3` audio files loaded into the `EXTRACT.AUDIO_FILES` table.
+
+
+### Step 1: Create STAGE_AUDIO_TRANSCRIPT
+
+In this step, you will build a Matillion Maia transformation pipeline to ingest and transcribe call center audio files. The pipeline reads `.mp3` files from the source table, applies the Snowflake Cortex `AI_TRANSCRIBE` function to convert audio into text, and extracts key metadata such as duration, transcript content, and word/character counts. The job is designed for incremental loading, ensuring only new or updated audio files are processed and added to the target table. This forms the foundation for downstream analytics and enrichment.
+
+#### Pipeline
+
+![Matillion Stage - STAGE_AUDIO_TRANSCRIPT_ANALYSIS](img/matillion-maia-call-center-lab/lab06/Matillion-Stage-06-01.png)
+
+#### Prompt
+
+```plaintext
+Task: Create a job to do incremental load of audio transcription:
+
+Job Name: STAGE_AUDIO_TRANSCRIPT
+Job Type: Transformation
+Folder: 02 - STAGE
+
+Source: EXTRACT.AUDIO_FILES  
+Target: STAGE.AUDIO_TRANSCRIPT (existing table)  
+Unique Identifier: TRANSCRIPT_ID (unique identifier)  
+Load Type: Incremental - exclude existing records
+
+Guidelines: Use AI_TRANSCRIBE function to convert audio files to JSON extract the audio_duration and text attributes.
+
+Required Output Fields:
+TRANSCRIPT_ID 
+FILE_PATH
+AUDIO_FILE_URL
+FILE_SIZE
+LAST_MODIFIED
+TRANSCRIPT_JSON
+DURATION
+TRANSCRIPT
+TRANSCRIPTION_DATE
+CHARACTER_COUNT
+WORD_COUNT
+```
+
+### Step 2: Create STAGE_AUDIO_TRANSCRIPT_ANALYSIS
+In this section, you will build a comprehensive transformation pipeline to analyze call center transcripts using Snowflake Cortex AI functions. 
+
+#### Pipeline
+
+![Matillion Stage - STAGE_AUDIO_TRANSCRIPT_ANALYSIS](img/matillion-maia-call-center-lab/lab06/Matillion-Stage-06-02.png)
+
+#### Prompt: Job
+
+Each step below describes the transformation logic and the corresponding pipeline component.
+
+First, you will create a blank transformation pipeline to serve as the foundation for subsequent steps.
+
+```plaintext
+Task: To create a complex data transformation pipeline step by step.
+First create a blank transformation pipeline.
+
+Job Name: STAGE_AUDIO_TRANSCRIPT_ANALYSIS
+Folder: 02 - STAGE
+```
+
+#### Prompt: Table Input
+
+Next, you will connect to the source table containing transcribed audio data. This step uses a Table Input component to read the necessary columns from the `STAGE.AUDIO_TRANSCRIPT` table.
+
+
+```plaintext
+Task: Create a connection to source table
+
+Component: Table Input
+Component Name: Input Audio Transcript
+
+Source: STAGE.AUDIO_TRANSCRIPT
+Columns:
+CALL_TRANSCRIPT_ID
+TRANSCRIPTION_DATE
+AUDIO_FILE_URL
+TRANSCRIPT
+DURATION
+CHARACTER_COUNT
+WORD_COUNT
+```
+#### Prompt: Extract Answer
+
+You will then extract the call center agent's name from each transcript using the Cortex Extract Answer component. This step applies an AI prompt to identify and return the agent's name.
+
+```plaintext
+Task: Extract the call centre agent name from the transcript.
+Component: Cortex Extract Answer
+Component Name: Extract Answer
+Column: AGENT_NAME_AI
+Question: What is the name of the caller centre agent?
+```
+
+#### Prompt: Summarise
+
+After extracting the agent name, you will summarize the transcript using the Cortex Summarise component. This provides a concise overview of each call.
+
+```plaintext
+Task: Summarise the call centre transcript
+Component: Cortex Summarise
+Component Name: Summarise
+```
+
+#### Prompt: Sentiment
+
+Next, you will classify the overall sentiment of the call using the Cortex Sentiment component. This step adds a sentiment score or label to each transcript.
+
+```plaintext
+Task: Add a sentiment classification
+Component: Cortex Sentiment
+Component Name: Sentiment
+```
+
+#### Prompt: Complete
+
+You will then extract multiple key attributes from the transcript using the Cortex Multi-Prompt component. This step categorizes the call type, resolution status, priority, and calculates a sentiment score based on AI-driven prompts.
+
+```plaintext
+Task: Extract the following information from the call centre transcript.
+Component: Cortex Multi-Prompt
+Component Name: Complete
+
+--------------------------------------------------
+Column: CALL_TYPE_CODE
+Prompt: Categorise the call into one of the following?
+
+BILLING:Billing enquiry. Questions about charges, payments, or invoices.
+TECHNICAL_SUPPORT: Technical support. Help resolving technical issues or access problems.
+COMPLAINT: Complaint. Customer expresses dissatisfaction or reports a problem.
+INFORMATION: Information request. Caller asks for information or clarification.
+SALES: Sales/upgrade. Interest in buying or upgrading a product or service.
+CANCELLATION: Cancellation. Caller wants to cancel a subscription or service.
+OTHER: Other. Does not fit known categories; requires manual review or enrichment.
+
+You must return ONE of the codes: BILLING, TECHNICAL_SUPPORT, COMPLAINT, INFORMATION, SALES, CANCELLATION, OTHER
+
+--------------------------------------------------
+Column: CALL_STATUS_CODE
+Prompt: Has the call be resolved?
+
+YES: Issue resolved. Problem fully addressed during the interaction.
+PARTIAL: Partially resolved. Follow-ups or actions still required.
+NO: Not resolved. Issue unresolved; escalation likely.
+
+You must return ONE of the codes: YES, PARTIAL, NO
+
+--------------------------------------------------
+Column: CALL_PRIORITY_CODE
+Prompt: What is the priority of this call?
+
+LOW: Items that can be solved within 3 days.
+MEDIUM: Target resolution within 24-72 hours.
+HIGH: Requires action within 24 hours.
+CRITICAL: Immediate action required; severe impact likely.
+
+--------------------------------------------------
+You must return ONE of the codes: LOW, MEDIUM, HIGH, CRITICAL
+
+Column: CALL_SENTIMENT_SCORE
+Prompt: Calculate a Call Sentiment Score between -1 and 1?
+
+```
+
+#### Prompt: Calculator
+
+After extracting and transforming the necessary attributes from the transcripts, you will use a Calculator component to further process and standardize the data. This step ensures that key fields are properly formatted and derived for downstream analytics.
+
+```plaintext
+Component: Calculator
+Component Name: Data Extraction
+
+Task: Extract the answer from the AGENT_NAME_AI json and upper case.
+Column: AGENT_NAME
+
+Task: Extract the sentiment from the sentiment_TRANSCRIPT json and upper case.
+Column: CALL_SENTIMENT_CODE
+
+Task: What are the initials of the caller centre agent, combined using REGEX and upper case?
+Column: AGENT_CODE
+```
+
+#### Prompt: Rename
+Next, review the pipeline to confirm that all required columns are present and correctly named. Use the Rename component to standardize column names and prepare the data for loading into the target table.
+
+```plaintext
+Task: Review the pipeline and ensure you have all the columns.
+Component: Rename
+Component Name: Rename
+Columns:
+CALL_TRANSCRIPT_ID
+CALL_SUMMARY
+CALL_TRANSCRIPT
+CALL_DATE
+AGENT_CODE
+AGENT_NAME
+CALL_TYPE_CODE
+CALL_SENTIMENT_CODE
+CALL_PRIORITY_CODE
+CALL_STATUS_CODE
+CALL_DURATION
+CALL_CHARACTER_COUNT
+CALL_WORD_COUNT
+CALL_SENTIMENT_SCORE
+
+Task: Insert into STAGE.AUDIO_TRANSCRIPT_ANALYSIS.
+Component: Table Output
+Component Name: Insert Audio Transcript Analysis
+```
+
+#### Prompt: Filter
+
+To prevent duplicate processing, add a filter to exclude records that have already been loaded. Insert a SQL component between the Input Audio Transcript and Extract Answer steps to implement this logic.
+
+```plaintext
+Task: Add Filter to exclude existing records that have already been loaded
+Component: SQL
+Component Name: Filter Existing Records
+Guidelines: Add this between Input Audio Transcript and Extract Answer
+```
+
+## Load ETL
+
+### Learning Outcomes
+
+By completing this section, you will:
+
+- Understand how to design and implement a star schema data warehouse for call center analytics.
+- Build transformation pipelines to incrementally load dimension and fact tables using Matillion Maia.
+- Apply best practices for data cleansing, deduplication, and surrogate key management.
+- Integrate AI-enriched call transcript data with structured warehouse tables for advanced reporting.
+
+### Prerequisites
+
+Completion of previous lab steps, including extraction and staging of call center audio and transcript data.
+
+### Description
+
+In this section, you will construct a robust data warehouse to support call center analytics. You will create transformation pipelines to load dimension tables (agents, call priority, sentiment, status, and type) and a fact table for call transcripts. Each pipeline ensures incremental loading by filtering out existing records and standardizing data formats. You will also build a parent orchestration job to automate the full data warehouse refresh, enabling seamless integration of AI-driven insights with traditional reporting structures.
+
+### Step 1: Create LOAD_DIM_AGENT
+
+In this step, you will build a transformation pipeline to load unique agent records into the `DIM_AGENT` dimension table. This process extracts distinct agent codes and names from the analyzed transcripts, ensures all data is upper case, and filters out records that already exist in the destination table for incremental loading.
+
+#### Pipeline
+
+![Matillion DWH - DIM_AGENT](img/matillion-maia-call-center-lab/lab07/Matillion-DWH-07-01.png)
+
+#### Prompt
+
+```plaintext
+Task: Load unique agent records into DIM_AGENT
+Job Name: LOAD_DIM_AGENT
+Job Type: Transformation
+Folder: 03 - LOAD
+
+Source: STAGE.AUDIO_TRANSCRIPT_ANALYSIS
+Target: DWH.DIM_AGENT (existing table)
+Unique Identifier: AGENT_CODE
+Load Type: Incremental Load
+Component: Table Input, SQL, Calculator, Table Ouput
+
+Guidelines:
+Use distinct AGENCT_CODE and AGENT_NAME
+Ensure all columns are upper case
+Filter Existing Records
+```
+
+### Step 2: Create LOAD_DIM_CALL_PRIORITY
+
+This section guides you through building a pipeline to populate the `DIM_CALL_PRIORITY` dimension table. You will filter lookup records for call priority, transform columns to upper case, and insert only new records into the destination table.
+
+#### Pipeline
+![Matillion DWH - DIM_CALL_PRIORITY](img/matillion-maia-call-center-lab/lab07/Matillion-DWH-07-02.png)
+
+#### Prompt
+
+```plaintext
+Task: Create Dimension Load for DIM_CALL_PRIORITY
+
+Job Name: LOAD_DIM_CALL_PRIORITY
+Job Type: Transformation
+Folder: 03 - LOAD
+
+Source: EXTRACT.LOOKUP  
+Filter: LOOKUP_FILTER = "CALL_PRIORITY"
+Target: DWH.DIM_CALL_PRIORITY (existing table)  
+Unique Identifier: CALL_PRIORITY_CODE
+Load Type: Incremental Load
+
+Guidelines:
+Component: Calculator
+Ensure all columns are upper case
+
+Component: SQL
+Filter for records that do not exist in destination
+
+Component: Table Ouput
+Insert records into destination
+
+```  
+
+### Step 3: Create LOAD_DIM_CALL_SENTIMENT
+
+Here, you will create a pipeline to load sentiment dimension data into `DIM_CALL_SENTIMENT`. The process filters for sentiment lookups, transforms columns to upper case, and loads only new records.
+
+#### Pipeline
+![Matillion DWH - DIM_CALL_SENTIMENT](img/matillion-maia-call-center-lab/lab07/Matillion-DWH-07-03.png)
+
+#### Prompt
+
+```plaintext
+Task: Create Dimension Load for DIM_CALL_SENTIMENT 
+
+Job Name: LOAD_DIM_CALL_SENTIMENT
+Folder: 03 - LOAD
+
+Source: EXTRACT.LOOKUP  
+Filter: LOOKUP_FILTER = "CALL_SENTIMENT"
+Target: DWH.DIM_CALL_SENTIMENT (existing table)  
+Unique Identifier: CALL_SENTIMENT_CODE
+Load Type: Incremental Load
+
+Guidelines:
+Component: Calculator
+Ensure all columns are upper case
+
+Component: SQL
+Filter for records that do not exist in destination
+
+Component: Table Ouput
+Insert records into destination
+```
+
+### Step 4: Create LOAD_DIM_CALL_STATUS
+
+This step walks you through building a pipeline to load call status dimension data into `DIM_CALL_STATUS`. You will filter for call status lookups, ensure all columns are upper case, and exclude existing records for incremental loading.
+
+#### Pipeline
+![Matillion DWH - DIM_CALL_STATUS](img/matillion-maia-call-center-lab/lab07/Matillion-DWH-07-04.png)
+
+#### Prompt
+```plaintext
+Task: Create Dimension Load for DIM_CALL_STATUS
+
+Job Name: LOAD_DIM_CALL_STATUS
+Folder: 03 - LOAD
+
+Source: EXTRACT.LOOKUP  
+Filter: LOOKUP_FILTER = "CALL_STATUS"
+Target: DWH.DIM_CALL_STATUS (existing table)  
+Unique Identifier: CALL_STATUS_CODE
+Load Type: Incremental Load
+Component: Table Input, SQL, Calculator, Table Ouput
+
+Guidelines:
+Ensure all columns are upper case
+Filter Existing Records
+```
+
+### Step 5: Create LOAD_DIM_CALL_TYPE
+
+In this section, you will build a pipeline to load call type dimension data into `DIM_CALL_TYPE`. The process filters for call type lookups, transforms columns to upper case, and loads only new records.
+
+#### Pipeline
+![Matillion DWH - DIM_CALL_TYPE](img/matillion-maia-call-center-lab/lab07/Matillion-DWH-07-05.png)
+
+#### Prompt
+```plaintext
+Task: Create Dimension Load for DIM_CALL_TYPE
+
+Job Name: LOAD_DIM_CALL_TYPE
+Folder: 03 - LOAD
+
+Source: EXTRACT.LOOKUP  
+Filter: LOOKUP_FILTER = "CALL_TYPE"
+Target: DWH.DIM_CALL_TYPE (existing table)  
+Unique Identifier: CALL_TYPE_CODE
+Load Type: Incremental Load
+
+Guidelines:
+Component: Calculator
+Ensure all columns are upper case
+
+Component: SQL
+Filter for records that do not exist in destination
+
+Component: Table Ouput
+Insert records into destination
+
+```
+
+### Step 6: Create LOAD_FCT_CALL_TRANSCRIPT
+
+This step covers building a pipeline to load fact data into `FCT_CALL_TRANSCRIPT`. You will join the analyzed transcripts with all dimension tables using lookups, handle incremental loads, and validate records before insertion.
+
+#### Pipeline
+![Matillion DWH - FCT_CALL_TRANSCRIPT](img/matillion-maia-call-center-lab/lab07/Matillion-DWH-07-06.png)
+
+#### Prompt
+```plaintext
+Task: Create Load Process for FCT_CALL_TRANSCRIPT
+Job Name: LOAD_FCT_CALL_TRANSCRIPT
+Job Type: Transformation
+Folder: 03 - LOAD
+
+Source: STAGE.AUDIO_TRANSCRIPT_ANALYSIS
+Target: DWH.FCT_CALL_TRANSCRIPT (existing table)
+
+Unique Identifier: CALL_TRANSCRIPT_ID (unique identifier)
+Load Type: Incremental Load
+Validation Errors: If there are validation errors let me check manually
+
+Dimension Lookup: 
+DWH.DIM_AGENT
+DWH.DIM_CALL_PRIORITY
+DWH.DIM_CALL_SENTIMENT
+DWH.DIM_CALL_STATUS
+DWH.DIM_CALL_TYPE
+
+Guidelines: 
+Create lookups for the dimensions that include the natural keys and surrogate keys.
+Join these to the results from the audio transcript table.
+```
+
+### Step 7: Create PARENT_LOAD_DWH
+
+Finally, you will create a parent orchestration job to automate the full data warehouse load process. This job truncates all dimension and fact tables, then runs all dimension and fact load jobs in sequence.
+
+#### Pipeline
+![Matillion DWH - PARENT_LOAD_DWH](img/matillion-maia-call-center-lab/lab07/Matillion-DWH-07-07.png)
+
+#### Prompt
+```plaintext
+Task: Create a Parent Orchestration Job. 
+Job Name: PARENT_LOAD_DWH
+Job Type: Orchastration
+Folder: 03 - LOAD 
+
+Guidelines:
+Use DWH Schema
+First truncate all the dimensions (tables prefixed with DIM_) 
+Then truncate all the fact tables (tables prefixed with FCT_) 
+
+Then run all the load dimension jobs (Jobs starting with LOAD_DIM_)
+Then run all the load fact jobs (Jobs starting with LOAD_FCT_)
+
+The load jobs are in the folder: 03 - Load
+```
