@@ -26,7 +26,6 @@ For a quick intro into Maia, llick on the image below to watch a short video:
 
 [![Matillion Maia Call Center Lab Overview](img/matillion-maia-call-center-lab/lab01/Maia.png)](https://www.youtube.com/watch?v=ihIRmJirWno)
 
-
 ### Introduction
 
 In this quickstart, you’ll sign up for Matillion’s Data Productivity Cloud and prepare your environment for call center analytics with Maia. You’ll create an account, choose your region and experience, and connect a Snowflake trial account so you can start building pipelines in minutes.
@@ -232,6 +231,8 @@ Your internal stage `CALL_CENTER_DB.RAW.INT_STAGE_DOC_RAW` is now set up.
 ---
 ## Configure Matillion
 
+Duration: 0:08:00
+
 ### Learning Outcomes
 In this section, you will learn how to sign up for Matillion’s Data Productivity Cloud and connect Matillion to your Snowflake warehouse. You will also set up the necessary defaults for seamless data integration.
 
@@ -303,17 +304,108 @@ Set role, warehouse, database, and schema defaults for pipelines
 
 You’re now ready to begin building pipelines with Matillion and Maia.
 
-## Configure Project & Deploy Schema
+## Configure Project
 
+Duration: 0:12:00
 
 ### Learning Outcomes
 
+- Understand how to navigate the development environment.
+- Learn how to import project files and manage folders.
+- Validate and deploy a data warehouse schema using provided SQL scripts.
+
 ### Prerequisites
+
+- Access to the main development environment.
+- Downloaded `CALL_CENTER_ANALYTICS_DW - START.zip` file.
+- Familiarity with basic file navigation.
+- Lab images available in the `lab04` folder.
 
 ### Description
 
+In this lab, you will clean up the workspace, import the required project files, and deploy a data warehouse schema using SQL scripts. You will also validate the deployment to ensure all objects are created successfully.
+
+### Steps 1: Enter the Main Development Environment
+
+- Select **main** to enter the main development environment.
+
+![Matillion Project](img/matillion-maia-call-center-lab/lab04/Matillion-Project-04-01.png)
+
+### Steps 2: Clean Up Existing Folders
+
+- You should see the File Browser on the left.  
+  If not, select **Open Files** in the center of the screen.
+- Select the **GreenWave Pipelines** folder, click the `...` menu, and choose **Delete Folder**.
+- Select the **readme** folder, click the `...` menu, and choose **Delete**.
+- The file navigation should now disappear.
+
+![Matillion Project](img/matillion-maia-call-center-lab/lab04/Matillion-Project-04-02.png)
+
+
+### Steps 3: Import Project Files
+
+- Click the **plus (+) button** in the top right corner of the file navigator and select **Import**.
+- Choose the `CALL_CENTER_ANALYTICS_DW - START.zip` file you downloaded.
+
+
+### Steps 4: Explore Project Structure
+
+- Expand all folders:
+   - `01 - EXTRACT`
+   - `02 - STAGE`
+   - `03 - LOAD`
+   - `04 - RESOURCES \ SQL \ DDL`
+   - `04 - RESOURCES \ SQL \ EXTRACT`
+   - `04 - RESOURCES \ SQL \ STAGE`
+- The `04 - RESOURCES` folder contains SQL scripts used by `BUILD_SCHEMA_DW` to create the data warehouse schema.
+
+
+### Steps 5: Deploy the Data Warehouse Schema
+
+- Expand the `00 - DDL` folder.
+- Double-click the `BUILD_SCHEMA_DW` job to open it.
+- Review the tasks and dependencies. This job will drop any existing objects and deploy all tables for the EXTRACT, STAGE, and DWH schemas.
+
+![Matillion Project](img/matillion-maia-call-center-lab/lab04/Matillion-Project-04-03.png)
+
+### Steps 6: Validate and Run the Job
+
+- Click **Validate** in the top right corner.  
+   You should see green ticks added to each object.
+- Click **Run** in the top right corner.
+- Review the **Task History** to confirm successful deployment.
+
+### Steps 7: Review in Snowflake
+
+- Open Snowflake Browser
+- In the left-hand menu, select **Projects \ Workspaces**.
+- Click **Add New** and import the validation script.
+- In the **Data Explorer** panel, expand the `CALL_CENTER_ANALYTICS_DW` database.
+- Expand each schema to review the available objects.
+
+![Matillion Project](img/matillion-maia-call-center-lab/lab04/Matillion-Project-04-04.png)
+
+There are several queries that you can use in the validation script as we go through the lab to ensure that data is being loaded. 
+
+Set the context:
+
+```sql
+USE ROLE ACCOUNTADMIN;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+USE DATABASE CALL_CENTER_ANALYTICS_DW;
+USE SCHEMA EXTRACT;
+```
+ 
+Check to see that all the files have been uploaded:
+
+```sql
+LIST @EXTRACT.INT_STAGE_DOC;
+```
+
 
 ## Extract ETL
+
+Duration: 0:12:00
 
 ### Learning Outcomes
 
@@ -386,6 +478,8 @@ Load Type: Incremental - exclude existing records
 ```
 
 ## Stage ETL
+
+Duration: 0:22:00
 
 ### Learning Outcomes
 
@@ -632,6 +726,8 @@ Guidelines: Add this between Input Audio Transcript and Extract Answer
 
 ## Load ETL
 
+Duration: 0:25:00
+
 ### Learning Outcomes
 
 By completing this section, you will:
@@ -858,3 +954,45 @@ Then run all the load fact jobs (Jobs starting with LOAD_FCT_)
 
 The load jobs are in the folder: 03 - Load
 ```
+
+---
+
+## Conclusion
+
+Duration: 0:03:00
+
+### What You Learned
+
+- Set up a Snowflake environment (database, warehouses, schemas, stages) for AI-driven analytics.
+- Connected Matillion Maia to Snowflake and configured project defaults for smooth development.
+- Built Extract and Stage pipelines to load audio files, transcribe them with Cortex AI, and enrich transcripts with key attributes (agent, summary, sentiment, type, status, priority, score).
+- Modeled a star schema and implemented incremental loads for dimension and fact tables.
+- Orchestrated a full warehouse refresh via a parent job.
+
+### Further Exploration
+
+- Build a semantic view in Snowflake that joins facts and dimensions with friendly names and formats (dates, percentages), then grant access to BI tools for self-service analytics.
+- Create an agent for analysts: use Snowflake Cortex Analyst or your preferred agent framework to answer natural language questions over the semantic view (e.g., "show weekly complaint rate by agent").
+- Add vector search: index call summaries and transcripts with Cortex Search for better retrieval-augmented Q&A.
+- Track data quality: add validation checks and exception tables to monitor transcript completeness and join coverage.
+- Automate schedules: run incremental loads on a schedule and alert on failures via your preferred channel.
+
+Dive deeper with these docs and ideas:
+
+* [**AISQL**](https://docs.snowflake.com/en/user-guide/snowflake-cortex/aisql)
+* [**Semantic Views**](https://docs.snowflake.com/en/user-guide/views-semantic/overview)
+* [**Cortex Analyst**](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst)
+* [**Cortex Search Service**](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-search/cortex-search-overview)
+* [**Cortex Agents**](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents)
+* [**Snowflake Intelligence**](https://docs.snowflake.com/en/user-guide/snowflake-cortex/snowflake-intelligence)
+
+
+---
+
+> 🎓 If you joined this lab as part of a AI Lab training session, you’ll receive a certified badge of attendance.
+
+Thank you for spending time with us!
+
+Visit **datalab** at [**www.datalab.co.za**](https://www.datalab.co.za) to learn more about our AI training and analytics solutions.
+
+Follow us on [**LinkedIn**](https://www.linkedin.com/company/datalabsolutions) for new labs and updates.

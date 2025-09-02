@@ -201,7 +201,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON FUTURE TABLES IN SCHEMA CALL_CENTER_ANAL
 
       </google-codelab-step>
     
-      <google-codelab-step label="Configure Matillion" duration="0">
+      <google-codelab-step label="Configure Matillion" duration="8">
         <h2 is-upgraded>Learning Outcomes</h2>
 <p>In this section, you will learn how to sign up for Matillion&#39;s Data Productivity Cloud and connect Matillion to your Snowflake warehouse. You will also set up the necessary defaults for seamless data integration.</p>
 <h2 is-upgraded>Prerequisites</h2>
@@ -278,15 +278,90 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON FUTURE TABLES IN SCHEMA CALL_CENTER_ANAL
 
       </google-codelab-step>
     
-      <google-codelab-step label="Configure Project &amp; Deploy Schema" duration="0">
+      <google-codelab-step label="Configure Project" duration="12">
         <h2 is-upgraded>Learning Outcomes</h2>
+<ul>
+<li>Understand how to navigate the development environment.</li>
+<li>Learn how to import project files and manage folders.</li>
+<li>Validate and deploy a data warehouse schema using provided SQL scripts.</li>
+</ul>
 <h2 is-upgraded>Prerequisites</h2>
+<ul>
+<li>Access to the main development environment.</li>
+<li>Downloaded <code>CALL_CENTER_ANALYTICS_DW - START.zip</code> file.</li>
+<li>Familiarity with basic file navigation.</li>
+<li>Lab images available in the <code>lab04</code> folder.</li>
+</ul>
 <h2 is-upgraded>Description</h2>
+<p>In this lab, you will clean up the workspace, import the required project files, and deploy a data warehouse schema using SQL scripts. You will also validate the deployment to ensure all objects are created successfully.</p>
+<h2 is-upgraded>Steps 1: Enter the Main Development Environment</h2>
+<ul>
+<li>Select <strong>main</strong> to enter the main development environment.</li>
+</ul>
+<p class="image-container"><img alt="Matillion Project" src="img\\89f4b1c1cbcc29b1.png"></p>
+<h2 is-upgraded>Steps 2: Clean Up Existing Folders</h2>
+<ul>
+<li>You should see the File Browser on the left.<br> If not, select <strong>Open Files</strong> in the center of the screen.</li>
+<li>Select the <strong>GreenWave Pipelines</strong> folder, click the <code>...</code> menu, and choose <strong>Delete Folder</strong>.</li>
+<li>Select the <strong>readme</strong> folder, click the <code>...</code> menu, and choose <strong>Delete</strong>.</li>
+<li>The file navigation should now disappear.</li>
+</ul>
+<p class="image-container"><img alt="Matillion Project" src="img\\3e4ffbc592b59cf3.png"></p>
+<h2 is-upgraded>Steps 3: Import Project Files</h2>
+<ul>
+<li>Click the <strong>plus (+) button</strong> in the top right corner of the file navigator and select <strong>Import</strong>.</li>
+<li>Choose the <code>CALL_CENTER_ANALYTICS_DW - START.zip</code> file you downloaded.</li>
+</ul>
+<h2 is-upgraded>Steps 4: Explore Project Structure</h2>
+<ul>
+<li>Expand all folders: <ul>
+<li><code>01 - EXTRACT</code></li>
+<li><code>02 - STAGE</code></li>
+<li><code>03 - LOAD</code></li>
+<li><code>04 - RESOURCES \ SQL \ DDL</code></li>
+<li><code>04 - RESOURCES \ SQL \ EXTRACT</code></li>
+<li><code>04 - RESOURCES \ SQL \ STAGE</code></li>
+</ul>
+</li>
+<li>The <code>04 - RESOURCES</code> folder contains SQL scripts used by <code>BUILD_SCHEMA_DW</code> to create the data warehouse schema.</li>
+</ul>
+<h2 is-upgraded>Steps 5: Deploy the Data Warehouse Schema</h2>
+<ul>
+<li>Expand the <code>00 - DDL</code> folder.</li>
+<li>Double-click the <code>BUILD_SCHEMA_DW</code> job to open it.</li>
+<li>Review the tasks and dependencies. This job will drop any existing objects and deploy all tables for the EXTRACT, STAGE, and DWH schemas.</li>
+</ul>
+<p class="image-container"><img alt="Matillion Project" src="img\\39d34ad407d51166.png"></p>
+<h2 is-upgraded>Steps 6: Validate and Run the Job</h2>
+<ul>
+<li>Click <strong>Validate</strong> in the top right corner.<br> You should see green ticks added to each object.</li>
+<li>Click <strong>Run</strong> in the top right corner.</li>
+<li>Review the <strong>Task History</strong> to confirm successful deployment.</li>
+</ul>
+<h2 is-upgraded>Steps 7: Review in Snowflake</h2>
+<ul>
+<li>Open Snowflake Browser</li>
+<li>In the left-hand menu, select <strong>Projects \ Workspaces</strong>.</li>
+<li>Click <strong>Add New</strong> and import the validation script.</li>
+<li>In the <strong>Data Explorer</strong> panel, expand the <code>CALL_CENTER_ANALYTICS_DW</code> database.</li>
+<li>Expand each schema to review the available objects.</li>
+</ul>
+<p class="image-container"><img alt="Matillion Project" src="img\\174948b5d8fc37d3.png"></p>
+<p>There are several queries that you can use in the validation script as we go through the lab to ensure that data is being loaded.</p>
+<p>Set the context:</p>
+<pre><code language="language-sql" class="language-sql">USE ROLE ACCOUNTADMIN;
+USE WAREHOUSE USER_STD_XSMALL_WH;
+USE DATABASE CALL_CENTER_ANALYTICS_DW;
+USE SCHEMA EXTRACT;
+</code></pre>
+<p>Check to see that all the files have been uploaded:</p>
+<pre><code language="language-sql" class="language-sql">LIST @EXTRACT.INT_STAGE_DOC;
+</code></pre>
 
 
       </google-codelab-step>
     
-      <google-codelab-step label="Extract ETL" duration="0">
+      <google-codelab-step label="Extract ETL" duration="12">
         <h2 is-upgraded>Learning Outcomes</h2>
 <p>By completing this section, you will:</p>
 <ul>
@@ -349,7 +424,7 @@ Load Type: Incremental - exclude existing records
 
       </google-codelab-step>
     
-      <google-codelab-step label="Stage ETL" duration="0">
+      <google-codelab-step label="Stage ETL" duration="22">
         <h2 is-upgraded>Learning Outcomes</h2>
 <p>By completing this section, you will:</p>
 <ul>
@@ -551,7 +626,7 @@ Guidelines: Add this between Input Audio Transcript and Extract Answer
 
       </google-codelab-step>
     
-      <google-codelab-step label="Load ETL" duration="0">
+      <google-codelab-step label="Load ETL" duration="25">
         <h2 is-upgraded>Learning Outcomes</h2>
 <p>By completing this section, you will:</p>
 <ul>
@@ -735,6 +810,40 @@ Then run all the load fact jobs (Jobs starting with LOAD_FCT_)
 
 The load jobs are in the folder: 03 - Load
 </code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Conclusion" duration="3">
+        <h2 is-upgraded>What You Learned</h2>
+<ul>
+<li>Set up a Snowflake environment (database, warehouses, schemas, stages) for AI-driven analytics.</li>
+<li>Connected Matillion Maia to Snowflake and configured project defaults for smooth development.</li>
+<li>Built Extract and Stage pipelines to load audio files, transcribe them with Cortex AI, and enrich transcripts with key attributes (agent, summary, sentiment, type, status, priority, score).</li>
+<li>Modeled a star schema and implemented incremental loads for dimension and fact tables.</li>
+<li>Orchestrated a full warehouse refresh via a parent job.</li>
+</ul>
+<h2 is-upgraded>Further Exploration</h2>
+<ul>
+<li>Build a semantic view in Snowflake that joins facts and dimensions with friendly names and formats (dates, percentages), then grant access to BI tools for self-service analytics.</li>
+<li>Create an agent for analysts: use Snowflake Cortex Analyst or your preferred agent framework to answer natural language questions over the semantic view (e.g., &#34;show weekly complaint rate by agent&#34;).</li>
+<li>Add vector search: index call summaries and transcripts with Cortex Search for better retrieval-augmented Q&amp;A.</li>
+<li>Track data quality: add validation checks and exception tables to monitor transcript completeness and join coverage.</li>
+<li>Automate schedules: run incremental loads on a schedule and alert on failures via your preferred channel.</li>
+</ul>
+<p>Dive deeper with these docs and ideas:</p>
+<ul>
+<li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/aisql" target="_blank"><strong>AISQL</strong></a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/views-semantic/overview" target="_blank"><strong>Semantic Views</strong></a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst" target="_blank"><strong>Cortex Analyst</strong></a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-search/cortex-search-overview" target="_blank"><strong>Cortex Search Service</strong></a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents" target="_blank"><strong>Cortex Agents</strong></a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/snowflake-intelligence" target="_blank"><strong>Snowflake Intelligence</strong></a></li>
+</ul>
+<p>🎓 If you joined this lab as part of a AI Lab training session, you&#39;ll receive a certified badge of attendance.</p>
+<p>Thank you for spending time with us!</p>
+<p>Visit <strong>datalab</strong> at <a href="https://www.datalab.co.za" target="_blank"><strong>www.datalab.co.za</strong></a> to learn more about our AI training and analytics solutions.</p>
+<p>Follow us on <a href="https://www.linkedin.com/company/datalabsolutions" target="_blank"><strong>LinkedIn</strong></a> for new labs and updates.</p>
 
 
       </google-codelab-step>
