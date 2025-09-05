@@ -9,7 +9,7 @@ status: Published
 license: Apache-2.0
 tags: ["matillion", "maia", "call-center", "etl", "data-integration"]
 source: internal
-analytics account: UA-XXXXXXXXX-X
+analytics account: G-02FDYMQBCN
 feedback link: https://github.com/datalab-solutions/matillion-codelabs/issues
 level: intermediate
 products: ["Matillion Maia"]

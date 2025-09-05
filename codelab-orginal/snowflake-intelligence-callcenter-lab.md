@@ -9,7 +9,7 @@ status: Published
 license: Apache-2.0
 tags: ["snowflake", "cortex-ai", "cortex-analyst", "cortex-search", "agentic-ai", "snowflake-intelligence"]
 source: internal
-analytics account: UA-XXXXXXXXX-X
+analytics account: G-02FDYMQBCN
 feedback link: https://github.com/datalab-solutions/snowflake-codelabs/issues
 level: advanced
 products: ["Snowflake Cortex Functions", "Cortex Analyst", "Cortex Search", "Agentic AI", "Snowflake Intelligence"]
