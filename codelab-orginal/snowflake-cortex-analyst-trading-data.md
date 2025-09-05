@@ -9,7 +9,7 @@ status: Published
 license: Apache-2.0
 tags: ["snowflake", "cortex-analyst", "natural-language-processing", "finance-data"]
 source: internal
-analytics account: UA-XXXXXXXXX-X
+analytics account: G-02FDYMQBCN
 feedback link: https://github.com/datalab-solutions/snowflake-codelabs/issues
 level: intermediate
 products: ["Snowflake Cortex Analyst"]

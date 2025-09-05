@@ -9,7 +9,7 @@ status: Published
 license: Apache-2.0
 tags: ["matillion", "maia", "call-center", "etl", "data-integration"]
 source: internal
-analytics account: UA-XXXXXXXXX-X
+analytics account: G-02FDYMQBCN
 feedback link: https://github.com/datalab-solutions/matillion-codelabs/issues
 level: intermediate
 products: ["Matillion Maia"]
@@ -37,11 +37,6 @@ This hands-on lab demonstrates how to use **Matillion Maia** to transform call c
 * Measure overall sentiment.
 * Classify call types by intent (complaint, query, sales, cancellation, etc.).
 * Extract key answers like agent name.
-
-In addition, you will:
-
-* Deploy a **Cortex Search Service** to perform contextual, vector-based retrieval across transcripts.
-* Use **Cortex Analyst** to enable guided, natural language Q&A on call data.
 
 By the end of this lab, you will have transformed **raw call recordings** into **actionable business intelligence**, equipping analysts and support managers with the ability to identify trends, improve service quality, and uncover insights faster.
 
@@ -75,7 +70,7 @@ You will learn how to build an end to end ETL pipeline that populates a traditio
 
 ### Download Source Files
 
-Download all source SQL files for this lab [here](https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2Fdatalabsolutions%2FAI-Labs%2Ftree%2Fmain%2Fsnowflake-snowflake-intelligence-callcenter-lab%2Fscripts)
+Download all source SQL files for this lab [here](https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2Fdatalabsolutions%2FAI-Labs%2Ftree%2Fmain%2Fmatillion-maia-call-center-lab)
 
 ### Prerequisites
 
@@ -83,8 +78,8 @@ Duration: 0:01:00
 
 * A [Snowflake account](https://trial.snowflake.com/?owner=SPN-PID-452710) in a region where **Snowflake Cortex LLM functions** are supported
 * Basic familiarity with SQL and the Snowflake UI
-* Access all the scripts for this Lab [on GitHub](https://github.com/datalabsolutions/AI-Labs/tree/main/snowflake-snowflake-intelligence-callcenter-lab)
-* [Download all the audio files](https://github.com/datalabsolutions/AI-Labs/blob/a27daf7c5d6f72949cc73c820351348d755bbd9c/snowflake-snowflake-intelligence-callcenter-lab/assets/audio_files/audio-files.zip?raw=1)
+* Access all the scripts for this Lab [on GitHub](https://github.com/datalabsolutions/AI-Labs/tree/main/matillion-maia-call-center-lab)
+* [Download all the audio files](https://github.com/datalabsolutions/AI-Labs/matillion-maia-call-center-lab/assets/audio-files.zip?raw=1)
 
 > 💡 **Tip:** Explore this interactive walkthrough to learn how to sign up for a [Snowflake account](https://app.supademo.com/demo/cmbw9nmxe0606xw0izxyku479).
 
@@ -98,7 +93,8 @@ Duration: 0:04:00
 Create the core Snowflake resources needed to run the AI Lab. This includes a database, warehouse, schemas, and a stage for uploading audio files.
 
 ### Download Script
-Download the source code for this step [here](https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-snowflake-intelligence-callcenter-lab/scripts/01-AI-LAB-CONFIGURATION.sql).
+Download the source code for this step [here](https://github.com/datalabsolutions/AI-Labs/blob/main/matillion-maia-call-center-lab/scripts/01-AI-LAB-CONFIGURATION.sql).
+
 
 ### Description
 This setup script prepares your Snowflake environment to ingest and process unstructured call center data.
@@ -198,6 +194,7 @@ GRANT USAGE ON DATABASE CALL_CENTER_ANALYTICS_DW TO ROLE APP_MATILLION_ROLE;
 GRANT USAGE ON ALL SCHEMAS IN DATABASE CALL_CENTER_ANALYTICS_DW TO ROLE APP_MATILLION_ROLE;
 
 -- Warehouse usage
+GRANT OPERATE ON WAREHOUSE APP_STD_XSMALL_WH TO ROLE APP_MATILLION_ROLE;
 GRANT USAGE ON WAREHOUSE APP_STD_XSMALL_WH TO ROLE APP_MATILLION_ROLE;
 
 -- Stage usage

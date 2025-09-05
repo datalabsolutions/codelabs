@@ -21,7 +21,7 @@
 </head>
 <body>
   <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
-  <google-codelab codelab-gaid="UA-XXXXXXXXX-X"
+  <google-codelab codelab-gaid="G-02FDYMQBCN"
                   id="matillion-maia-call-center-lab"
                   title="Matillion Maia: Call Center AI Agents"
                   environment="web"
@@ -40,11 +40,6 @@
 <li>Measure overall sentiment.</li>
 <li>Classify call types by intent (complaint, query, sales, cancellation, etc.).</li>
 <li>Extract key answers like agent name.</li>
-</ul>
-<p>In addition, you will:</p>
-<ul>
-<li>Deploy a <strong>Cortex Search Service</strong> to perform contextual, vector-based retrieval across transcripts.</li>
-<li>Use <strong>Cortex Analyst</strong> to enable guided, natural language Q&amp;A on call data.</li>
 </ul>
 <p>By the end of this lab, you will have transformed <strong>raw call recordings</strong> into <strong>actionable business intelligence</strong>, equipping analysts and support managers with the ability to identify trends, improve service quality, and uncover insights faster.</p>
 <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
@@ -68,13 +63,13 @@
 <p>You will learn how to build an end to end ETL pipeline that populates a traditional data warehouse design.</p>
 <p class="image-container"><img alt="Call Center Analytics Data Warehouse ERD" src="img\\1075953eb3ef52b5.svg"></p>
 <h2 is-upgraded>Download Source Files</h2>
-<p>Download all source SQL files for this lab <a href="https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2Fdatalabsolutions%2FAI-Labs%2Ftree%2Fmain%2Fsnowflake-snowflake-intelligence-callcenter-lab%2Fscripts" target="_blank">here</a></p>
+<p>Download all source SQL files for this lab <a href="https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2Fdatalabsolutions%2FAI-Labs%2Ftree%2Fmain%2Fmatillion-maia-call-center-lab" target="_blank">here</a></p>
 <h2 is-upgraded>Prerequisites</h2>
 <ul>
 <li>A <a href="https://trial.snowflake.com/?owner=SPN-PID-452710" target="_blank">Snowflake account</a> in a region where <strong>Snowflake Cortex LLM functions</strong> are supported</li>
 <li>Basic familiarity with SQL and the Snowflake UI</li>
-<li>Access all the scripts for this Lab <a href="https://github.com/datalabsolutions/AI-Labs/tree/main/snowflake-snowflake-intelligence-callcenter-lab" target="_blank">on GitHub</a></li>
-<li><a href="https://github.com/datalabsolutions/AI-Labs/blob/a27daf7c5d6f72949cc73c820351348d755bbd9c/snowflake-snowflake-intelligence-callcenter-lab/assets/audio_files/audio-files.zip?raw=1" target="_blank">Download all the audio files</a></li>
+<li>Access all the scripts for this Lab <a href="https://github.com/datalabsolutions/AI-Labs/tree/main/matillion-maia-call-center-lab" target="_blank">on GitHub</a></li>
+<li><a href="https://github.com/datalabsolutions/AI-Labs/matillion-maia-call-center-lab/assets/audio-files.zip?raw=1" target="_blank">Download all the audio files</a></li>
 </ul>
 <p>💡 <strong>Tip:</strong> Explore this interactive walkthrough to learn how to sign up for a <a href="https://app.supademo.com/demo/cmbw9nmxe0606xw0izxyku479" target="_blank">Snowflake account</a>.</p>
 <p>💡 <strong>Tip:</strong> Use the <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#availability" target="_blank">LLM Function Availability</a> page to check which cloud regions are supported.</p>
@@ -86,7 +81,7 @@
         <h2 is-upgraded>Learning Outcome</h2>
 <p>Create the core Snowflake resources needed to run the AI Lab. This includes a database, warehouse, schemas, and a stage for uploading audio files.</p>
 <h2 is-upgraded>Download Script</h2>
-<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/snowflake-snowflake-intelligence-callcenter-lab/scripts/01-AI-LAB-CONFIGURATION.sql" target="_blank">here</a>.</p>
+<p>Download the source code for this step <a href="https://github.com/datalabsolutions/AI-Labs/blob/main/matillion-maia-call-center-lab/scripts/01-AI-LAB-CONFIGURATION.sql" target="_blank">here</a>.</p>
 <h2 is-upgraded>Description</h2>
 <p>This setup script prepares your Snowflake environment to ingest and process unstructured call center data.</p>
 <ul>
@@ -170,6 +165,7 @@ GRANT USAGE ON DATABASE CALL_CENTER_ANALYTICS_DW TO ROLE APP_MATILLION_ROLE;
 GRANT USAGE ON ALL SCHEMAS IN DATABASE CALL_CENTER_ANALYTICS_DW TO ROLE APP_MATILLION_ROLE;
 
 -- Warehouse usage
+GRANT OPERATE ON WAREHOUSE APP_STD_XSMALL_WH TO ROLE APP_MATILLION_ROLE;
 GRANT USAGE ON WAREHOUSE APP_STD_XSMALL_WH TO ROLE APP_MATILLION_ROLE;
 
 -- Stage usage
