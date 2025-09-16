@@ -69,7 +69,7 @@
 <li>A <a href="https://trial.snowflake.com/?owner=SPN-PID-452710" target="_blank">Snowflake account</a> in a region where <strong>Snowflake Cortex LLM functions</strong> are supported</li>
 <li>Basic familiarity with SQL and the Snowflake UI</li>
 <li>Access all the scripts for this Lab <a href="https://github.com/datalabsolutions/AI-Labs/tree/main/matillion-maia-call-center-lab" target="_blank">on GitHub</a></li>
-<li><a href="https://github.com/datalabsolutions/AI-Labs/matillion-maia-call-center-lab/assets/audio-files.zip?raw=1" target="_blank">Download all the audio files</a></li>
+<li><a href="https://github.com/datalabsolutions/AI-Labs/blob/64711000eb4ef2bcb8fd1bd28e52e4200d779a9f/matillion-maia-call-center-lab/assets/audio-files.zip?raw=1" target="_blank">Download all the audio files</a></li>
 </ul>
 <p>💡 <strong>Tip:</strong> Explore this interactive walkthrough to learn how to sign up for a <a href="https://app.supademo.com/demo/cmbw9nmxe0606xw0izxyku479" target="_blank">Snowflake account</a>.</p>
 <p>💡 <strong>Tip:</strong> Use the <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#availability" target="_blank">LLM Function Availability</a> page to check which cloud regions are supported.</p>
@@ -134,7 +134,7 @@ CREATE SCHEMA IF NOT EXISTS CALL_CENTER_ANALYTICS_DW.DWH;
 <p>Using <code>IF NOT EXISTS</code> prevents duplication errors and makes the script safe to rerun.</p>
 <h2 is-upgraded>Step 4: Create an Internal Stage for Uploads</h2>
 <p>The internal stage is where you will upload audio files. Also, create a file format for JSON to enable parsing of JSON documents.</p>
-<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE STAGE CALL_CENTER_ANALYTICS_DW.CALL_CENTER_DB.RAW.INT_STAGE_DOC
+<pre><code language="language-sql" class="language-sql">CREATE OR REPLACE STAGE CALL_CENTER_ANALYTICS_DW.CALL_CENTER_ANALYTICS_DW.RAW.INT_STAGE_DOC
     DIRECTORY = ( ENABLE = true )
     ENCRYPTION = ( TYPE = &#39;SNOWFLAKE_SSE&#39; );
 
@@ -169,8 +169,8 @@ GRANT OPERATE ON WAREHOUSE APP_STD_XSMALL_WH TO ROLE APP_MATILLION_ROLE;
 GRANT USAGE ON WAREHOUSE APP_STD_XSMALL_WH TO ROLE APP_MATILLION_ROLE;
 
 -- Stage usage
-GRANT READ ON STAGE CALL_CENTER_DB.RAW.INT_STAGE_DOC_RAW TO ROLE APP_MATILLION_ROLE;
-GRANT WRITE ON STAGE CALL_CENTER_DB.RAW.INT_STAGE_DOC_RAW TO ROLE APP_MATILLION_ROLE;
+GRANT READ ON STAGE CALL_CENTER_ANALYTICS_DW.RAW.INT_STAGE_DOC_RAW TO ROLE APP_MATILLION_ROLE;
+GRANT WRITE ON STAGE CALL_CENTER_ANALYTICS_DW.RAW.INT_STAGE_DOC_RAW TO ROLE APP_MATILLION_ROLE;
 
 -- Table privileges (all current + future tables)
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA CALL_CENTER_ANALYTICS_DW.RAW TO ROLE APP_MATILLION_ROLE;
@@ -184,7 +184,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON FUTURE TABLES IN SCHEMA CALL_CENTER_ANAL
 
 </code></pre>
 <h2 is-upgraded>Step 6: Upload Files to the Stage</h2>
-<p>Your internal stage <code>CALL_CENTER_DB.RAW.INT_STAGE_DOC_RAW</code> is now set up.</p>
+<p>Your internal stage <code>CALL_CENTER_ANALYTICS_DW.RAW.INT_STAGE_DOC_RAW</code> is now set up.</p>
 <ol type="1">
 <li>In Snowsight, go to <strong>Databases</strong>.</li>
 <li>Select <code>CALL_CENTER_ANALYTICS_DW</code> → <code>EXTRACT</code> → <strong>Stages</strong>.</li>
@@ -192,7 +192,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON FUTURE TABLES IN SCHEMA CALL_CENTER_ANAL
 <li>Click <strong>+ Files</strong> and upload one or more audio recordings (.mp3), there are 50 files in total.</li>
 <li>Click <strong>+ Files</strong> and upload the LOOKUP.json file (.json).</li>
 </ol>
-<p>🔒 <strong>Note:</strong> The zip file that you <a href="https://github.com/datalabsolutions/AI-Labs/blob/a27daf7c5d6f72949cc73c820351348d755bbd9c/snowflake-snowflake-intelligence-callcenter-lab/assets/audio_files/audio-files.zip?raw=1" target="_blank">downloaded</a> will need to be unzipped.  You need to upload the individual files.</p>
+<p>🔒 <strong>Note:</strong> The zip file that you <a href="https://github.com/datalabsolutions/AI-Labs/blob/64711000eb4ef2bcb8fd1bd28e52e4200d779a9f/matillion-maia-call-center-lab/assets/audio-files.zip?raw=1" target="_blank">downloaded</a> will need to be unzipped.  You need to upload the individual files.</p>
 
 
       </google-codelab-step>

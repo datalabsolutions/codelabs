@@ -79,7 +79,7 @@ Duration: 0:01:00
 * A [Snowflake account](https://trial.snowflake.com/?owner=SPN-PID-452710) in a region where **Snowflake Cortex LLM functions** are supported
 * Basic familiarity with SQL and the Snowflake UI
 * Access all the scripts for this Lab [on GitHub](https://github.com/datalabsolutions/AI-Labs/tree/main/matillion-maia-call-center-lab)
-* [Download all the audio files](https://github.com/datalabsolutions/AI-Labs/matillion-maia-call-center-lab/assets/audio-files.zip?raw=1)
+* [Download all the audio files](https://github.com/datalabsolutions/AI-Labs/blob/64711000eb4ef2bcb8fd1bd28e52e4200d779a9f/matillion-maia-call-center-lab/assets/audio-files.zip?raw=1)
 
 > 💡 **Tip:** Explore this interactive walkthrough to learn how to sign up for a [Snowflake account](https://app.supademo.com/demo/cmbw9nmxe0606xw0izxyku479).
 
@@ -161,7 +161,7 @@ Using `IF NOT EXISTS` prevents duplication errors and makes the script safe to r
 The internal stage is where you will upload audio files. Also, create a file format for JSON to enable parsing of JSON documents.
 
 ```sql
-CREATE OR REPLACE STAGE CALL_CENTER_ANALYTICS_DW.CALL_CENTER_DB.RAW.INT_STAGE_DOC
+CREATE OR REPLACE STAGE CALL_CENTER_ANALYTICS_DW.CALL_CENTER_ANALYTICS_DW.RAW.INT_STAGE_DOC
     DIRECTORY = ( ENABLE = true )
     ENCRYPTION = ( TYPE = 'SNOWFLAKE_SSE' );
 
@@ -198,8 +198,8 @@ GRANT OPERATE ON WAREHOUSE APP_STD_XSMALL_WH TO ROLE APP_MATILLION_ROLE;
 GRANT USAGE ON WAREHOUSE APP_STD_XSMALL_WH TO ROLE APP_MATILLION_ROLE;
 
 -- Stage usage
-GRANT READ ON STAGE CALL_CENTER_DB.RAW.INT_STAGE_DOC_RAW TO ROLE APP_MATILLION_ROLE;
-GRANT WRITE ON STAGE CALL_CENTER_DB.RAW.INT_STAGE_DOC_RAW TO ROLE APP_MATILLION_ROLE;
+GRANT READ ON STAGE CALL_CENTER_ANALYTICS_DW.RAW.INT_STAGE_DOC_RAW TO ROLE APP_MATILLION_ROLE;
+GRANT WRITE ON STAGE CALL_CENTER_ANALYTICS_DW.RAW.INT_STAGE_DOC_RAW TO ROLE APP_MATILLION_ROLE;
 
 -- Table privileges (all current + future tables)
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA CALL_CENTER_ANALYTICS_DW.RAW TO ROLE APP_MATILLION_ROLE;
@@ -215,7 +215,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON FUTURE TABLES IN SCHEMA CALL_CENTER_ANAL
 
 ### Step 6: Upload Files to the Stage
 
-Your internal stage `CALL_CENTER_DB.RAW.INT_STAGE_DOC_RAW` is now set up.
+Your internal stage `CALL_CENTER_ANALYTICS_DW.RAW.INT_STAGE_DOC_RAW` is now set up.
 
 1. In Snowsight, go to **Databases**.
 2. Select `CALL_CENTER_ANALYTICS_DW` → `EXTRACT` → **Stages**.
@@ -223,7 +223,7 @@ Your internal stage `CALL_CENTER_DB.RAW.INT_STAGE_DOC_RAW` is now set up.
 4. Click **+ Files** and upload one or more audio recordings (.mp3), there are 50 files in total.
 4. Click **+ Files** and upload the LOOKUP.json file (.json).
 
-> 🔒 **Note:** The zip file that you [downloaded](https://github.com/datalabsolutions/AI-Labs/blob/a27daf7c5d6f72949cc73c820351348d755bbd9c/snowflake-snowflake-intelligence-callcenter-lab/assets/audio_files/audio-files.zip?raw=1) will need to be unzipped.  You need to upload the individual files.
+> 🔒 **Note:** The zip file that you [downloaded](https://github.com/datalabsolutions/AI-Labs/blob/64711000eb4ef2bcb8fd1bd28e52e4200d779a9f/matillion-maia-call-center-lab/assets/audio-files.zip?raw=1) will need to be unzipped.  You need to upload the individual files.
 
 ---
 ## Configure Matillion
